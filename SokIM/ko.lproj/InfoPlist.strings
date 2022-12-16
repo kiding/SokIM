@@ -1,0 +1,8 @@
+/* Localized versions of Info.plist keys */
+
+NSHumanReadableCopyright = "© Dongsung Kim, 2022";
+
+com.kiding.inputmethod.sok.mode = "속";
+
+CFBundleName = "속 입력기";
+CFBundleDisplayName = "속 입력기";
