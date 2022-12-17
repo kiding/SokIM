@@ -1,6 +1,21 @@
 import Foundation
 
+enum RotateShortcutType: String {
+    case capsLock = "CapsLock"
+    case shiftSpace = "ShiftSpace"
+    case commandSpace = "CommandSpace"
+}
+
 struct Preferences {
+    /** 한/A 전환키 */
+
+    static var rotateShortcut: RotateShortcutType {
+        get { RotateShortcutType(rawValue: UserDefaults.standard.string(forKey: "RotateShortcut") ?? "") ?? .capsLock }
+        set(new) { UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut") }
+    }
+
+    /** 기타 */
+
     static var graveOverWon: Bool {
         get { UserDefaults.standard.bool(forKey: "GraveOverWon") }
         set(new) { UserDefaults.standard.set(new, forKey: "GraveOverWon") }

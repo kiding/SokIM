@@ -1,50 +1,90 @@
 import AppKit
 
 class StatusBar {
-    private let statusItem: NSStatusItem
+    private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     private var engine: Engine.Type = TwoSetEngine.self
     private let engines: [Engine.Type] = [QwertyEngine.self, TwoSetEngine.self]
 
-    private let menu: NSMenu
-    private let appNameItem: NSMenuItem
-    private let messageItem: NSMenuItem
-    private let separatorItem: NSMenuItem
+    /** 메뉴 */
+
+    private let menu = NSMenu()
+
+    /** 시스템 메시지 */
+
+    private let messageItem = NSMenuItem()
+
+    /** 한/A 전환키 */
+
+    private let capsLockItem = NSMenuItem()
+    private let shiftSpaceItem = NSMenuItem()
+    private let commandSpaceItem = NSMenuItem()
 
     init() {
         debug()
 
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusItem.button?.title = "⌨️"
+        /** 한/A 상태 */
 
-        menu = NSMenu.init(title: "SokIM")
+        statusItem.button?.title = "⌨️"
         statusItem.menu = menu
 
-        appNameItem = NSMenuItem.init()
-        appNameItem.title = "속 입력기"
-        menu.addItem(appNameItem)
+        /** 입력기 정보 */
 
-        messageItem = NSMenuItem.init()
+        let infoItem = NSMenuItem()
+        infoItem.title = "속 입력기"
+        menu.addItem(infoItem)
+
+        /** 시스템 메시지 */
+
         messageItem.title = "초기화 중..."
         menu.addItem(messageItem)
 
-        separatorItem = NSMenuItem.separator()
-        menu.addItem(separatorItem)
+        menu.addItem(NSMenuItem.separator())
 
-        let graveItem = NSMenuItem.init()
+        /** 한/A 전환키 */
+
+        let rotateShortcutItem = NSMenuItem()
+        rotateShortcutItem.title = "한/A 전환"
+        menu.addItem(rotateShortcutItem)
+
+        capsLockItem.title = "한/A (⇪)"
+        capsLockItem.state = Preferences.rotateShortcut == .capsLock ? .on : .off
+        capsLockItem.target = self
+        capsLockItem.action = #selector(toggleCapsLock)
+        menu.addItem(capsLockItem)
+
+        shiftSpaceItem.title = "⇧스페이스"
+        shiftSpaceItem.state = Preferences.rotateShortcut == .shiftSpace ? .on : .off
+        shiftSpaceItem.target = self
+        shiftSpaceItem.action = #selector(toggleShiftSpace)
+        menu.addItem(shiftSpaceItem)
+
+        commandSpaceItem.title = "⌘스페이스"
+        commandSpaceItem.state = Preferences.rotateShortcut == .commandSpace ? .on : .off
+        commandSpaceItem.target = self
+        commandSpaceItem.action = #selector(toggleCommandSpace)
+        menu.addItem(commandSpaceItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        /** 기타 설정 */
+
+        let graveItem = NSMenuItem()
         graveItem.title = "₩ 대신 ` 입력"
         graveItem.state = Preferences.graveOverWon ? .on : .off
         graveItem.target = self
         graveItem.action = #selector(toggleGraveOverWon)
         menu.addItem(graveItem)
 
-        let debugItem = NSMenuItem.init()
+        let debugItem = NSMenuItem()
         debugItem.title = "디버그 모드"
         debugItem.state = Preferences.debug ? .on : .off
         debugItem.target = self
         debugItem.action = #selector(toggleDebug)
         menu.addItem(debugItem)
     }
+
+    /** 한/A 상태 */
 
     func rotateEngine() {
         debug()
@@ -69,6 +109,8 @@ class StatusBar {
         statusItem.button?.title = msg
     }
 
+    /** 시스템 메시지 */
+
     func setMessage(_ msg: String) {
         debug()
 
@@ -79,8 +121,38 @@ class StatusBar {
         debug()
 
         menu.removeItem(messageItem)
-        menu.removeItem(separatorItem)
     }
+
+    /** 한/A 전환키 */
+
+    @objc func toggleCapsLock(sender: NSMenuItem) {
+        if sender.state == .off {
+            Preferences.rotateShortcut = .capsLock
+            capsLockItem.state = .on
+            shiftSpaceItem.state = .off
+            commandSpaceItem.state = .off
+        }
+    }
+
+    @objc func toggleShiftSpace(sender: NSMenuItem) {
+        if sender.state == .off {
+            Preferences.rotateShortcut = .shiftSpace
+            capsLockItem.state = .off
+            shiftSpaceItem.state = .on
+            commandSpaceItem.state = .off
+        }
+    }
+
+    @objc func toggleCommandSpace(sender: NSMenuItem) {
+        if sender.state == .off {
+            Preferences.rotateShortcut = .commandSpace
+            capsLockItem.state = .off
+            shiftSpaceItem.state = .off
+            commandSpaceItem.state = .on
+        }
+    }
+
+    /** 기타 설정 */
 
     @objc func toggleDebug(sender: NSMenuItem) {
         Preferences.debug = sender.state == .on ? false : true

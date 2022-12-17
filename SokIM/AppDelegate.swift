@@ -4,11 +4,12 @@
 // TODO: Safari: 구글 문서, iCloud Pages 한/글/을/입/력 문제... string 가져오기? Safari에서 downgrade 하는 방법 찾기
 // TODO: D->M downgrade: NotificationCenter to Context & memory
 
-// TODO: 연타
 // TODO: ElementRect -> ElementTree (Rect는 바뀔 수 있음)
 // TODO: AXManualAccessibility
 // TODO: AXEnhancedUserInterface
 // TODO: 인스톨러: 재시동, Sparkle
+
+// TODO: Shift+Space 한영전환 시 iTerm에서 Space 입력됨
 
 import Cocoa
 import InputMethodKit

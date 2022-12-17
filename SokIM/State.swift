@@ -1,3 +1,5 @@
+// swiftlint:disable function_body_length cyclomatic_complexity
+
 import Cocoa
 import Foundation
 
@@ -28,8 +30,8 @@ struct State: CustomStringConvertible {
             case .leftControl, .leftCommand, .rightControl, .rightCommand:
                 commit()
 
-                // Caps Lock: keyDown인 경우 한영 전환
-            case .capsLock where type == .keyDown:
+                // Caps Lock: keyDown인 경우 한/A 전환
+            case .capsLock where type == .keyDown && Preferences.rotateShortcut == .capsLock:
                 commit()
                 rotate()
 
@@ -42,18 +44,34 @@ struct State: CustomStringConvertible {
             // 눌린 키를 down에 기록
             down = input
 
-            // Control, Command: keyDown 상태인 경우 키 무시
+            // Control, Command, Alt, Shift: keyDown 상태인 경우 키 무시
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
             let isCommandDown = modifier[.leftCommand] == .keyDown || modifier[.rightCommand] == .keyDown
+            let isAltDown = modifier[.leftAlt] == .keyDown || modifier[.rightAlt] == .keyDown
+            let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
+
+            // Shift/Command + Space: keyDown인 경우 한/A 전환
+            if (
+                isShiftDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .shiftSpace
+            ) || (
+                isCommandDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .commandSpace
+            ) {
+                commit()
+                rotate()
+
+                return
+            }
+
+            // Control, Command: keyDown 상태인 경우 키 무시
             if isControlDown || isCommandDown {
                 debug("Input ignored: \(input) \(modifier)")
 
                 return
             }
-
-            // Alt, Shift: keyDown 상태
-            let isAltDown = modifier[.leftAlt] == .keyDown || modifier[.rightAlt] == .keyDown
-            let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
 
             // input 입력 시점부터 지금까지 걸린 시간
             let elapsed = ms(since: input.timestamp)

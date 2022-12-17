@@ -19,6 +19,11 @@ enum ModifierUsage: UInt32 {
     case capsLock = 0x39
 }
 
+/** 특수한 키 -> USB HID Usage 매핑 */
+enum SpecialUsage: UInt32 {
+    case space = 0x2C
+}
+
 /**
  Virtual keycodes -> USB HID Usage 매핑
  @see <HIToolbox/Events.h>

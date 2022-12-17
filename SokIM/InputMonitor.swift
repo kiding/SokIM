@@ -168,8 +168,9 @@ class InputMonitor {
             usage = getMappedModifierUsage(usage, device)
         }
 
-        // 별도 처리: Caps Lock Down: 메뉴 막대 갱신
-        if (type, usage) == (.keyDown, ModifierUsage.capsLock.rawValue) {
+        // 별도 처리: Caps Lock Down: 한/A 상태 갱신
+        if (type, usage) == (.keyDown, ModifierUsage.capsLock.rawValue)
+            && Preferences.rotateShortcut == .capsLock {
             (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
         }
 
