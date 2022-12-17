@@ -40,7 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             warning("\(error)")
             statusBar.setStatus("⚠️")
             statusBar.setMessage("⚠️ \(error)")
-            self.perform(#selector(startMonitor), with: nil, afterDelay: 3)
+            self.perform(#selector(startMonitor), with: nil, afterDelay: 1)
         }
     }
 
