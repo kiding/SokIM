@@ -35,7 +35,6 @@
 		DF2651CD28328B23001A9317 /* DirectStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectStrategy.swift; sourceTree = "<group>"; };
 		DF2B53C12802B61D00A64F95 /* TwoSetEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoSetEngine.swift; sourceTree = "<group>"; };
 		DF67EC1B290FDB9E00BED120 /* ko */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ko; path = ko.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		DF6B0B5026F65D3700333D22 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DF7A3048289F96970003BFA6 /* InputMonitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputMonitor.swift; sourceTree = "<group>"; };
 		DF7A949D27F44C05005E3783 /* Controller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
 		DF7A949F27F470E7005E3783 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
@@ -104,7 +103,6 @@
 				DF9286D426F5CFB000002080 /* Info.plist */,
 				DFEB9DD627F49EFB007D978A /* InfoPlist.strings */,
 				DF9286D526F5CFB000002080 /* SokIM.entitlements */,
-				DF6B0B5026F65D3700333D22 /* README.md */,
 				DFFFD8AF280FE99B007B6470 /* icon.tiff */,
 			);
 			path = SokIM;
