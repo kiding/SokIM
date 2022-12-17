@@ -112,7 +112,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debug("중간 event context: \(interimEventContext)")
         if eventContext != interimEventContext {
             debug("event context 변경!")
-            state.clear(includeComposing: true)
+            state.clear(composing: true)
             eventContext = interimEventContext
         }
 
@@ -126,7 +126,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         //            debug("중간 input context: \(interimInputContext)")
         //            if inputContext != interimInputContext {
         //                debug("input context 변경!")
-        //                state.clear(includeComposing: true)
+        //                state.clear(composing: true)
         //                inputContext = interimInputContext
         //            }
 
@@ -142,40 +142,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return false
         }
 
-        // 현재 state 복제 후 inputs를 입력
-        var clonedState = State(from: state, next: inputs)
-        debug("현재 clonedState: \(clonedState)")
+        // 기존 state 보존
+        let oldState = state
 
-        // 반복 입력인 경우 down 한번 더 입력
-        if event.isARepeat, let down = clonedState.down {
-            clonedState.next(down)
-        }
+        // inputs 입력, 반복 입력인 경우 down 한번 더 입력
+        inputs.forEach { state.next($0) }
+        if event.isARepeat, let down = state.down { state.next(down) }
 
-        // modifier, down, engine 변경은 언제나 바로 반영
-        state.modifier = clonedState.modifier
-        state.down = clonedState.down
-        state.engine = clonedState.engine
+        // 최종 처리 여부, false면 OS가 대신 입력
+        var handled = true
 
         // 별도 처리: modifier 없는 백스페이스 키
         if event.keyCode == kVK_Delete && event.modifierFlags.subtracting(.capsLock).isEmpty {
-            return eventContext.strategy.backspace(with: &state, to: sender)
-        }
+            // 이전에 조합 중이던 글자에서 백스페이스
+            state.deleteBackwardComposing()
 
-        // 입력할 tuples
-        var tuples = clonedState.tuples
-        var handled = true
+            // sender에 입력
+            handled = eventContext.strategy.backspace(from: state, to: sender, with: oldState)
 
-        // tuples의 마지막 글자, 완성될 문자열의 마지막 글자, event로 처리하려는 마지막 글자가 모두 동일한 경우
-        if let lastTupleChar = tuples.last?.char,
-           let lastComposedChar = clonedState.composed.last,
-           let lastEventChar = event.characters?.last,
-           lastTupleChar == lastComposedChar,
-           lastComposedChar == lastEventChar {
-            // strategy가 입력하지 않도록 삭제
-            tuples.removeLast()
+            // 완성/입력 초기화
+            state.clear(composing: false)
 
-            // OS가 대신 입력하도록 반환
-            handled = false
+            // OS가 대신 처리할 것이 있는 경우
+            if handled == false {
+                // 완성/조합/입력 초기화
+                state.clear(composing: true)
+            }
+
+            return handled
         }
 
         // event가 engine이 처리할 수 없는 글자인 경우
@@ -184,13 +178,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             handled = false
         }
 
-        // 쌓여있는 tuples 입력
-        eventContext.strategy.tuples(tuples, with: &state, to: sender)
+        // state에 완성/조합된 문자열을 sender에 입력
+        eventContext.strategy.insert(from: state, to: sender, with: oldState)
+
+        // 완성/입력 초기화
+        state.clear(composing: false)
 
         // OS가 대신 처리할 것이 있는 경우
         if handled == false {
             // 조합 종료
-            eventContext.strategy.flush(with: &state, to: sender)
+            eventContext.strategy.flush(from: state, to: sender)
+
+            // 완성/조합/입력 초기화
+            state.clear(composing: true)
         }
 
         return handled
@@ -229,7 +229,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 inputs = inputs.indices
                     .filter { $0 > idx || ModifierUsage(rawValue: inputs[$0].usage) != nil }
                     .map { inputs[$0] }
-                state.clear(includeComposing: true)
+                state.clear(composing: true)
             }
         default:
             break

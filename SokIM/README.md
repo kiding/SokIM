@@ -14,7 +14,7 @@
 1. 시스템 환경설정 > 키보드 > 입력 소스 > "+" 버튼 > 영어 > "속" > "추가" 버튼
 1. 메뉴 막대에서 입력 메뉴를 클릭한 다음 입력기 "속" 선택
 
-#### 삭제 또는 재설치
+#### 삭제 (재설치)
 
 1. 시스템 환경설정 > 키보드 > 입력 소스 > "속" > "-" 버튼
 1. `killall KeyboardSettings keyboardservicesd TextInputMenuAgent TextInputSwitcher imklaunchagent SokIM`

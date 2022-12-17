@@ -6,17 +6,6 @@ let defaultRange = NSRange(location: NSNotFound, length: 0)
 /** 입력 상태 및 변화 */
 struct State: CustomStringConvertible {
     init() {}
-    init(from: State, next inputs: [Input]) {
-        self.modifier = from.modifier
-        self.down = from.down
-        self.engine = from.engine
-
-        self.composed = from.composed
-        self.composing = from.composing
-        self.tuples = from.tuples
-
-        inputs.forEach { self.next($0) }
-    }
 
     // MARK: - Input
 
@@ -24,7 +13,7 @@ struct State: CustomStringConvertible {
     var modifier: [ModifierUsage: InputType] = [:]
 
     /** 현재 눌려있는 Input, 반복 입력 시 사용 */
-    var down: Input?
+    private(set) var down: Input?
 
     /** 새로운 Input 입력 처리 */
     mutating func next(_ input: Input) {
@@ -125,7 +114,7 @@ struct State: CustomStringConvertible {
     /** 조합 */
     private(set) var composing: String = "" //   / ´  /     | ㄱ / 가
     /** 입력 */
-    private(set) var tuples: [CharTuple] = []
+    private var tuples: [CharTuple] = []
 
     /** 새로운 CharTuple 입력 처리 */
     mutating func next(_ tuple: CharTuple) {
@@ -165,7 +154,7 @@ struct State: CustomStringConvertible {
     }
 
     /** 완성/조합/입력 초기화 */
-    mutating func clear(includeComposed: Bool = true, includeComposing: Bool = false) {
+    mutating func clear(composed includeComposed: Bool = true, composing includeComposing: Bool = false) {
         debug("composed: \(includeComposed), composing: \(includeComposing)")
 
         if includeComposed {
@@ -179,8 +168,7 @@ struct State: CustomStringConvertible {
         tuples = []
     }
 
-    /** composing이 변경되었으면 true, 비어있거나 변경이 없으면 false 반환 */
-    mutating func deleteBackwardComposing() -> Bool {
+    mutating func deleteBackwardComposing() {
         // 조합에서 마지막 글자를 꺼냈을 때, 글자가 있다면
         if let oldLast = composing.popLast() {
             debug("oldLast: \(oldLast)")
@@ -192,16 +180,10 @@ struct State: CustomStringConvertible {
                 // 다시 조합에 붙임
                 composing += "\(newLast)"
             }
-
-            // 조합이 변경되었음
-            return true
-        } else {
-            // 변경된 것이 없음
-            return false
         }
     }
 
     // MARK: - CustomStringConvertible
 
-    var description: String { "\(engine) \(tuples) \(composed) [\(composing)] \(modifier)" }
+    var description: String { "\(engine) \(tuples) '\(composed)' [\(composing)] \(modifier)" }
 }

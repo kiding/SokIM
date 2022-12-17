@@ -1,32 +1,23 @@
 import InputMethodKit
 
 struct MarkedStrategy: Strategy {
-    static func backspace(with state: inout State, to sender: IMKTextInput) -> Bool {
-        debug()
+    static func backspace(from state: State, to sender: IMKTextInput, with oldState: State) -> Bool {
+        debug("\(oldState) -> \(state)")
 
-        // 이전에 조합 중이던 글자에서 백스페이스
-        if state.deleteBackwardComposing() {
-            // 변경된 경우 composing으로 갱신
+        // composing이 변경된 경우
+        if oldState.composing != state.composing {
             sender.setMarkedText(state.composing, selectionRange: defaultRange, replacementRange: defaultRange)
-            state.clear(includeComposing: false)
 
-            // sender가 추가 처리 하지 않음
+            // OS가 추가 처리 하지 않음
             return true
         } else {
-            // 완성/조합/입력 초기화
-            state.clear(includeComposing: true)
-
-            // sender가 처리함
+            // OS가 추가 처리함
             return false
         }
     }
 
-    static func tuples(_ tuples: [CharTuple], with state: inout State, to sender: IMKTextInput) {
-        debug("\(tuples)")
-        if tuples.count <= 0 { return }
-
-        // tuples 처리
-        tuples.forEach { state.next($0) }
+    static func insert(from state: State, to sender: IMKTextInput, with oldState: State) {
+        debug("\(oldState) -> \(state)")
 
         // composed -> insertText
         if state.composed.count > 0 {
@@ -46,13 +37,10 @@ struct MarkedStrategy: Strategy {
         if state.composing.count > 0 {
             sender.setMarkedText(state.composing, selectionRange: defaultRange, replacementRange: defaultRange)
         }
-
-        // 완성/입력 초기화
-        state.clear(includeComposing: false)
     }
 
-    static func flush(with state: inout State, to sender: IMKTextInput) {
-        debug()
+    static func flush(from state: State, to sender: IMKTextInput) {
+        debug("\(state)")
 
         // composed -> insertText
         if state.composed.count > 0 {
@@ -63,9 +51,6 @@ struct MarkedStrategy: Strategy {
         if state.composing.count > 0 {
             sender.insertText(state.composing, replacementRange: defaultRange)
         }
-
-        // 완성/조합/입력 초기화
-        state.clear(includeComposing: true)
     }
 
 /*

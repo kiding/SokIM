@@ -9,40 +9,31 @@ private func union(_ selected: NSRange, _ composing: String) -> NSRange {
 }
 
 struct DirectStrategy: Strategy {
-    static func backspace(with state: inout State, to sender: IMKTextInput) -> Bool {
-        debug()
+    static func backspace(from state: State, to sender: IMKTextInput, with oldState: State) -> Bool {
+        debug("\(oldState) -> \(state)")
 
         // 이전의 "조합||커서||블록" 위치
-        let prevRange = union(sender.selectedRange(), state.composing)
+        let prevRange = union(sender.selectedRange(), oldState.composing)
 
-        // 이전에 조합 중이던 글자에서 백스페이스
-        if state.deleteBackwardComposing() && state.composing.count > 0 {
-            // 변경된 경우 composing으로 갱신
+        // composing이 변경된 경우
+        if oldState.composing != state.composing && state.composing.count > 0 {
             sender.insertText(state.composing, replacementRange: prevRange)
-            state.clear(includeComposing: false)
 
-            // sender가 추가 처리 하지 않음
+            // OS가 추가 처리 하지 않음
             return true
         }
         // 그 외, 초성만 남는 경우도 포함함
         else {
-            // 완성/조합/입력 초기화
-            state.clear(includeComposing: true)
-
-            // sender가 처리함
+            // OS가 추가 처리함
             return false
         }
     }
 
-    static func tuples(_ tuples: [CharTuple], with state: inout State, to sender: IMKTextInput) {
-        debug("\(tuples)")
-        if tuples.count <= 0 { return }
+    static func insert(from state: State, to sender: IMKTextInput, with oldState: State) {
+        debug("\(oldState) -> \(state)")
 
         // 이전의 "조합||커서||블록" 위치
-        let prevRange = union(sender.selectedRange(), state.composing)
-
-        // tuples 처리
-        tuples.forEach { state.next($0) }
+        let prevRange = union(sender.selectedRange(), oldState.composing)
 
         // composed -> insertText
         if state.composed.count > 0 {
@@ -71,13 +62,10 @@ struct DirectStrategy: Strategy {
                 sender.insertText(state.composing, replacementRange: defaultRange)
             }
         }
-
-        // 완성/입력 초기화
-        state.clear(includeComposing: false)
     }
 
-    static func flush(with state: inout State, to sender: IMKTextInput) {
-        debug()
+    static func flush(from state: State, to sender: IMKTextInput) {
+        debug("\(state)")
 
         // composed -> insertText
         if state.composed.count > 0 {
@@ -85,9 +73,6 @@ struct DirectStrategy: Strategy {
         }
 
         // composing: 이미 직접 입력되어 있으므로 무시
-
-        // 완성/조합/입력 초기화
-        state.clear(includeComposing: true)
     }
 
 /*
