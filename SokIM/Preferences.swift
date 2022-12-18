@@ -4,6 +4,7 @@ enum RotateShortcutType: String {
     case capsLock = "CapsLock"
     case commandSpace = "CommandSpace"
     case shiftSpace = "ShiftSpace"
+    case controlSpace = "ControlSpace"
 }
 
 struct Preferences {

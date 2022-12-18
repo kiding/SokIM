@@ -59,6 +59,10 @@ struct State: CustomStringConvertible {
                 isShiftDown
                 && usage == SpecialUsage.space.rawValue
                 && Preferences.rotateShortcut == .shiftSpace
+            ) || (
+                isControlDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .controlSpace
             ) {
                 commit()
                 rotate()

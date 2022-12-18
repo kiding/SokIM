@@ -19,6 +19,7 @@ class StatusBar {
     private let capsLockItem = NSMenuItem()
     private let commandSpaceItem = NSMenuItem()
     private let shiftSpaceItem = NSMenuItem()
+    private let controlSpaceItem = NSMenuItem()
 
     init() {
         debug()
@@ -64,6 +65,12 @@ class StatusBar {
         shiftSpaceItem.target = self
         shiftSpaceItem.action = #selector(toggleShiftSpace)
         menu.addItem(shiftSpaceItem)
+
+        controlSpaceItem.title = "⌃스페이스"
+        controlSpaceItem.state = Preferences.rotateShortcut == .controlSpace ? .on : .off
+        controlSpaceItem.target = self
+        controlSpaceItem.action = #selector(toggleControlSpace)
+        menu.addItem(controlSpaceItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -131,6 +138,7 @@ class StatusBar {
             capsLockItem.state = .on
             commandSpaceItem.state = .off
             shiftSpaceItem.state = .off
+            controlSpaceItem.state = .off
         }
     }
 
@@ -140,6 +148,7 @@ class StatusBar {
             capsLockItem.state = .off
             commandSpaceItem.state = .on
             shiftSpaceItem.state = .off
+            controlSpaceItem.state = .off
         }
     }
 
@@ -149,6 +158,17 @@ class StatusBar {
             capsLockItem.state = .off
             commandSpaceItem.state = .off
             shiftSpaceItem.state = .on
+            controlSpaceItem.state = .off
+        }
+    }
+
+    @objc func toggleControlSpace(sender: NSMenuItem) {
+        if sender.state == .off {
+            Preferences.rotateShortcut = .controlSpace
+            capsLockItem.state = .off
+            commandSpaceItem.state = .off
+            shiftSpaceItem.state = .off
+            controlSpaceItem.state = .on
         }
     }
 
