@@ -2,8 +2,8 @@ import Foundation
 
 enum RotateShortcutType: String {
     case capsLock = "CapsLock"
-    case shiftSpace = "ShiftSpace"
     case commandSpace = "CommandSpace"
+    case shiftSpace = "ShiftSpace"
 }
 
 struct Preferences {

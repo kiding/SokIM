@@ -17,8 +17,8 @@ class StatusBar {
     /** 한/A 전환키 */
 
     private let capsLockItem = NSMenuItem()
-    private let shiftSpaceItem = NSMenuItem()
     private let commandSpaceItem = NSMenuItem()
+    private let shiftSpaceItem = NSMenuItem()
 
     init() {
         debug()
@@ -53,17 +53,17 @@ class StatusBar {
         capsLockItem.action = #selector(toggleCapsLock)
         menu.addItem(capsLockItem)
 
-        shiftSpaceItem.title = "⇧스페이스"
-        shiftSpaceItem.state = Preferences.rotateShortcut == .shiftSpace ? .on : .off
-        shiftSpaceItem.target = self
-        shiftSpaceItem.action = #selector(toggleShiftSpace)
-        menu.addItem(shiftSpaceItem)
-
         commandSpaceItem.title = "⌘스페이스"
         commandSpaceItem.state = Preferences.rotateShortcut == .commandSpace ? .on : .off
         commandSpaceItem.target = self
         commandSpaceItem.action = #selector(toggleCommandSpace)
         menu.addItem(commandSpaceItem)
+
+        shiftSpaceItem.title = "⇧스페이스"
+        shiftSpaceItem.state = Preferences.rotateShortcut == .shiftSpace ? .on : .off
+        shiftSpaceItem.target = self
+        shiftSpaceItem.action = #selector(toggleShiftSpace)
+        menu.addItem(shiftSpaceItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -129,17 +129,8 @@ class StatusBar {
         if sender.state == .off {
             Preferences.rotateShortcut = .capsLock
             capsLockItem.state = .on
+            commandSpaceItem.state = .off
             shiftSpaceItem.state = .off
-            commandSpaceItem.state = .off
-        }
-    }
-
-    @objc func toggleShiftSpace(sender: NSMenuItem) {
-        if sender.state == .off {
-            Preferences.rotateShortcut = .shiftSpace
-            capsLockItem.state = .off
-            shiftSpaceItem.state = .on
-            commandSpaceItem.state = .off
         }
     }
 
@@ -147,8 +138,17 @@ class StatusBar {
         if sender.state == .off {
             Preferences.rotateShortcut = .commandSpace
             capsLockItem.state = .off
-            shiftSpaceItem.state = .off
             commandSpaceItem.state = .on
+            shiftSpaceItem.state = .off
+        }
+    }
+
+    @objc func toggleShiftSpace(sender: NSMenuItem) {
+        if sender.state == .off {
+            Preferences.rotateShortcut = .shiftSpace
+            capsLockItem.state = .off
+            commandSpaceItem.state = .off
+            shiftSpaceItem.state = .on
         }
     }
 

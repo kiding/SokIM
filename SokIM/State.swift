@@ -44,21 +44,21 @@ struct State: CustomStringConvertible {
             // 눌린 키를 down에 기록
             down = input
 
-            // Control, Command, Alt, Shift: keyDown 상태인 경우 키 무시
-            let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
+            // Command, Shift, Alt, Control: keyDown 상태인 경우 키 무시
             let isCommandDown = modifier[.leftCommand] == .keyDown || modifier[.rightCommand] == .keyDown
-            let isAltDown = modifier[.leftAlt] == .keyDown || modifier[.rightAlt] == .keyDown
             let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
+            let isAltDown = modifier[.leftAlt] == .keyDown || modifier[.rightAlt] == .keyDown
+            let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
 
-            // Shift/Command + Space: keyDown인 경우 한/A 전환
+            // Command/Shift + Space: keyDown인 경우 한/A 전환
             if (
-                isShiftDown
-                && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .shiftSpace
-            ) || (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue
                 && Preferences.rotateShortcut == .commandSpace
+            ) || (
+                isShiftDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .shiftSpace
             ) {
                 commit()
                 rotate()
