@@ -1,5 +1,14 @@
 import AppKit
 
+extension Bundle {
+    var releaseVersionNumber: String? {
+        return infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+    var buildVersionNumber: String? {
+        return infoDictionary?["CFBundleVersion"] as? String
+    }
+}
+
 class StatusBar {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
@@ -31,8 +40,10 @@ class StatusBar {
 
         /** 입력기 정보 */
 
+        let version = Bundle.main.releaseVersionNumber ?? "0.0"
+        let build = Bundle.main.buildVersionNumber ?? "0"
         let infoItem = NSMenuItem()
-        infoItem.title = "속 입력기"
+        infoItem.title = "속 입력기 v\(version) (\(build))"
         menu.addItem(infoItem)
 
         /** 시스템 메시지 */
