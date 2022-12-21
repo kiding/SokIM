@@ -161,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // sender에 입력
             handled = eventContext.strategy.backspace(from: state, to: sender, with: oldState)
 
-            // 완성/입력 초기화
+            // 완성 초기화
             state.clear(composing: false)
 
             // OS가 대신 처리할 것이 있는 경우
@@ -182,7 +182,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // state에 완성/조합된 문자열을 sender에 입력
         eventContext.strategy.insert(from: state, to: sender, with: oldState)
 
-        // 완성/입력 초기화
+        // 완성 초기화
         state.clear(composing: false)
 
         // OS가 대신 처리할 것이 있는 경우

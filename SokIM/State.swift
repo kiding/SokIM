@@ -135,8 +135,6 @@ struct State: CustomStringConvertible {
     private(set) var composed: String = ""  // å / å  / åé  |   /
     /** 조합 */
     private(set) var composing: String = "" //   / ´  /     | ㄱ / 가
-    /** 입력 */
-    private var tuples: [CharTuple] = []
 
     /** 새로운 CharTuple 입력 처리 */
     mutating func next(_ tuple: CharTuple) {
@@ -162,9 +160,8 @@ struct State: CustomStringConvertible {
             composing = ""
         }
 
-        // 완성/입력 갱신
+        // 완성 갱신
         composed += nextText
-        tuples.append(tuple)
     }
 
     /** 조합->완성 반영 */
@@ -175,7 +172,7 @@ struct State: CustomStringConvertible {
         composing = ""
     }
 
-    /** 완성/조합/입력 초기화 */
+    /** 완성/조합 초기화 */
     mutating func clear(composed includeComposed: Bool = true, composing includeComposing: Bool = false) {
         debug("composed: \(includeComposed), composing: \(includeComposing)")
 
@@ -186,8 +183,6 @@ struct State: CustomStringConvertible {
         if includeComposing {
             composing = ""
         }
-
-        tuples = []
     }
 
     mutating func deleteBackwardComposing() {
@@ -207,5 +202,5 @@ struct State: CustomStringConvertible {
 
     // MARK: - CustomStringConvertible
 
-    var description: String { "\(engine) \(tuples) '\(composed)' [\(composing)] \(modifier)" }
+    var description: String { "\(engine) '\(composed)' [\(composing)] \(modifier)" }
 }
