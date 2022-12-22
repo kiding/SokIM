@@ -136,6 +136,7 @@ struct State: CustomStringConvertible {
     /** 조합 */
     private(set) var composing: String = "" //   / ´  /     | ㄱ / 가
 
+    // TODO: 세벌식 모아치기 (두 글자 이상 조합) 지원
     /** 새로운 CharTuple 입력 처리 */
     mutating func next(_ tuple: CharTuple) {
         let (inputChar, inputMarked) = tuple

@@ -1,12 +1,14 @@
 // TODO: "Automatically switch to a document's input source"를 InputContext로 구현
-// TODO: 조합 시 스타일링 (IMKInputController override)
-// TODO: 빌드 세팅에 따라 privacy .auto
 // TODO: Safari: 구글 문서, iCloud Pages 한/글/을/입/력 문제... string 가져오기? Safari에서 downgrade 하는 방법 찾기
 // TODO: D->M downgrade: NotificationCenter to Context & memory
 
-// TODO: ElementRect -> ElementTree (Rect는 바뀔 수 있음)
+// TODO: vv 좀 더 정교한 컨텍스트 변경 감지 vv
+// TODO: 파폭 폼 필드 입력할 수 없는 필드에서 입력한 것까지 몰려서 다음 필드에 들어감
+// TODO: 포토샵 단축키 T 누르고 텍스트 편집하면 맨 앞에 T가 들어감
 // TODO: AXManualAccessibility
 // TODO: AXEnhancedUserInterface
+// TODO: ElementRect -> ElementTree (Rect는 바뀔 수 있음)
+
 // TODO: 인스톨러: 재시동, Sparkle
 
 // TODO: Shift+Space 한영전환 시 iTerm에서 Space 입력됨
