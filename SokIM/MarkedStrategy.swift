@@ -32,6 +32,14 @@ struct MarkedStrategy: Strategy {
 
             sender.insertText(state.composed, replacementRange: defaultRange)
         }
+        /*
+         insertText할 것이 없다면 더미 setMarkedText 호출, 하위 앱이 추가 처리하지 않도록 알림
+         예시: LINE, iTerm 등 Shift+Space로 한/A 전환 시 스페이스가 입력됨
+         */
+        else {
+            sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
+            sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
+        }
 
         // composing -> setMarkedText
         if state.composing.count > 0 {
@@ -51,6 +59,13 @@ struct MarkedStrategy: Strategy {
         if state.composing.count > 0 {
             sender.insertText(state.composing, replacementRange: defaultRange)
         }
+
+        /*
+         더미 setMarkedText 호출, 하위 앱이 추가 처리하지 않도록 알림
+         예시: LINE, iTerm 등 Shift+Space로 한/A 전환 시 스페이스가 입력됨
+         */
+        sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
+        sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
     }
 
 /*

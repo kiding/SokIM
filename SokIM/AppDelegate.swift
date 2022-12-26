@@ -110,7 +110,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             debug("이후 event context: \(eventContext)")
         }
 
-        // event context 변한 경우 완성/조합/입력 초기화
+        // event context 변한 경우 완성/조합 초기화
         let interimEventContext = EventContext(sender)
         debug("중간 event context: \(interimEventContext)")
         if eventContext != interimEventContext {
@@ -124,7 +124,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         defer { debug("이후 input context: \(inputContext)") }
 
         // TODO: See :8 ~ :10
-        //            // input context 변한 경우 완성/조합/입력 초기화
+        //            // input context 변한 경우 완성/조합 초기화
         //            let interimInputContext = inputs.last?.context ?? (nil, nil)
         //            debug("중간 input context: \(interimInputContext)")
         //            if inputContext != interimInputContext {
@@ -168,7 +168,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
             // OS가 대신 처리할 것이 있는 경우
             if handled == false {
-                // 완성/조합/입력 초기화
+                // 완성/조합 초기화
                 state.clear(composing: true)
             }
 
@@ -192,7 +192,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // 조합 종료
             eventContext.strategy.flush(from: state, to: sender)
 
-            // 완성/조합/입력 초기화
+            // 완성/조합 초기화
             state.clear(composing: true)
         }
 

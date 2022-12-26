@@ -44,13 +44,13 @@ struct State: CustomStringConvertible {
             // 눌린 키를 down에 기록
             down = input
 
-            // Command, Shift, Alt, Control: keyDown 상태인 경우 키 무시
+            // Command, Shift, Alt, Control
             let isCommandDown = modifier[.leftCommand] == .keyDown || modifier[.rightCommand] == .keyDown
             let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
             let isAltDown = modifier[.leftAlt] == .keyDown || modifier[.rightAlt] == .keyDown
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
 
-            // Command/Shift + Space: keyDown인 경우 한/A 전환
+            // Command/Shift/Control + Space: keyDown인 경우 한/A 전환
             if (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue
@@ -102,7 +102,7 @@ struct State: CustomStringConvertible {
                 down = nil
             }
         }
-        // 그 외 경우 중 모든 keyUp 무시
+        // 그 외 경우
         else {
             debug("Input ignored: \(input)")
         }
