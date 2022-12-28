@@ -123,10 +123,11 @@ class InputMonitor {
 
             running.context = true
 
+            // 100ms마다 context 수집
             Task {
                 while running.context {
                     nextContext()
-                    try? await Task.sleep(nanoseconds: 100_000_000)
+                    try? await Task.sleep(for: .milliseconds(100))
                 }
             }
 
