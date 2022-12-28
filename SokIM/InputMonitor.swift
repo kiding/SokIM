@@ -206,19 +206,11 @@ class InputMonitor {
     private func nextContext() {
         debug()
 
-        let system = AXUIElementCreateSystemWide()
-
-        // 포커스가 있는 앱의 bundleIdentifier 가져오기
-        var bundleIdentifier: String?
-        for _ in 0..<30 {
-            bundleIdentifier = getBundleIdentifier(system)
-            if bundleIdentifier != nil { break }
-        }
-        if bundleIdentifier == nil {
-            bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-        }
+        // 가장 앞에 있는 앱의 bundleIdentifier 가져오기
+        let bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
 
         // 포커스가 있는 AXUIElement의 CGRect 가져오기
+        let system = AXUIElementCreateSystemWide()
         var elementRect: CGRect?
         for _ in 0..<30 {
             elementRect = getElementRect(system)
@@ -226,21 +218,6 @@ class InputMonitor {
         }
 
         context = InputContext(bundleIdentifier, elementRect)
-    }
-
-    private func getBundleIdentifier(_ system: AXUIElement) -> String? {
-        var appPkd: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(system, kAXAppAttr, &appPkd) == .success else { return nil }
-        let app = appPkd as! AXUIElement
-
-        var pid: pid_t = -1
-        guard AXUIElementGetPid(app, &pid) == .success else { return nil }
-
-        return NSWorkspace.shared
-            .runningApplications
-            .filter { $0.processIdentifier == pid }
-            .first?
-            .bundleIdentifier
     }
 
     private func getElementRect(_ system: AXUIElement) -> CGRect? {
