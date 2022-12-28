@@ -141,7 +141,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // modifier 끄기
             state.modifier.removeAll()
 
-            // OS가 처리할 수 있도록 반환
+            // OS가 대신 처리하도록 반환
             return false
         }
 
@@ -152,33 +152,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         inputs.forEach { state.next($0) }
         if event.isARepeat, let down = state.down { state.next(down) }
 
-        // 최종 처리 여부, false면 OS가 대신 입력
-        var handled = true
-
         // 별도 처리: modifier 없는 백스페이스 키
         if event.keyCode == kVK_Delete && event.modifierFlags.subtracting(.capsLock).isEmpty {
             // 이전에 조합 중이던 글자에서 백스페이스
             state.deleteBackwardComposing()
 
             // sender에 입력
-            handled = eventContext.strategy.backspace(from: state, to: sender, with: oldState)
+            let handled = eventContext.strategy.backspace(from: state, to: sender, with: oldState)
 
-            // 완성 초기화
-            state.clear(composing: false)
-
-            // OS가 대신 처리할 것이 있는 경우
-            if handled == false {
-                // 완성/조합 초기화
-                state.clear(composing: true)
-            }
+            /*
+             처리가 완료된 경우 -> 완성 초기화
+             OS가 대신 처리할 것이 있는 경우 -> 완성/조합 초기화
+             */
+            state.clear(composing: !handled)
 
             return handled
         }
 
         // event가 engine이 처리할 수 없는 글자인 경우
         if state.engine.eventToTuple(event) == nil {
+            // 조합 종료
+            eventContext.strategy.flush(from: state, to: sender)
+
+            // 완성/조합 초기화
+            state.clear(composing: true)
+
             // OS가 대신 처리하도록 반환
-            handled = false
+            return false
         }
 
         // state에 완성/조합된 문자열을 sender에 입력
@@ -187,16 +187,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 완성 초기화
         state.clear(composing: false)
 
-        // OS가 대신 처리할 것이 있는 경우
-        if handled == false {
-            // 조합 종료
-            eventContext.strategy.flush(from: state, to: sender)
-
-            // 완성/조합 초기화
-            state.clear(composing: true)
-        }
-
-        return handled
+        // 처리 완료
+        return true
     }
 
     /** 전처리: EventContext와 InputContext 비교하여 입력 정리 */
