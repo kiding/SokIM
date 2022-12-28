@@ -26,10 +26,6 @@ struct State: CustomStringConvertible {
             modifier[key] = type
 
             switch key {
-                // Control, Command: 조합->완성 반영
-            case .leftControl, .leftCommand, .rightControl, .rightCommand:
-                commit()
-
                 // Caps Lock: keyDown인 경우 한/A 전환
             case .capsLock where type == .keyDown && Preferences.rotateShortcut == .capsLock:
                 commit()
