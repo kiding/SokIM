@@ -37,7 +37,7 @@ struct MarkedStrategy: Strategy {
          예시: LINE, iTerm 등 Shift+Space로 한/A 전환 시 스페이스가 입력됨
          */
         else {
-            sender.setMarkedText("​", selectionRange: defaultRange, replacementRange: defaultRange) // U+200B
+            sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
             sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
         }
 
