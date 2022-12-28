@@ -51,6 +51,9 @@ private let kAXRoleAttr = kAXRoleAttribute as CFString
 private let kAXPosAttr = kAXPositionAttribute as CFString
 private let kAXSizeAttr = kAXSizeAttribute as CFString
 
+private let kAXManualAccessibility = "AXManualAccessibility" as CFString
+private let kAXEnhancedUserInterface = "AXEnhancedUserInterface" as CFString
+
 /**
  키보드 입력 모니터링
  @see https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/HID/new_api_10_5/tn2187.html
@@ -126,6 +129,15 @@ class InputMonitor {
                     try? await Task.sleep(nanoseconds: 100_000_000)
                 }
             }
+
+            // 가장 앞에 있는 앱 바뀔 때마다 AX 활성화
+            NSWorkspace.shared.notificationCenter.addObserver(
+                self,
+                selector: #selector(activateAX),
+                name: NSWorkspace.didActivateApplicationNotification,
+                object: nil
+            )
+            activateAX(nil) // 첫 시작 시 자동으로 가장 앞에 있는 앱 AX 활성화
         }
     }
 
@@ -138,6 +150,11 @@ class InputMonitor {
         }
 
         if running.context == true {
+            NSWorkspace.shared.notificationCenter.removeObserver(
+                self,
+                name: NSWorkspace.didActivateApplicationNotification,
+                object: nil
+            )
             running.context = false
         }
     }
@@ -265,5 +282,55 @@ class InputMonitor {
         guard AXValueGetValue(axSize, .cgSize, &cgSize) else { return nil }
 
         return CGRect(origin: cgPosition, size: cgSize)
+    }
+
+    /**
+     @see https://www.electronjs.org/docs/latest/tutorial/accessibility/
+     @see https://www.chromium.org/developers/design-documents/accessibility/
+     @see https://github.com/dexterleng/vimac/issues/325
+     */
+    @objc private func activateAX(_ noti: Notification?) {
+        debug("\(String(describing: noti))")
+
+        // noti로 들어온 앱 또는 가장 앞에 있는 앱의 pid 가져오기
+        guard let app = noti?.userInfo?["NSWorkspaceApplicationKey"] as? NSRunningApplication
+                ?? NSWorkspace.shared.frontmostApplication else {
+            return
+        }
+
+        // 별도의 스레드에서 진행
+        Task {
+            let appRef = AXUIElementCreateApplication(app.processIdentifier)
+
+            // AXManualAccessibility
+            var axmaValuePkd: CFTypeRef?
+            var shouldSetAXMA = true
+            if AXUIElementCopyAttributeValue(appRef, kAXManualAccessibility, &axmaValuePkd) == .success {
+                let axmaValue = axmaValuePkd as! CFBoolean
+                if axmaValue == kCFBooleanTrue {
+                    debug("AXManualAccessibility 이미 활성화되어 있음 \(appRef)")
+                    shouldSetAXMA = false
+                }
+            }
+            if shouldSetAXMA {
+                debug("AXManualAccessibility 활성화 완료 \(appRef)")
+                AXUIElementSetAttributeValue(appRef, kAXManualAccessibility, kCFBooleanTrue)
+            }
+
+            // AXEnhancedUserInterface
+            var axeuiValuePkd: CFTypeRef?
+            var shouldSetAXEUI = true
+            if AXUIElementCopyAttributeValue(appRef, kAXEnhancedUserInterface, &axeuiValuePkd) == .success {
+                let axeuiValue = axeuiValuePkd as! CFBoolean
+                if axeuiValue == kCFBooleanTrue {
+                    debug("AXEnhancedUserInterface 이미 활성화되어 있음 \(appRef)")
+                    shouldSetAXEUI = false
+                }
+            }
+            if shouldSetAXEUI {
+                debug("AXEnhancedUserInterface 활성화 \(appRef)")
+                AXUIElementSetAttributeValue(appRef, kAXEnhancedUserInterface, kCFBooleanTrue)
+            }
+        }
     }
 }
