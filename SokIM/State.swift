@@ -1,4 +1,4 @@
-// swiftlint:disable function_body_length cyclomatic_complexity
+// swiftlint:disable function_body_length
 
 import Cocoa
 import Foundation

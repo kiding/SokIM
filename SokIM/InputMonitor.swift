@@ -44,13 +44,6 @@ enum InputMonitorError: Error, CustomStringConvertible {
     }
 }
 
-private let kAXAppAttr = kAXFocusedApplicationAttribute as CFString
-private let kAXElemAttr = kAXFocusedUIElementAttribute as CFString
-private let kAXParentAttr = kAXParentAttribute as CFString
-private let kAXRoleAttr = kAXRoleAttribute as CFString
-private let kAXPosAttr = kAXPositionAttribute as CFString
-private let kAXSizeAttr = kAXSizeAttribute as CFString
-
 private let kAXManualAccessibility = "AXManualAccessibility" as CFString
 private let kAXEnhancedUserInterface = "AXEnhancedUserInterface" as CFString
 
@@ -62,7 +55,7 @@ private let kAXEnhancedUserInterface = "AXEnhancedUserInterface" as CFString
 class InputMonitor {
     private let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
     private var inputs: [Input] = []
-    private var context = InputContext(nil, nil)
+    private var context = InputContext()
 
     init() {
         debug()
@@ -123,11 +116,11 @@ class InputMonitor {
 
             running.context = true
 
-            // 100ms마다 context 수집
+            // 30ms마다 context 수집
             Task {
                 while running.context {
                     nextContext()
-                    try? await Task.sleep(for: .milliseconds(100))
+                    try? await Task.sleep(for: .milliseconds(30))
                 }
             }
 
@@ -204,62 +197,7 @@ class InputMonitor {
     }
 
     private func nextContext() {
-        debug()
-
-        // 가장 앞에 있는 앱의 bundleIdentifier 가져오기
-        let bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-
-        // 포커스가 있는 AXUIElement의 CGRect 가져오기
-        let system = AXUIElementCreateSystemWide()
-        var elementRect: CGRect?
-        for _ in 0..<30 {
-            elementRect = getElementRect(system)
-            if elementRect != nil { break }
-        }
-
-        context = InputContext(bundleIdentifier, elementRect)
-    }
-
-    private func getElementRect(_ system: AXUIElement) -> CGRect? {
-        // element 가져오기
-        var elementPkd: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(system, kAXElemAttr, &elementPkd) == .success else { return nil }
-        var element = elementPkd as! AXUIElement
-
-        // 부모 element가 있는지 확인하고
-        var parentElementPkd: CFTypeRef?
-        if AXUIElementCopyAttributeValue(element, kAXParentAttr, &parentElementPkd) == .success {
-            let parentElement = parentElementPkd as! AXUIElement
-
-            // role이 있는지 확인하고
-            var parentRolePkd: CFTypeRef?
-            if AXUIElementCopyAttributeValue(parentElement, kAXRoleAttr, &parentRolePkd) == .success {
-                let parentRole = parentRolePkd as! String
-
-                // AXScrollArea면 부모를 대신 사용
-                if parentRole == "AXScrollArea" {
-                    element = parentElement
-                }
-            }
-        }
-
-        // Position 가져오기
-        var axPositionPkd: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(element, kAXPosAttr, &axPositionPkd) == .success else { return nil }
-        let axPosition = axPositionPkd as! AXValue
-
-        var cgPosition = CGPoint()
-        guard AXValueGetValue(axPosition, .cgPoint, &cgPosition) else { return nil }
-
-        // Size 가져오기
-        var axSizePkd: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(element, kAXSizeAttr, &axSizePkd) == .success else { return nil }
-        let axSize = axSizePkd as! AXValue
-
-        var cgSize = CGSize()
-        guard AXValueGetValue(axSize, .cgSize, &cgSize) else { return nil }
-
-        return CGRect(origin: cgPosition, size: cgSize)
+        context = InputContext(AXUIElementCreateSystemWide())
     }
 
     /**

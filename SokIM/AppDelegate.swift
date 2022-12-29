@@ -2,13 +2,6 @@
 // TODO: Safari: 구글 문서, iCloud Pages 한/글/을/입/력 문제... string 가져오기? Safari에서 downgrade 하는 방법 찾기
 // TODO: D->M downgrade: NotificationCenter to Context & memory
 
-// TODO: vv 좀 더 정교한 컨텍스트 변경 감지 vv
-// TODO: 파폭 폼 필드 입력할 수 없는 필드에서 입력한 것까지 몰려서 다음 필드에 들어감
-// TODO: 포토샵 단축키 T 누르고 텍스트 편집하면 맨 앞에 T가 들어감
-// TODO: AXManualAccessibility
-// TODO: AXEnhancedUserInterface
-// TODO: ElementRect -> ElementTree (Rect는 바뀔 수 있음)
-
 // TODO: 인스톨러: 재시동, Sparkle
 
 // TODO: Shift+Space 한영전환 시 iTerm에서 Space 입력됨
@@ -179,18 +172,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func filterContexts(_ inputs: inout [Input]) {
         debug()
 
-        // 마지막과 동일한 bundleIdentifier만 남김, 단 modifier는 언제나 처리
+        // 마지막과 동일한 context만 남김, 단 modifier는 언제나 처리
         if let last = inputs.last {
             inputs = inputs.filter {
-                $0.context.bundleIdentifier == last.context.bundleIdentifier
-                || ModifierUsage(rawValue: $0.usage) != nil
-            }
-        }
-
-        // 마지막과 동일한 elementRect만 남김, 단 modifier는 언제나 처리
-        if let last = inputs.last {
-            inputs = inputs.filter {
-                $0.context.elementRect == last.context.elementRect
+                $0.context == last.context
                 || ModifierUsage(rawValue: $0.usage) != nil
             }
         }
