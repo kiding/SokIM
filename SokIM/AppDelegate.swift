@@ -29,7 +29,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var state = State()
     private var eventContext = EventContext()
-    private var inputContext = InputContext(nil, nil)
 
     @objc private func startMonitor() {
         debug()
@@ -81,7 +80,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         inputMonitor.flush()
         state = State(engine: state.engine)
         eventContext = EventContext()
-        inputContext = (nil, nil)
     }
 
     // swiftlint:disable:next function_body_length
@@ -118,20 +116,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             state.clear(composing: true)
             eventContext = interimEventContext
         }
-
-        // input context 처리
-        debug("이전 input context: \(inputContext)")
-        defer { debug("이후 input context: \(inputContext)") }
-
-        // TODO: See :8 ~ :10
-        //            // input context 변한 경우 완성/조합 초기화
-        //            let interimInputContext = inputs.last?.context ?? (nil, nil)
-        //            debug("중간 input context: \(interimInputContext)")
-        //            if inputContext != interimInputContext {
-        //                debug("input context 변경!")
-        //                state.clear(composing: true)
-        //                inputContext = interimInputContext
-        //            }
 
         // 별도 처리: 보안 입력 상태인 경우 Monitor가 작동하지 않음
         if IsSecureEventInputEnabled() {
