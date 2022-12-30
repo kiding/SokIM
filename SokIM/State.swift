@@ -76,8 +76,8 @@ struct State: CustomStringConvertible {
             // input 입력 시점부터 지금까지 걸린 시간
             let elapsed = ms(since: input.timestamp)
 
-            // engine으로 현재 input을 tuple로 변환 가능하며 처리 시간이 3000ms 이내면
-            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown), elapsed < 3000 {
+            // engine으로 현재 input을 tuple로 변환 가능하며 처리 시간이 1000ms 이내면
+            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown), elapsed < 1000 {
                 // "₩ 대신 ` 입력" 처리
                 if tuple.char == "₩" && Preferences.graveOverWon {
                     tuple.char = "`"
