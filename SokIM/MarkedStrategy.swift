@@ -44,7 +44,9 @@ struct MarkedStrategy: Strategy {
          */
         if state.composed.count <= 0 && state.composing.count <= 0 {
             sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
-            sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
+            DispatchQueue.main.async {
+                sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
+            }
         }
     }
 
