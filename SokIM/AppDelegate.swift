@@ -75,7 +75,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         eventContext = EventContext()
     }
 
-    // swiftlint:disable:next function_body_length
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         debug("\(String(describing: event)) \(String(describing: sender))")
 
