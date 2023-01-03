@@ -39,11 +39,13 @@ struct MarkedStrategy: Strategy {
         }
 
         /*
-         처리한 것이 없다면 더미 setMarkedText 호출, 하위 앱이 추가 처리하지 않도록 알림
-         예시: LINE, iTerm 등 Shift+Space로 한/A 전환 시 스페이스가 입력됨
+         LINE, iTerm 등 Shift+Space로 한/A 전환 시 스페이스가 입력됨
+         Shift+처리없음이면 더미 setMarkedText 호출, 하위 앱이 추가 처리하지 않도록 알림
          */
-        if state.composed.count <= 0 && state.composing.count <= 0 {
+        let isShiftDown = state.modifier[.leftShift] == .keyDown || state.modifier[.rightShift] == .keyDown
+        if isShiftDown && state.composed.count <= 0 && state.composing.count <= 0 {
             sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
+            sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
             DispatchQueue.main.async {
                 sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
             }
