@@ -43,7 +43,9 @@ struct MarkedStrategy: Strategy {
          Shift+처리없음이면 더미 setMarkedText 호출, 하위 앱이 추가 처리하지 않도록 알림
          */
         let isShiftDown = state.modifier[.leftShift] == .keyDown || state.modifier[.rightShift] == .keyDown
-        if isShiftDown && state.composed.count <= 0 && state.composing.count <= 0 {
+        if isShiftDown
+            && state.composed.count <= 0 && state.composing.count <= 0
+            && Preferences.rotateShortcut == .shiftSpace {
             sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
             sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
             DispatchQueue.main.async {
