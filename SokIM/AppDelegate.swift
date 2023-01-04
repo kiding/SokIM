@@ -44,13 +44,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         startMonitor()
 
-        // 사용자가 입력기를 변경하는 시점을 추적하는 observer 추가
+        // 사용자가 입력기를 변경하는 시점에 초기화
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(keyboardChangedHandler),
+            selector: #selector(reset),
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
+
+        // 사용자가 마우스 클릭하는 시점에 초기화
+        NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) {
+            self.reset($0)
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -66,10 +71,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
-    // 사용자가 입력기를 변경하는 경우 state 초기화
-    @objc private func keyboardChangedHandler(_ noti: Notification) {
-        debug("\(noti)")
+    // 초기화
+    @objc private func reset(_ context: Any?) {
+        debug("\(String(describing: context))")
 
+        if let sender = eventContext.sender {
+            eventContext.strategy.flush(from: state, to: sender)
+        }
         inputMonitor.flush()
         state = State(engine: state.engine)
         eventContext = EventContext()
