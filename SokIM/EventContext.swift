@@ -2,6 +2,8 @@ import InputMethodKit
 
 /** 키보드 입력 후 InputMethodKit에 의해 event 발생 시점의 context */
 struct EventContext {
+    /** AppDelegate.handle로 들어오는 sender */
+    let sender: IMKTextInput?
     /** 입력되는 앱, sender 상황에 따라 달라짐 */
     let bundleIdentifier: String
     /** 포인터 값, sender 상황에 따라 달라짐 */
@@ -16,6 +18,7 @@ struct EventContext {
     init() {
         debug()
 
+        sender = nil
         bundleIdentifier = ""
         pointerValue = 0
         selectedRange = defaultRange
@@ -26,6 +29,7 @@ struct EventContext {
     init(_ sender: IMKTextInput) {
         debug()
 
+        self.sender = sender
         bundleIdentifier = sender.bundleIdentifier()
         pointerValue = Unmanaged<AnyObject>.passUnretained(sender).toOpaque().hashValue
         selectedRange = sender.selectedRange()
