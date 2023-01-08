@@ -119,7 +119,7 @@ struct MarkedStrategy: Strategy {
                - (right.selectedRange.location + right.selectedRange.length))
         <= left.markedRange.length * 2 // 2칸씩 이동하는 경우 있음 (예: 터미널)
 
-        // 특수 처리: Slack 앱에서 빠르게 입력하는 경우 조합 도중에 selectedRange가 0이 되는 경우 있음
+        // 별도 처리: Slack 앱에서 빠르게 입력하는 경우 조합 도중에 selectedRange가 0이 되는 경우 있음
         let doMarkedExistAndSelectedIsZero =
         left.markedRange.location != NSNotFound
         && right.markedRange.location != NSNotFound

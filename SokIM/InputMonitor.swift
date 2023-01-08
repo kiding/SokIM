@@ -179,15 +179,22 @@ class InputMonitor {
             usage = getMappedModifierUsage(usage, device)
         }
 
-        // 별도 처리: Caps Lock Down: 한/A 상태 갱신
-        if (type, usage) == (.keyDown, ModifierUsage.capsLock.rawValue)
-            && Preferences.rotateShortcut == .capsLock {
-            (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
-        }
+        if let key = ModifierUsage(rawValue: usage) {
+            // 별도 처리: Caps Lock / 오른쪽 Command Down: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            if (
+                (type, key) == (.keyDown, .capsLock)
+                && Preferences.rotateShortcut == .capsLock
+            ) || (
+                (type, key) == (.keyDown, .rightCommand)
+                && Preferences.rotateShortcut == .rightCommand
+            ) {
+                (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
+            }
 
-        // 별도 처리: Caps Lock Up: 상태 및 LED 자동으로 끄기
-        if (type, usage) == (.keyUp, ModifierUsage.capsLock.rawValue) {
-            setKeyboardCapsLock(enabled: false)
+            // 별도 처리: Caps Lock Up: 상태 및 LED 자동으로 끄기
+            if (type, key) == (.keyUp, .capsLock) {
+                setKeyboardCapsLock(enabled: false)
+            }
         }
 
         let input = Input(context: context, timestamp: timestamp, type: type, usage: usage)

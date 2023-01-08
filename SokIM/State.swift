@@ -25,14 +25,18 @@ struct State: CustomStringConvertible {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            switch key {
-                // Caps Lock: keyDown인 경우 한/A 전환
-            case .capsLock where type == .keyDown && Preferences.rotateShortcut == .capsLock:
+            // Caps Lock / 오른쪽 Command: keyDown인 경우 한/A 전환
+            if (
+                (type, key) == (.keyDown, .capsLock)
+                && Preferences.rotateShortcut == .capsLock
+            ) || (
+                (type, key) == (.keyDown, .rightCommand)
+                && Preferences.rotateShortcut == .rightCommand
+            ) {
                 commit()
                 rotate()
 
-            default:
-                break
+                return
             }
         }
         // 그 외 경우 중 keyDown인 경우

@@ -2,6 +2,7 @@ import Foundation
 
 enum RotateShortcutType: String {
     case capsLock = "CapsLock"
+    case rightCommand = "RightCommand"
     case commandSpace = "CommandSpace"
     case shiftSpace = "ShiftSpace"
     case controlSpace = "ControlSpace"

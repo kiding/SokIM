@@ -26,10 +26,12 @@ class StatusBar {
     /** 한/A 전환키 */
 
     private let capsLockItem = NSMenuItem()
+    private let rightCommandItem = NSMenuItem()
     private let commandSpaceItem = NSMenuItem()
     private let shiftSpaceItem = NSMenuItem()
     private let controlSpaceItem = NSMenuItem()
 
+    // swiftlint:disable:next function_body_length
     init() {
         debug()
 
@@ -64,6 +66,12 @@ class StatusBar {
         capsLockItem.target = self
         capsLockItem.action = #selector(toggleCapsLock)
         menu.addItem(capsLockItem)
+
+        rightCommandItem.title = "오른쪽 ⌘"
+        rightCommandItem.state = Preferences.rotateShortcut == .rightCommand ? .on : .off
+        rightCommandItem.target = self
+        rightCommandItem.action = #selector(toggleRightCommand)
+        menu.addItem(rightCommandItem)
 
         commandSpaceItem.title = "⌘스페이스"
         commandSpaceItem.state = Preferences.rotateShortcut == .commandSpace ? .on : .off
@@ -147,6 +155,18 @@ class StatusBar {
         if sender.state == .off {
             Preferences.rotateShortcut = .capsLock
             capsLockItem.state = .on
+            rightCommandItem.state = .off
+            commandSpaceItem.state = .off
+            shiftSpaceItem.state = .off
+            controlSpaceItem.state = .off
+        }
+    }
+
+    @objc func toggleRightCommand(sender: NSMenuItem) {
+        if sender.state == .off {
+            Preferences.rotateShortcut = .rightCommand
+            capsLockItem.state = .off
+            rightCommandItem.state = .on
             commandSpaceItem.state = .off
             shiftSpaceItem.state = .off
             controlSpaceItem.state = .off
@@ -157,6 +177,7 @@ class StatusBar {
         if sender.state == .off {
             Preferences.rotateShortcut = .commandSpace
             capsLockItem.state = .off
+            rightCommandItem.state = .off
             commandSpaceItem.state = .on
             shiftSpaceItem.state = .off
             controlSpaceItem.state = .off
@@ -167,6 +188,7 @@ class StatusBar {
         if sender.state == .off {
             Preferences.rotateShortcut = .shiftSpace
             capsLockItem.state = .off
+            rightCommandItem.state = .off
             commandSpaceItem.state = .off
             shiftSpaceItem.state = .on
             controlSpaceItem.state = .off
@@ -177,6 +199,7 @@ class StatusBar {
         if sender.state == .off {
             Preferences.rotateShortcut = .controlSpace
             capsLockItem.state = .off
+            rightCommandItem.state = .off
             commandSpaceItem.state = .off
             shiftSpaceItem.state = .off
             controlSpaceItem.state = .on
