@@ -4,10 +4,14 @@
 
 // TODO: 인스톨러: 재시동, Sparkle
 
-// TODO: Shift+Space 한영전환 시 iTerm에서 Space 입력됨
-
 import Cocoa
 import InputMethodKit
+
+func eventHotKeyHandler(
+    nextHandler: EventHandlerCallRef?,
+    theEvent: EventRef?,
+    userData: UnsafeMutableRawPointer?
+) -> OSStatus { noErr }
 
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -19,6 +23,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let statusBar = StatusBar()
     let inputMonitor = InputMonitor()
+
+    private var eventHandlerRef: EventHandlerRef?
+    private var eventHotKeyRef: EventHotKeyRef?
 
     private var state = State()
     private var eventContext = EventContext()
@@ -40,6 +47,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) {
             self.reset($0)
         }
+
+        // 사용자의 한/A 전환키 조합을 시스템에 등록, 더미 함수 호출
+        var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+        InstallEventHandler(GetApplicationEventTarget(), eventHotKeyHandler, 1, &eventSpec, nil, &eventHandlerRef)
+        registerEventHotKey(Preferences.rotateShortcut)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -53,6 +65,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
+
+        unregisterEventHotKey()
+        RemoveEventHandler(eventHandlerRef)
     }
 
     @objc private func startMonitor() {
@@ -68,6 +83,49 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             statusBar.setStatus("⚠️")
             statusBar.setMessage("⚠️ \(error)")
             self.perform(#selector(startMonitor), with: nil, afterDelay: 1)
+        }
+    }
+
+    func registerEventHotKey(_ value: RotateShortcutType) {
+        debug()
+
+        unregisterEventHotKey()
+
+        let code: UInt32
+        let modifiers: UInt32
+
+        switch value {
+        case .capsLock:
+            return
+        case .rightCommand:
+            return
+        case .commandSpace:
+            code = UInt32(kVK_Space)
+            modifiers = UInt32(cmdKey)
+        case .shiftSpace:
+            code = UInt32(kVK_Space)
+            modifiers = UInt32(shiftKey)
+        case .controlSpace:
+            code = UInt32(kVK_Space)
+            modifiers = UInt32(controlKey)
+        }
+
+        RegisterEventHotKey(
+            code,
+            modifiers,
+            EventHotKeyID(signature: 0, id: 0),
+            GetApplicationEventTarget(),
+            0,
+            &eventHotKeyRef
+        )
+    }
+
+    func unregisterEventHotKey() {
+        debug()
+
+        if eventHotKeyRef != nil {
+            UnregisterEventHotKey(eventHotKeyRef)
+            eventHotKeyRef = nil
         }
     }
 

@@ -1,4 +1,4 @@
-import Foundation
+import Cocoa
 
 enum RotateShortcutType: String {
     case capsLock = "CapsLock"
@@ -13,7 +13,11 @@ struct Preferences {
 
     static var rotateShortcut: RotateShortcutType {
         get { RotateShortcutType(rawValue: UserDefaults.standard.string(forKey: "RotateShortcut") ?? "") ?? .capsLock }
-        set(new) { UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut") }
+        set(new) {
+            UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut")
+            // swiftlint:disable:next force_cast
+            (NSApp.delegate as! AppDelegate).registerEventHotKey(new)
+        }
     }
 
     /** 기타 설정 */

@@ -37,21 +37,6 @@ struct MarkedStrategy: Strategy {
         if state.composing.count > 0 {
             sender.setMarkedText(state.composing, selectionRange: defaultRange, replacementRange: defaultRange)
         }
-
-        /*
-         LINE, iTerm 등 Shift+Space로 한/A 전환 시 스페이스가 입력됨
-         Shift+처리없음이면 더미 setMarkedText 호출, 하위 앱이 추가 처리하지 않도록 알림
-         */
-        let isShiftDown = state.modifier[.leftShift] == .keyDown || state.modifier[.rightShift] == .keyDown
-        if isShiftDown
-            && state.composed.count <= 0 && state.composing.count <= 0
-            && Preferences.rotateShortcut == .shiftSpace {
-            sender.setMarkedText(" ", selectionRange: defaultRange, replacementRange: defaultRange)
-            sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
-            DispatchQueue.main.async {
-                sender.setMarkedText("", selectionRange: defaultRange, replacementRange: defaultRange)
-            }
-        }
     }
 
     static func flush(from state: State, to sender: IMKTextInput) {
