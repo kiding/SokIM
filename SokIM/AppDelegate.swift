@@ -23,22 +23,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var state = State()
     private var eventContext = EventContext()
 
-    @objc private func startMonitor() {
-        debug()
-
-        do {
-            notice("모니터 시작 중...")
-            try inputMonitor.start()
-            statusBar.setStatus("⌨️")
-            statusBar.removeMessage()
-        } catch {
-            warning("\(error)")
-            statusBar.setStatus("⚠️")
-            statusBar.setMessage("⚠️ \(error)")
-            self.perform(#selector(startMonitor), with: nil, afterDelay: 1)
-        }
-    }
-
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         debug()
 
@@ -69,6 +53,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
+    }
+
+    @objc private func startMonitor() {
+        debug()
+
+        do {
+            notice("모니터 시작 중...")
+            try inputMonitor.start()
+            statusBar.setStatus("⌨️")
+            statusBar.removeMessage()
+        } catch {
+            warning("\(error)")
+            statusBar.setStatus("⚠️")
+            statusBar.setMessage("⚠️ \(error)")
+            self.perform(#selector(startMonitor), with: nil, afterDelay: 1)
+        }
     }
 
     // 초기화

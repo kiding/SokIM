@@ -16,7 +16,7 @@ struct Preferences {
         set(new) { UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut") }
     }
 
-    /** 기타 */
+    /** 기타 설정 */
 
     static var graveOverWon: Bool {
         get { UserDefaults.standard.bool(forKey: "GraveOverWon") }
