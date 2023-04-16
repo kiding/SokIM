@@ -113,14 +113,15 @@ struct DirectStrategy: Strategy {
         let doLocationsDiffByOne = abs(left.selectedRange.location - right.selectedRange.location) <= 1
         let doLengthsMatch = left.selectedRange.length == right.selectedRange.length
 
-        // 별도 처리: 메시지 앱에서 사진 첨부 직후 입력 시 location이 최대 3까지 차이나는 경우 있음
-        let isMessagesAndDoLocationsDiffByFour =
+        // 별도 처리: 메시지 앱에서 여러 줄 입력 시 location 숫자가 급격하게 변함, 무시
+        let isMessagesAndNotSelected =
         left.bundleIdentifier == "com.apple.MobileSMS"
-        && abs(left.selectedRange.location - right.selectedRange.location) <= 3
+        && left.selectedRange.length == 0
+        && right.selectedRange.length == 0
 
         return doIdentifiersMatch
         && doPointersMatch
-        && (doLocationsDiffByOne || isMessagesAndDoLocationsDiffByFour)
+        && (doLocationsDiffByOne || isMessagesAndNotSelected)
         && doLengthsMatch
     }
 }
