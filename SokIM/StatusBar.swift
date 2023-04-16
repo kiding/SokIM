@@ -48,6 +48,14 @@ class StatusBar {
         infoItem.title = "속 입력기 v\(version) (\(build))"
         menu.addItem(infoItem)
 
+        /** 업데이트 확인 */
+
+        let updateItem = NSMenuItem()
+        updateItem.title = "업데이트 확인..."
+        updateItem.target = self
+        updateItem.action = #selector(checkUpdate)
+        menu.addItem(updateItem)
+
         /** 시스템 메시지 */
 
         messageItem.title = "초기화 중..."
@@ -133,6 +141,12 @@ class StatusBar {
         debug()
 
         statusItem.button?.title = msg
+    }
+
+    /** 업데이트 확인 */
+
+    @objc func checkUpdate(sender: NSMenuItem) {
+        NSWorkspace.shared.open(URL(string: "https://github.com/kiding/SokIM")!)
     }
 
     /** 시스템 메시지 */
