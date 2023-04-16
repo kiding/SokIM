@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DF1D7D0F29EBF5E000A2302F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DF1D7D0E29EBF5E000A2302F /* README.md */; };
 		DF2651AC28321AC3001A9317 /* EventContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651AB28321AC3001A9317 /* EventContext.swift */; };
 		DF2651B028324E8A001A9317 /* MarkedStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */; };
 		DF2651CE28328B23001A9317 /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651CC28328B23001A9317 /* Strategy.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DF1D7D0E29EBF5E000A2302F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		DF2651AB28321AC3001A9317 /* EventContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventContext.swift; sourceTree = "<group>"; };
 		DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkedStrategy.swift; sourceTree = "<group>"; };
 		DF2651CC28328B23001A9317 /* Strategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Strategy.swift; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				DFEB9DD627F49EFB007D978A /* InfoPlist.strings */,
 				DF9286D526F5CFB000002080 /* SokIM.entitlements */,
 				DFFFD8AF280FE99B007B6470 /* icon.tiff */,
+				DF1D7D0E29EBF5E000A2302F /* README.md */,
 			);
 			path = SokIM;
 			sourceTree = "<group>";
@@ -167,6 +170,7 @@
 			files = (
 				DF9286D026F5CFB000002080 /* Assets.xcassets in Resources */,
 				DFFFD8B0280FE99B007B6470 /* icon.tiff in Resources */,
+				DF1D7D0F29EBF5E000A2302F /* README.md in Resources */,
 				DFEB9DD827F49EFB007D978A /* InfoPlist.strings in Resources */,
 				DF9286D326F5CFB000002080 /* MainMenu.xib in Resources */,
 			);
@@ -369,7 +373,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 34FLEMFP24;
 				INFOPLIST_FILE = "$(SRCROOT)/SokIM/Info.plist";
@@ -396,7 +400,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 34FLEMFP24;
 				INFOPLIST_FILE = "$(SRCROOT)/SokIM/Info.plist";
