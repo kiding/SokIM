@@ -31,12 +31,12 @@
 
 /* Begin PBXFileReference section */
 		DF1D7D0E29EBF5E000A2302F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		DF1D7D1229EBF9BB00A2302F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		DF2651AB28321AC3001A9317 /* EventContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventContext.swift; sourceTree = "<group>"; };
 		DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkedStrategy.swift; sourceTree = "<group>"; };
 		DF2651CC28328B23001A9317 /* Strategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Strategy.swift; sourceTree = "<group>"; };
 		DF2651CD28328B23001A9317 /* DirectStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectStrategy.swift; sourceTree = "<group>"; };
 		DF2B53C12802B61D00A64F95 /* TwoSetEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoSetEngine.swift; sourceTree = "<group>"; };
-		DF67EC1B290FDB9E00BED120 /* ko */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ko; path = ko.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		DF7A3048289F96970003BFA6 /* InputMonitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputMonitor.swift; sourceTree = "<group>"; };
 		DF7A949D27F44C05005E3783 /* Controller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
 		DF7A949F27F470E7005E3783 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
@@ -138,8 +138,9 @@
 		DF9286C226F5CFAE00002080 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1250;
-				LastUpgradeCheck = 1410;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					DF9286C926F5CFAE00002080 = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -152,6 +153,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				ko,
+				Base,
 			);
 			mainGroup = DF9286C126F5CFAE00002080;
 			productRefGroup = DF9286CB26F5CFAE00002080 /* Products */;
@@ -228,7 +230,7 @@
 		DF9286D126F5CFB000002080 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				DF67EC1B290FDB9E00BED120 /* ko */,
+				DF1D7D1229EBF9BB00A2302F /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
