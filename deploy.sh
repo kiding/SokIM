@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Eeuxo pipefail
 
-APP='/Users/kiding/Library/Developer/Xcode/Archives/2023-04-16/SokIM 2023-04-16 7.09 PM.xcarchive/Products/Applications/SokIM.app'
+APP='/Users/kiding/Desktop/SokIM 2023-04-17 17-31-46/SokIM.app'
 
 rm -rfv /tmp/SokIM
 mkdir /tmp/SokIM
@@ -24,7 +24,21 @@ killall KeyboardSettings keyboardservicesd TextInputMenuAgent TextInputSwitcher 
     --root ROOT \
     --scripts scripts \
     --identifier com.kiding.inputmethod.sok \
-    --sign "Developer ID Installer: Dongsung Kim" \
+    SokIM_component.pkg
+
+  productbuild \
+    --synthesize \
+    --package SokIM_component.pkg \
+    Distribution.xml
+
+  productbuild \
+    --distribution Distribution.xml \
+    --package-path . \
+    SokIM_unsigned.pkg
+
+  productsign \
+    --sign "Developer ID Installer: Dong Sung Kim (MHKL47BD47)" \
+    SokIM_unsigned.pkg \
     SokIM.pkg
   open .
 popd
