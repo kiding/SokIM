@@ -27,10 +27,27 @@ killall KeyboardSettings keyboardservicesd TextInputMenuAgent TextInputSwitcher 
     --identifier com.kiding.inputmethod.sok \
     SokIM_component.pkg
 
-  productbuild \
-    --synthesize \
-    --package SokIM_component.pkg \
-    Distribution.xml
+  cat > Distribution.xml <<< '<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>속 입력기</title>
+    <pkg-ref id="com.kiding.inputmethod.sok"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <volume-check>
+      <allowed-os-versions>
+        <os-version min="13.0"/>
+      </allowed-os-versions>
+    </volume-check>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.kiding.inputmethod.sok"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.kiding.inputmethod.sok" visible="false">
+        <pkg-ref id="com.kiding.inputmethod.sok"/>
+    </choice>
+    <pkg-ref id="com.kiding.inputmethod.sok" version="0" onConclusion="RequireLogout">SokIM_component.pkg</pkg-ref>
+</installer-gui-script>'
 
   productbuild \
     --distribution Distribution.xml \
