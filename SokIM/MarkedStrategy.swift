@@ -6,7 +6,8 @@ struct MarkedStrategy: Strategy {
 
         // composing이 변경된 경우
         if oldState.composing != state.composing {
-            sender.setMarkedText(state.composing, selectionRange: defaultRange, replacementRange: defaultRange)
+            let string = NSAttributedString(string: state.composing, attributes: [.backgroundColor: NSColor.clear])
+            sender.setMarkedText(string, selectionRange: defaultRange, replacementRange: defaultRange)
 
             // OS가 추가 처리 하지 않음
             return true
@@ -27,7 +28,8 @@ struct MarkedStrategy: Strategy {
              */
             let selectedRange = sender.selectedRange()
             if 0 < selectedRange.length && selectedRange.length < NSNotFound {
-                sender.setMarkedText(state.composed, selectionRange: defaultRange, replacementRange: selectedRange)
+                let string = NSAttributedString(string: state.composed, attributes: [.backgroundColor: NSColor.clear])
+                sender.setMarkedText(string, selectionRange: defaultRange, replacementRange: selectedRange)
             }
 
             sender.insertText(state.composed, replacementRange: defaultRange)
@@ -35,7 +37,8 @@ struct MarkedStrategy: Strategy {
 
         // composing -> setMarkedText
         if state.composing.count > 0 {
-            sender.setMarkedText(state.composing, selectionRange: defaultRange, replacementRange: defaultRange)
+            let string = NSAttributedString(string: state.composing, attributes: [.backgroundColor: NSColor.clear])
+            sender.setMarkedText(string, selectionRange: defaultRange, replacementRange: defaultRange)
         }
     }
 
