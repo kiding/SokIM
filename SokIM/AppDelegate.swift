@@ -216,10 +216,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return handled
         }
 
-        // event가 engine이 처리할 수 없는 글자인 경우
-        if state.engine.eventToTuple(event) == nil {
-            // 조합 종료
-            eventContext.strategy.flush(from: state, to: sender)
+        if (
+            // event가 engine이 처리할 수 없는 글자인 경우
+            state.engine.eventToTuple(event) == nil
+        ) || (
+            // event가 state가 입력할 문자열과 완전히 동일한 경우
+            state.composed == event.characters
+            && state.composing == ""
+        ) {
+            // 이전 조합 종료
+            eventContext.strategy.flush(from: oldState, to: sender)
 
             // 완성/조합 초기화
             state.clear(composing: true)
