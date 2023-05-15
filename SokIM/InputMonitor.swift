@@ -166,6 +166,9 @@ class InputMonitor {
         return result
     }
 
+    /** modifier 키 눌림 상태 (State와 유사) */
+    private var modifier: [ModifierUsage: InputType] = [:]
+
     private func nextHID(_ value: IOHIDValue, _ device: IOHIDDevice) {
         let timestamp = IOHIDValueGetTimeStamp(value)
         let type: InputType = IOHIDValueGetIntegerValue(value) != 0 ? .keyDown : .keyUp
@@ -179,7 +182,10 @@ class InputMonitor {
             usage = getMappedModifierUsage(usage, device)
         }
 
+        // usage가 modifier인 경우
         if let key = ModifierUsage(rawValue: usage) {
+            modifier[key] = type
+
             // 별도 처리: Caps Lock / 오른쪽 Command Down: 한/A 표시만 우선 갱신, 실제 처리는 State에서
             if (
                 (type, key) == (.keyDown, .capsLock)
@@ -194,6 +200,30 @@ class InputMonitor {
             // 별도 처리: Caps Lock Up: 상태 및 LED 자동으로 끄기
             if (type, key) == (.keyUp, .capsLock) {
                 setKeyboardCapsLock(enabled: false)
+            }
+        }
+        // 그 외 경우 중 keyDown인 경우
+        else if type == .keyDown {
+            // Command, Shift, Alt, Control
+            let isCommandDown = modifier[.leftCommand] == .keyDown || modifier[.rightCommand] == .keyDown
+            let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
+            let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
+
+            // 별도 처리: Command/Shift/Control + Space: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            if (
+                isCommandDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .commandSpace
+            ) || (
+                isShiftDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .shiftSpace
+            ) || (
+                isControlDown
+                && usage == SpecialUsage.space.rawValue
+                && Preferences.rotateShortcut == .controlSpace
+            ) {
+                (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
             }
         }
 

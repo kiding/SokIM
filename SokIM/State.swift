@@ -11,7 +11,7 @@ struct State: CustomStringConvertible {
 
     // MARK: - Input
 
-    /** modifier 키 눌림 상태 */
+    /** modifier 키 눌림 상태 (InputMonitor와 유사) */
     var modifier: [ModifierUsage: InputType] = [:]
 
     /** 현재 눌려있는 Input, 반복 입력 시 사용 */
