@@ -23,4 +23,4 @@
 ## 디버그 메시지 보기
 
 1. 속 입력기 → 디버그 모드 활성화
-1. 터미널에서 `log stream --predicate 'process == "SokIM"' --debug --style compact`
+1. 터미널에서 `log stream --predicate 'process == "SokIM"' --debug --style compact | grep swift`
