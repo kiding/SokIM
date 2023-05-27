@@ -64,7 +64,7 @@ struct QwertyEngine: Engine {
         0x2F: (("[", false), ("“", false), ("{", false), ("”", false)), // Keyboard [ and {
         0x30: (("]", false), ("‘", false), ("}", false), ("’", false)), // Keyboard ] and }
         0x31: (("\\", false), ("«", false), ("|", false), ("»", false)), // Keyboard \ and |
-        0x32: (("#", false), ("«", false), ("~", false), ("»", false)), // Keyboard Non-US # and ~
+        0x32: (("\\", false), ("«", false), ("|", false), ("»", false)), // Keyboard Non-US # and ~
         0x33: ((";", false), ("…", false), (":", false), ("Ú", false)), // Keyboard ; and :
         0x34: (("'", false), ("æ", false), ("\"", false), ("Æ", false)), // Keyboard ‘ and “
         0x35: (("`", false), ("`", true), ("~", false), ("`", false)), // Keyboard Grave Accent and Tilde
