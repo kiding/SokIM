@@ -84,18 +84,32 @@ protocol Engine {
 
 extension Engine {
     /** USB HID Usage -> CharTuple 매핑 */
-    static func usageToTuple(_ usage: UInt32, _ isAltDown: Bool, _ isShiftDown: Bool) -> CharTuple? {
+    static func usageToTuple(_ usage: UInt32, _ isAltDown: Bool, _ isShiftDown: Bool, _ isQwertyCapsLockOn: Bool) -> CharTuple? {
         let map = usageToTupleMap[usage]
 
-        switch (isAltDown, isShiftDown) {
-        case (true, true):
-            return map?.altShift
-        case (true, false):
-            return map?.alt
-        case (false, true):
-            return map?.shift
-        case (false, false):
-            return map?.base
+        if isQwertyCapsLockOn && usage >= 0x04 && usage <= 0x1D {
+            switch (isAltDown, !isShiftDown) {
+            case (true, true):
+                return map?.altShift
+            case (true, false):
+                return map?.alt
+            case (false, true):
+                return map?.shift
+            case (false, false):
+                return map?.base
+            }
+        }
+        else {
+            switch (isAltDown, isShiftDown) {
+            case (true, true):
+                return map?.altShift
+            case (true, false):
+                return map?.alt
+            case (false, true):
+                return map?.shift
+            case (false, false):
+                return map?.base
+            }
         }
     }
 
@@ -119,9 +133,11 @@ extension Engine {
         // Alt, Shift: keyDown 상태
         let isAltDown = flags.contains(.option)
         let isShiftDown = flags.contains(.shift)
+        let isCapsLockOn = flags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
+        let isQwerty = Self.self == QwertyEngine.self
 
         if let usage = keyCodeToUsage[Int(keyCode)],
-           let tuple = usageToTuple(usage, isAltDown, isShiftDown) {
+           let tuple = usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn && isQwerty) {
             return tuple
         } else {
             return nil

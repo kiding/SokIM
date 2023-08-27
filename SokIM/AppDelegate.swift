@@ -47,6 +47,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) {
             self.reset($0)
         }
+        
+        // CapsLock 상태를 모니터링
+        NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged, handler: capsLockHasToggled)
 
         // 사용자의 한/A 전환키 조합을 시스템에 등록, 더미 함수 호출
         var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
@@ -274,5 +277,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         default:
             break
         }
+    }
+    
+    /** CapsLock 상태를 반영 */
+    private func capsLockHasToggled(with event: NSEvent) {
+        state.capsLockState = event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.capsLock)
     }
 }
