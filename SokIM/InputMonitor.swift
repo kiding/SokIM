@@ -190,6 +190,8 @@ class InputMonitor {
             if (
                 (type, key) == (.keyDown, .capsLock)
                 && Preferences.rotateShortcut == .capsLock
+                && modifier[.leftShift] != .keyDown // Shift가 눌려있을 경우 한영전환 표시 무시
+                && modifier[.rightShift] != .keyDown
             ) || (
                 (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand
@@ -198,7 +200,9 @@ class InputMonitor {
             }
 
             // 별도 처리: Caps Lock Up: 상태 및 LED 자동으로 끄기
-            if (type, key) == (.keyUp, .capsLock) {
+            if (type, key) == (.keyUp, .capsLock)
+                && modifier[.leftShift] != .keyDown // Shift가 눌려있을 경우 캡스락 자동 끄기 안함
+                && modifier[.rightShift] != .keyDown {
                 setKeyboardCapsLock(enabled: false)
             }
         }

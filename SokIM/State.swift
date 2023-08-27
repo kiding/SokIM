@@ -29,6 +29,8 @@ struct State: CustomStringConvertible {
             if (
                 (type, key) == (.keyDown, .capsLock)
                 && Preferences.rotateShortcut == .capsLock
+                && modifier[.leftShift] != .keyDown // Shift가 눌려있을 경우 rotate 차단
+                && modifier[.rightShift] != .keyDown
             ) || (
                 (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand
