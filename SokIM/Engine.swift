@@ -61,8 +61,8 @@ private let keyCodeToUsage: [Int: UInt32] = [
 
 /** (글자, 글자가 이후 조합을 허용하는지 여부) */
 typealias CharTuple = (char: Character, composable: Bool)
-/** 특정 키를 alt, shift와 합쳐서 눌렀을 때 해당하는 CharTuple */
-typealias CharTupleMap = (base: CharTuple, alt: CharTuple?, shift: CharTuple?, altShift: CharTuple?)
+/** 특정 키를 alt, shift와 합쳐서 눌렀을 때 해당하는 CharTuple과 Caps Lock 상태에 영향을 받는지 여부 */
+typealias CharTupleMap = (base: CharTuple, alt: CharTuple, shift: CharTuple, altShift: CharTuple, capsLock: Bool)
 
 /** 키보드 엔진 / 오토마타 */
 protocol Engine {

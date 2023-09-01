@@ -117,76 +117,76 @@ struct TwoSetEngine: Engine {
     static var name: String { "가" }
 
     static let usageToTupleMap: [UInt32: CharTupleMap] = [
-        0x04: (("ㅁ", true), ("a", false), ("ㅁ", true), ("A", false)), // Keyboard a and A
-        0x05: (("ㅠ", true), ("b", false), ("ㅠ", true), ("B", false)), // Keyboard b and B
-        0x06: (("ㅊ", true), ("c", false), ("ㅊ", true), ("C", false)), // Keyboard c and C
-        0x07: (("ㅇ", true), ("d", false), ("ㅇ", true), ("D", false)), // Keyboard d and D
-        0x08: (("ㄷ", true), ("e", false), ("ㄸ", true), ("E", false)), // Keyboard e and E
-        0x09: (("ㄹ", true), ("f", false), ("ㄹ", true), ("F", false)), // Keyboard f and F
-        0x0A: (("ㅎ", true), ("g", false), ("ㅎ", true), ("G", false)), // Keyboard g and G
-        0x0B: (("ㅗ", true), ("h", false), ("ㅗ", true), ("H", false)), // Keyboard h and H
-        0x0C: (("ㅑ", true), ("i", false), ("ㅑ", true), ("I", false)), // Keyboard i and I
-        0x0D: (("ㅓ", true), ("j", false), ("ㅓ", true), ("J", false)), // Keyboard j and J
-        0x0E: (("ㅏ", true), ("k", false), ("ㅏ", true), ("K", false)), // Keyboard k and K
-        0x0F: (("ㅣ", true), ("l", false), ("ㅣ", true), ("L", false)), // Keyboard l and L
-        0x10: (("ㅡ", true), ("m", false), ("ㅡ", true), ("M", false)), // Keyboard m and M
-        0x11: (("ㅜ", true), ("n", false), ("ㅜ", true), ("N", false)), // Keyboard n and N
-        0x12: (("ㅐ", true), ("o", false), ("ㅒ", true), ("O", false)), // Keyboard o and O
-        0x13: (("ㅔ", true), ("p", false), ("ㅖ", true), ("P", false)), // Keyboard p and P
-        0x14: (("ㅂ", true), ("q", false), ("ㅃ", true), ("Q", false)), // Keyboard q and Q
-        0x15: (("ㄱ", true), ("r", false), ("ㄲ", true), ("R", false)), // Keyboard r and R
-        0x16: (("ㄴ", true), ("s", false), ("ㄴ", true), ("S", false)), // Keyboard s and S
-        0x17: (("ㅅ", true), ("t", false), ("ㅆ", true), ("T", false)), // Keyboard t and T
-        0x18: (("ㅕ", true), ("u", false), ("ㅕ", true), ("U", false)), // Keyboard u and U
-        0x19: (("ㅍ", true), ("v", false), ("ㅍ", true), ("V", false)), // Keyboard v and V
-        0x1A: (("ㅈ", true), ("w", false), ("ㅉ", true), ("W", false)), // Keyboard w and W
-        0x1B: (("ㅌ", true), ("x", false), ("ㅌ", true), ("X", false)), // Keyboard x and X
-        0x1C: (("ㅛ", true), ("y", false), ("ㅛ", true), ("Y", false)), // Keyboard y and Y
-        0x1D: (("ㅋ", true), ("z", false), ("ㅋ", true), ("Z", false)), // Keyboard z and Z
+        0x04: (("ㅁ", true), ("a", false), ("ㅁ", true), ("A", false), false), // Keyboard a and A
+        0x05: (("ㅠ", true), ("b", false), ("ㅠ", true), ("B", false), false), // Keyboard b and B
+        0x06: (("ㅊ", true), ("c", false), ("ㅊ", true), ("C", false), false), // Keyboard c and C
+        0x07: (("ㅇ", true), ("d", false), ("ㅇ", true), ("D", false), false), // Keyboard d and D
+        0x08: (("ㄷ", true), ("e", false), ("ㄸ", true), ("E", false), false), // Keyboard e and E
+        0x09: (("ㄹ", true), ("f", false), ("ㄹ", true), ("F", false), false), // Keyboard f and F
+        0x0A: (("ㅎ", true), ("g", false), ("ㅎ", true), ("G", false), false), // Keyboard g and G
+        0x0B: (("ㅗ", true), ("h", false), ("ㅗ", true), ("H", false), false), // Keyboard h and H
+        0x0C: (("ㅑ", true), ("i", false), ("ㅑ", true), ("I", false), false), // Keyboard i and I
+        0x0D: (("ㅓ", true), ("j", false), ("ㅓ", true), ("J", false), false), // Keyboard j and J
+        0x0E: (("ㅏ", true), ("k", false), ("ㅏ", true), ("K", false), false), // Keyboard k and K
+        0x0F: (("ㅣ", true), ("l", false), ("ㅣ", true), ("L", false), false), // Keyboard l and L
+        0x10: (("ㅡ", true), ("m", false), ("ㅡ", true), ("M", false), false), // Keyboard m and M
+        0x11: (("ㅜ", true), ("n", false), ("ㅜ", true), ("N", false), false), // Keyboard n and N
+        0x12: (("ㅐ", true), ("o", false), ("ㅒ", true), ("O", false), false), // Keyboard o and O
+        0x13: (("ㅔ", true), ("p", false), ("ㅖ", true), ("P", false), false), // Keyboard p and P
+        0x14: (("ㅂ", true), ("q", false), ("ㅃ", true), ("Q", false), false), // Keyboard q and Q
+        0x15: (("ㄱ", true), ("r", false), ("ㄲ", true), ("R", false), false), // Keyboard r and R
+        0x16: (("ㄴ", true), ("s", false), ("ㄴ", true), ("S", false), false), // Keyboard s and S
+        0x17: (("ㅅ", true), ("t", false), ("ㅆ", true), ("T", false), false), // Keyboard t and T
+        0x18: (("ㅕ", true), ("u", false), ("ㅕ", true), ("U", false), false), // Keyboard u and U
+        0x19: (("ㅍ", true), ("v", false), ("ㅍ", true), ("V", false), false), // Keyboard v and V
+        0x1A: (("ㅈ", true), ("w", false), ("ㅉ", true), ("W", false), false), // Keyboard w and W
+        0x1B: (("ㅌ", true), ("x", false), ("ㅌ", true), ("X", false), false), // Keyboard x and X
+        0x1C: (("ㅛ", true), ("y", false), ("ㅛ", true), ("Y", false), false), // Keyboard y and Y
+        0x1D: (("ㅋ", true), ("z", false), ("ㅋ", true), ("Z", false), false), // Keyboard z and Z
 
-        0x1E: (("1", false), ("¡", false), ("!", false), ("⁄", false)), // Keyboard 1 and !
-        0x1F: (("2", false), ("™", false), ("@", false), ("€", false)), // Keyboard 2 and @
-        0x20: (("3", false), ("£", false), ("#", false), ("‹", false)), // Keyboard 3 and #
-        0x21: (("4", false), ("¢", false), ("$", false), ("›", false)), // Keyboard 4 and $
-        0x22: (("5", false), ("∞", false), ("%", false), ("ﬁ", false)), // Keyboard 5 and %
-        0x23: (("6", false), ("§", false), ("^", false), ("ﬂ", false)), // Keyboard 6 and ∧
-        0x24: (("7", false), ("¶", false), ("&", false), ("‡", false)), // Keyboard 7 and &
-        0x25: (("8", false), ("•", false), ("*", false), ("°", false)), // Keyboard 8 and *
-        0x26: (("9", false), ("ª", false), ("(", false), ("·", false)), // Keyboard 9 and (
-        0x27: (("0", false), ("º", false), (")", false), ("‚", false)), // Keyboard 0 and )
+        0x1E: (("1", false), ("¡", false), ("!", false), ("⁄", false), false), // Keyboard 1 and !
+        0x1F: (("2", false), ("™", false), ("@", false), ("€", false), false), // Keyboard 2 and @
+        0x20: (("3", false), ("£", false), ("#", false), ("‹", false), false), // Keyboard 3 and #
+        0x21: (("4", false), ("¢", false), ("$", false), ("›", false), false), // Keyboard 4 and $
+        0x22: (("5", false), ("∞", false), ("%", false), ("ﬁ", false), false), // Keyboard 5 and %
+        0x23: (("6", false), ("§", false), ("^", false), ("ﬂ", false), false), // Keyboard 6 and ∧
+        0x24: (("7", false), ("¶", false), ("&", false), ("‡", false), false), // Keyboard 7 and &
+        0x25: (("8", false), ("•", false), ("*", false), ("°", false), false), // Keyboard 8 and *
+        0x26: (("9", false), ("ª", false), ("(", false), ("·", false), false), // Keyboard 9 and (
+        0x27: (("0", false), ("º", false), (")", false), ("‚", false), false), // Keyboard 0 and )
 
-        0x2C: ((" ", false), (" ", false), (" ", false), (" ", false)), // Keyboard Spacebar
-        0x2D: (("-", false), ("–", false), ("_", false), ("—", false)), // Keyboard - and (underscore)
-        0x2E: (("=", false), ("≠", false), ("+", false), ("±", false)), // Keyboard = and +
-        0x2F: (("[", false), ("“", false), ("{", false), ("”", false)), // Keyboard [ and {
-        0x30: (("]", false), ("‘", false), ("}", false), ("’", false)), // Keyboard ] and }
-        0x31: (("\\", false), ("«", false), ("|", false), ("»", false)), // Keyboard \ and |
-        0x32: (("\\", false), ("«", false), ("|", false), ("»", false)), // Keyboard Non-US # and ~
-        0x33: ((";", false), ("…", false), (":", false), ("Ú", false)), // Keyboard ; and :
-        0x34: (("'", false), ("æ", false), ("\"", false), ("Æ", false)), // Keyboard ‘ and “
+        0x2C: ((" ", false), (" ", false), (" ", false), (" ", false), false), // Keyboard Spacebar
+        0x2D: (("-", false), ("–", false), ("_", false), ("—", false), false), // Keyboard - and (underscore)
+        0x2E: (("=", false), ("≠", false), ("+", false), ("±", false), false), // Keyboard = and +
+        0x2F: (("[", false), ("“", false), ("{", false), ("”", false), false), // Keyboard [ and {
+        0x30: (("]", false), ("‘", false), ("}", false), ("’", false), false), // Keyboard ] and }
+        0x31: (("\\", false), ("«", false), ("|", false), ("»", false), false), // Keyboard \ and |
+        0x32: (("\\", false), ("«", false), ("|", false), ("»", false), false), // Keyboard Non-US # and ~
+        0x33: ((";", false), ("…", false), (":", false), ("Ú", false), false), // Keyboard ; and :
+        0x34: (("'", false), ("æ", false), ("\"", false), ("Æ", false), false), // Keyboard ‘ and “
 
-        0x35: (("₩", false), ("`", false), ("~", false), ("~", false)), // Keyboard Grave Accent and Tilde
+        0x35: (("₩", false), ("`", false), ("~", false), ("~", false), false), // Keyboard Grave Accent and Tilde
 
-        0x36: ((",", false), ("≤", false), ("<", false), ("¯", false)), // Keyboard , and <
-        0x37: ((".", false), ("≥", false), (">", false), ("˘", false)), // Keyboard . and >
-        0x38: (("/", false), ("÷", false), ("?", false), ("¿", false)), // Keyboard / and ?
-        0x54: (("/", false), ("/", false), ("/", false), ("/", false)), // Keypad /
-        0x55: (("*", false), ("*", false), ("*", false), ("*", false)), // Keypad *
-        0x56: (("-", false), ("-", false), ("-", false), ("-", false)), // Keypad -
-        0x57: (("+", false), ("+", false), ("+", false), ("+", false)), // Keypad +
+        0x36: ((",", false), ("≤", false), ("<", false), ("¯", false), false), // Keyboard , and <
+        0x37: ((".", false), ("≥", false), (">", false), ("˘", false), false), // Keyboard . and >
+        0x38: (("/", false), ("÷", false), ("?", false), ("¿", false), false), // Keyboard / and ?
+        0x54: (("/", false), ("/", false), ("/", false), ("/", false), false), // Keypad /
+        0x55: (("*", false), ("*", false), ("*", false), ("*", false), false), // Keypad *
+        0x56: (("-", false), ("-", false), ("-", false), ("-", false), false), // Keypad -
+        0x57: (("+", false), ("+", false), ("+", false), ("+", false), false), // Keypad +
 
-        0x59: (("1", false), ("1", false), ("1", false), ("1", false)), // Keypad 1 and End
-        0x5A: (("2", false), ("2", false), ("2", false), ("2", false)), // Keypad 2 and Down Arrow
-        0x5B: (("3", false), ("3", false), ("3", false), ("3", false)), // Keypad 3 and PageDn
-        0x5C: (("4", false), ("4", false), ("4", false), ("4", false)), // Keypad 4 and Left Arrow
-        0x5D: (("5", false), ("5", false), ("5", false), ("5", false)), // Keypad 5
-        0x5E: (("6", false), ("6", false), ("6", false), ("6", false)), // Keypad 6 and Right Arrow
-        0x5F: (("7", false), ("7", false), ("7", false), ("7", false)), // Keypad 7 and Home
-        0x60: (("8", false), ("8", false), ("8", false), ("8", false)), // Keypad 8 and Up Arrow
-        0x61: (("9", false), ("9", false), ("9", false), ("9", false)), // Keypad 9 and PageUp
-        0x62: (("0", false), ("0", false), ("0", false), ("0", false)), // Keypad 0 and Insert
-        0x63: ((".", false), (".", false), (".", false), (".", false)), // Keypad . and Delete
-        0x64: (("\\", false), ("«", false), ("|", false), ("»", false)) // Keyboard Non-US \ and |
+        0x59: (("1", false), ("1", false), ("1", false), ("1", false), false), // Keypad 1 and End
+        0x5A: (("2", false), ("2", false), ("2", false), ("2", false), false), // Keypad 2 and Down Arrow
+        0x5B: (("3", false), ("3", false), ("3", false), ("3", false), false), // Keypad 3 and PageDn
+        0x5C: (("4", false), ("4", false), ("4", false), ("4", false), false), // Keypad 4 and Left Arrow
+        0x5D: (("5", false), ("5", false), ("5", false), ("5", false), false), // Keypad 5
+        0x5E: (("6", false), ("6", false), ("6", false), ("6", false), false), // Keypad 6 and Right Arrow
+        0x5F: (("7", false), ("7", false), ("7", false), ("7", false), false), // Keypad 7 and Home
+        0x60: (("8", false), ("8", false), ("8", false), ("8", false), false), // Keypad 8 and Up Arrow
+        0x61: (("9", false), ("9", false), ("9", false), ("9", false), false), // Keypad 9 and PageUp
+        0x62: (("0", false), ("0", false), ("0", false), ("0", false), false), // Keypad 0 and Insert
+        0x63: ((".", false), (".", false), (".", false), (".", false), false), // Keypad . and Delete
+        0x64: (("\\", false), ("«", false), ("|", false), ("»", false), false) // Keyboard Non-US \ and |
     ]
 
     /** 한글 조합 영역 */
