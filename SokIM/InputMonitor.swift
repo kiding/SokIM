@@ -186,12 +186,12 @@ class InputMonitor {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // 별도 처리: Caps Lock / 오른쪽 Command Down: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            // 별도 처리: Caps Lock / 오른쪽 Command: 한/A 표시만 우선 갱신, 실제 처리는 State에서
             if (
-                (type, key) == (.keyDown, .capsLock)
+                (type, key) == (.keyUp, .capsLock)
                 && Preferences.rotateShortcut == .capsLock
             ) || (
-                (type, key) == (.keyDown, .rightCommand)
+                (type, key) == (.keyUp, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand
             ) {
                 (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
