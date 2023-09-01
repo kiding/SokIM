@@ -87,67 +87,26 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
 }
 
 /**
- 연결된 모든 HID 키보드에 대해 Caps Lock 상태와 LED 조정
- @see https://github.com/busyloop/maclight
+ 연결된 키보드에 대해 Caps Lock 상태 및 LED 조정
+ @see https://stackoverflow.com/a/75870807
  */
 func setKeyboardCapsLock(enabled: Bool) {
     let block = {
-        let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
+        var conn = io_connect_t()
+        let serv = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching(kIOHIDSystemClass))
 
-        /** HID 키보드 찾기 */
-        IOHIDManagerSetDeviceMatching(hid, [
-            kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop, // Generic Desktop Page (0x01)
-            kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard        // Keyboard (0x06, Collection Application)
-        ] as CFDictionary)
+        guard IOServiceOpen(serv, mach_task_self_, UInt32(kIOHIDParamConnectType), &conn) == KERN_SUCCESS else {
+            warning("IOServiceOpen 실패: \(serv)")
+            return
+        }
+        defer { IOServiceClose(conn) }
 
-        guard IOHIDManagerOpen(hid, 0) == kIOReturnSuccess else {
-            warning("IOHIDManagerOpen 실패")
+        guard IOHIDSetModifierLockState(conn, Int32(kIOHIDCapsLockState), enabled) == KERN_SUCCESS else {
+            warning("IOHIDSetModifierLockState 실패: \(conn)")
             return
         }
 
-        guard let devs = IOHIDManagerCopyDevices(hid) as? Set<IOHIDDevice> else {
-            warning("IOHIDManagerCopyDevices 실패")
-            return
-        }
-
-        for dev in devs {
-            /** Caps Lock 상태 */
-            let serv = IOHIDDeviceGetService(dev)
-            var conn = io_connect_t()
-
-            guard IOServiceOpen(serv, mach_task_self_, UInt32(kIOHIDParamConnectType), &conn) == KERN_SUCCESS else {
-                warning("IOServiceOpen 실패: \(serv)")
-                continue
-            }
-            defer { IOServiceClose(conn) }
-
-            guard IOHIDSetModifierLockState(conn, Int32(kIOHIDCapsLockState), enabled) == KERN_SUCCESS else {
-                warning("IOHIDSetModifierLockState 실패: \(conn)")
-                continue
-            }
-
-            debug("IOHIDSetModifierLockState 성공: \(dev)")
-
-            /** Caps Lock LED */
-            guard let elems = IOHIDDeviceCopyMatchingElements(dev, [
-                kIOHIDElementUsagePageKey: kHIDPage_LEDs,     // LED Page (0x08)
-                kIOHIDElementUsageKey: kHIDUsage_LED_CapsLock // Caps Lock (0x02)
-            ] as CFDictionary, 0) as? [IOHIDElement] else {
-                warning("IOHIDDeviceCopyMatchingElements 실패: \(dev)")
-                continue
-            }
-
-            let time = mach_absolute_time()
-            for elem in elems {
-                let val = IOHIDValueCreateWithIntegerValue(kCFAllocatorDefault, elem, time, enabled ? 1 : 0)
-                guard IOHIDDeviceSetValue(dev, elem, val) == kIOReturnSuccess else {
-                    warning("IOHIDDeviceSetValue 실패: \(elem)")
-                    continue
-                }
-            }
-
-            debug("IOHIDDeviceSetValue 성공: \(dev)")
-        }
+        debug("IOHIDSetModifierLockState 성공: \(conn) \(enabled)")
     }
 
     DispatchQueue.main.asyncAfter(deadline: .now(), execute: block)
