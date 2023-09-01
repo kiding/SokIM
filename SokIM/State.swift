@@ -13,6 +13,9 @@ struct State: CustomStringConvertible {
     /** modifier 키 눌림 상태 (InputMonitor와 유사) */
     var modifier: [ModifierUsage: InputType] = [:]
 
+    /** Caps Lock 키 활성화 상태 (InputMonitor와 유사) */
+    private var isCapsLockOn = false
+
     /** 현재 눌려있는 Input, 반복 입력 시 사용 */
     private(set) var down: Input?
 
@@ -34,8 +37,21 @@ struct State: CustomStringConvertible {
             ) {
                 commit()
                 rotate()
+            }
 
-                return
+            // Caps Lock: 한/A 전환 종류에 따라 상태 및 LED 실제 처리
+            if (type, key) == (.keyDown, .capsLock) {
+                // 한/A 전환이 Caps Lock인 경우 처리
+                if Preferences.rotateShortcut == .capsLock {
+                    // TODO:
+                    isCapsLockOn = false
+                    setKeyboardCapsLock(enabled: false)
+                }
+                // 그 외의 경우 일반 반전 처리
+                else {
+                    isCapsLockOn.toggle()
+                    setKeyboardCapsLock(enabled: isCapsLockOn)
+                }
             }
         }
         // 그 외 경우 중 keyDown인 경우
@@ -80,7 +96,7 @@ struct State: CustomStringConvertible {
             let elapsed = ms(since: input.timestamp)
 
             // engine으로 현재 input을 tuple로 변환 가능하며 처리 시간이 3000ms 이내면
-            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown), elapsed < 3000 {
+            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn), elapsed < 3000 {
                 // "₩ 대신 ` 입력" 처리
                 if tuple.char == "₩" && Preferences.graveOverWon {
                     tuple.char = "`"

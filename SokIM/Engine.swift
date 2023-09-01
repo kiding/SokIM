@@ -84,8 +84,19 @@ protocol Engine {
 
 extension Engine {
     /** USB HID Usage -> CharTuple 매핑 */
-    static func usageToTuple(_ usage: UInt32, _ isAltDown: Bool, _ isShiftDown: Bool) -> CharTuple? {
+    static func usageToTuple(
+        _ usage: UInt32,
+        _ isAltDown: Bool,
+        _ isShiftDown: Bool,
+        _ isCapsLockOn: Bool
+    ) -> CharTuple? {
         let map = usageToTupleMap[usage]
+
+        // Caps Lock이 켜져있고 map이 Caps Lock의 영향을 받는다면 Shift가 눌린 것으로 가정하여 처리
+        var isShiftDown = isShiftDown
+        if isCapsLockOn && map?.capsLock == true {
+            isShiftDown = true
+        }
 
         switch (isAltDown, isShiftDown) {
         case (true, true):
@@ -120,8 +131,11 @@ extension Engine {
         let isAltDown = flags.contains(.option)
         let isShiftDown = flags.contains(.shift)
 
+        // Caps Lock: 활성화 상태
+        let isCapsLockOn = flags.contains(.capsLock)
+
         if let usage = keyCodeToUsage[Int(keyCode)],
-           let tuple = usageToTuple(usage, isAltDown, isShiftDown) {
+           let tuple = usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn) {
             return tuple
         } else {
             return nil

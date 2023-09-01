@@ -197,9 +197,17 @@ class InputMonitor {
                 (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
             }
 
-            // 별도 처리: Caps Lock Up: 상태 및 LED 자동으로 끄기
-            if (type, key) == (.keyUp, .capsLock) {
-                setKeyboardCapsLock(enabled: false)
+            // Caps Lock: 한/A 전환 종류에 따라 상태 및 LED 우선 갱신, 실제 처리는 State에서
+            if (type, key) == (.keyDown, .capsLock) {
+                // 한/A 전환이 Caps Lock인 경우 처리
+                if Preferences.rotateShortcut == .capsLock {
+                    // TODO:
+                    setKeyboardCapsLock(enabled: false)
+                }
+                // 그 외의 경우 일반 반전 처리
+                else {
+                    setKeyboardCapsLock(enabled: !getKeyboardCapsLock())
+                }
             }
         }
         // 그 외 경우 중 keyDown인 경우

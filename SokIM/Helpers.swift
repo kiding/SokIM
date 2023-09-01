@@ -153,3 +153,24 @@ func setKeyboardCapsLock(enabled: Bool) {
     DispatchQueue.main.asyncAfter(deadline: .now(), execute: block)
     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: block)
 }
+
+func getKeyboardCapsLock() -> Bool {
+    var conn = io_connect_t()
+    let serv = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching(kIOHIDSystemClass))
+
+    guard IOServiceOpen(serv, mach_task_self_, UInt32(kIOHIDParamConnectType), &conn) == KERN_SUCCESS else {
+        warning("IOServiceOpen 실패: \(serv)")
+        return false
+    }
+    defer { IOServiceClose(conn) }
+
+    var enabled = false
+    guard IOHIDGetModifierLockState(conn, Int32(kIOHIDCapsLockState), &enabled) == KERN_SUCCESS else {
+        warning("IOHIDGetModifierLockState 실패: \(conn)")
+        return false
+    }
+
+    debug("IOHIDGetModifierLockState 성공: \(conn) \(enabled)")
+
+    return enabled
+}
