@@ -68,3 +68,4 @@ struct InputContext {
         !(left == right)
     }
 }
+// swiftlint:enable force_cast

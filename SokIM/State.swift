@@ -1,5 +1,4 @@
 // swiftlint:disable function_body_length
-
 import Cocoa
 import Foundation
 
@@ -25,7 +24,7 @@ struct State: CustomStringConvertible {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // Caps Lock / 오른쪽 Command: keyDown인 경우 한/A 전환
+            // Caps Lock / 오른쪽 Command: keyDown인 경우 한/A 전환 실제 처리
             if (
                 (type, key) == (.keyDown, .capsLock)
                 && Preferences.rotateShortcut == .capsLock
@@ -205,3 +204,4 @@ struct State: CustomStringConvertible {
 
     var description: String { "\(engine) '\(composed)' [\(composing)] \(modifier)" }
 }
+// swiftlint:enable function_body_length

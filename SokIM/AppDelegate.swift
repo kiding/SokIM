@@ -2,8 +2,7 @@
 // TODO: Safari: 구글 문서, iCloud Pages 한/글/을/입/력 문제... string 가져오기? Safari에서 downgrade 하는 방법 찾기
 // TODO: D->M downgrade: NotificationCenter to Context & memory
 
-// TODO: 인스톨러: 재시동, Sparkle
-
+// swiftlint:disable function_body_length
 import Cocoa
 import InputMethodKit
 
@@ -276,3 +275,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 }
+// swiftlint:enable function_body_length

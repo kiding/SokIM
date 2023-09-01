@@ -1,4 +1,4 @@
-// swiftlint:disable force_cast
+// swiftlint:disable force_cast function_body_length
 import ApplicationServices
 import AppKit
 import IOKit.hid
@@ -287,3 +287,4 @@ class InputMonitor {
         }
     }
 }
+// swiftlint:enable force_cast function_body_length
