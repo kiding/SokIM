@@ -16,6 +16,9 @@ struct State: CustomStringConvertible {
     /** Caps Lock 키 활성화 상태 */
     private var isCapsLockOn = false
 
+    /** 한/A 전환이 Caps Lock인 경우 Caps Lock이 활성화/비활성화 되는 과정에서 한/A 전환이 진행될 수 있는지 여부를 판단하는 플래그 (InputMonitor와 유사) */
+    private var canCapsLockRotate = true
+
     /** 마지막으로 keyDown이었던 Caps Lock Input */
     private var lastCapsLockDownInput: Input?
 
@@ -41,6 +44,12 @@ struct State: CustomStringConvertible {
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 처리
                 if Preferences.rotateShortcut == .capsLock {
+                    // Caps Lock 활성 -> 비활성: 한/A 전환 1회 억제
+                    if isCapsLockOn {
+                        canCapsLockRotate = false
+                    }
+
+                    // Caps Lock 비활성화
                     isCapsLockOn = false
                     setKeyboardCapsLock(enabled: false)
                     lastCapsLockDownInput = input
@@ -58,14 +67,20 @@ struct State: CustomStringConvertible {
                 // 마지막으로 keyDown된 Caps Lock Input의 timestamp가 800ms 이상 차이 나면 Caps Lock 활성화
                 if let down = lastCapsLockDownInput,
                     ms(absolute: input.timestamp) - ms(absolute: down.timestamp) > 800 {
+                    // Caps Lock 비활성 -> 활성: 한/A 전환 1회 억제
+                    canCapsLockRotate = false
+
+                    // Caps Lock 활성화
                     isCapsLockOn = true
                     setKeyboardCapsLock(enabled: true)
                     lastCapsLockDownInput = nil
                 }
                 // 그 외에는 한/A 전환
-                else {
+                else if canCapsLockRotate {
                     commit()
                     rotate()
+                } else {
+                    canCapsLockRotate = true
                 }
             }
         }

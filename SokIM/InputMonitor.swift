@@ -1,4 +1,4 @@
-// swiftlint:disable force_cast function_body_length
+// swiftlint:disable force_cast function_body_length cyclomatic_complexity
 import ApplicationServices
 import AppKit
 import IOKit.hid
@@ -169,6 +169,9 @@ class InputMonitor {
     /** modifier 키 눌림 상태 (State와 유사) */
     private var modifier: [ModifierUsage: InputType] = [:]
 
+    /** 한/A 전환이 Caps Lock인 경우 Caps Lock이 활성화/비활성화 되는 과정에서 한/A 전환이 진행될 수 있는지 여부를 판단하는 플래그 (State와 유사) */
+    private var canCapsLockRotate = true
+
     /** 한/A 전환이 Caps Lock인 경우 1초 이상 누르고 있음을 탐지하는 타이머 */
     private var capsLockTimer = DispatchWorkItem(block: {})
 
@@ -189,33 +192,50 @@ class InputMonitor {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // 별도 처리: Caps Lock / 오른쪽 Command: 한/A 표시만 우선 갱신, 실제 처리는 State에서
-            if (
-                (type, key) == (.keyUp, .capsLock)
-                && Preferences.rotateShortcut == .capsLock
-            ) || (
-                (type, key) == (.keyUp, .rightCommand)
-                && Preferences.rotateShortcut == .rightCommand
-            ) {
+            // 별도 처리: 오른쪽 Command: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            if (type, key) == (.keyUp, .rightCommand)
+                && Preferences.rotateShortcut == .rightCommand {
                 (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
             }
 
-            // Caps Lock: 한/A 전환 종류에 따라 상태 및 LED 우선 갱신, 실제 처리는 State에서
+            // 별도 처리: Caps Lock: 한/A 전환 종류에 따라 상태 및 LED 우선 갱신, 실제 처리는 State에서
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 800ms 이상 누르고 있으면 활성화
                 if Preferences.rotateShortcut == .capsLock {
+                    let enabled = getKeyboardCapsLock()
+
+                    // Caps Lock 활성 -> 비활성: 한/A 전환 1회 억제
+                    if enabled {
+                        canCapsLockRotate = false
+                    }
+
+                    // Caps Lock 비활성화 및 타이머 초기화
                     setKeyboardCapsLock(enabled: false)
                     capsLockTimer.cancel()
-                    capsLockTimer = DispatchWorkItem(block: { [self] in
+                    capsLockTimer = DispatchWorkItem { [self] in
                         if modifier[.capsLock] == .keyDown {
+                            // Caps Lock 비활성 -> 활성: 한/A 전환 1회 억제
+                            canCapsLockRotate = false
+
+                            // Caps Lock 활성화
                             setKeyboardCapsLock(enabled: true)
                         }
-                    })
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: capsLockTimer)
                 }
                 // 그 외의 경우 일반 반전 처리
                 else {
                     setKeyboardCapsLock(enabled: !getKeyboardCapsLock())
+                }
+            }
+
+            // 별도 처리: Caps Lock: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            if (type, key) == (.keyUp, .capsLock)
+                && Preferences.rotateShortcut == .capsLock {
+                if canCapsLockRotate {
+                    (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
+                } else {
+                    canCapsLockRotate = true
                 }
             }
         }
@@ -304,4 +324,4 @@ class InputMonitor {
         }
     }
 }
-// swiftlint:enable force_cast function_body_length
+// swiftlint:enable force_cast function_body_length cyclomatic_complexity
