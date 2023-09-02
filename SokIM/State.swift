@@ -1,4 +1,4 @@
-// swiftlint:disable function_body_length
+// swiftlint:disable function_body_length cyclomatic_complexity
 import Cocoa
 import Foundation
 
@@ -13,8 +13,11 @@ struct State: CustomStringConvertible {
     /** modifier 키 눌림 상태 (InputMonitor와 유사) */
     var modifier: [ModifierUsage: InputType] = [:]
 
-    /** Caps Lock 키 활성화 상태 (InputMonitor와 유사) */
+    /** Caps Lock 키 활성화 상태 */
     private var isCapsLockOn = false
+
+    /** 마지막으로 keyDown이었던 Caps Lock Input */
+    private var lastCapsLockDownInput: Input?
 
     /** 현재 눌려있는 Input, 반복 입력 시 사용 */
     private(set) var down: Input?
@@ -27,14 +30,9 @@ struct State: CustomStringConvertible {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // Caps Lock / 오른쪽 Command: keyUp인 경우 한/A 전환 실제 처리
-            if (
-                (type, key) == (.keyUp, .capsLock)
-                && Preferences.rotateShortcut == .capsLock
-            ) || (
-                (type, key) == (.keyUp, .rightCommand)
-                && Preferences.rotateShortcut == .rightCommand
-            ) {
+            // 오른쪽 Command: keyUp인 경우 한/A 전환 실제 처리
+            if (type, key) == (.keyUp, .rightCommand)
+                && Preferences.rotateShortcut == .rightCommand {
                 commit()
                 rotate()
             }
@@ -43,14 +41,31 @@ struct State: CustomStringConvertible {
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 처리
                 if Preferences.rotateShortcut == .capsLock {
-                    // TODO:
                     isCapsLockOn = false
                     setKeyboardCapsLock(enabled: false)
+                    lastCapsLockDownInput = input
                 }
                 // 그 외의 경우 일반 반전 처리
                 else {
                     isCapsLockOn.toggle()
                     setKeyboardCapsLock(enabled: isCapsLockOn)
+                }
+            }
+
+            // Caps Lock: keyUp인 경우 한/A 전환 및 Caps Lock 실제 처리
+            if (type, key) == (.keyUp, .capsLock)
+                && Preferences.rotateShortcut == .capsLock {
+                // 마지막으로 keyDown된 Caps Lock Input의 timestamp가 800ms 이상 차이 나면 Caps Lock 활성화
+                if let down = lastCapsLockDownInput,
+                    ms(absolute: input.timestamp) - ms(absolute: down.timestamp) > 800 {
+                    isCapsLockOn = true
+                    setKeyboardCapsLock(enabled: true)
+                    lastCapsLockDownInput = nil
+                }
+                // 그 외에는 한/A 전환
+                else {
+                    commit()
+                    rotate()
                 }
             }
         }
@@ -220,4 +235,4 @@ struct State: CustomStringConvertible {
 
     var description: String { "\(engine) '\(composed)' [\(composing)] \(modifier)" }
 }
-// swiftlint:enable function_body_length
+// swiftlint:enable function_body_length cyclomatic_complexity

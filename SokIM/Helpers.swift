@@ -30,7 +30,7 @@ func warning(_ message: String = "",
 @inlinable func flip<T>(_ array: [T]) -> [T: Int] { Dictionary(uniqueKeysWithValues: zip(array, 0..<array.count)) }
 @inlinable func flip<T, U>(_ dictionary: [T: U]) -> [U: T] { dictionary.reduce(into: [:]) { $0[$1.value] = $1.key } }
 
-// MARK: - Etc
+// MARK: - OS AbsoluteTime
 
 // https://developer.apple.com/library/archive/qa/qa1398/
 private var sTimebaseInfo = mach_timebase_info()
@@ -48,6 +48,20 @@ func ms(since: UInt64) -> Int64 {
 
     return nsec / Int64(NSEC_PER_MSEC)
 }
+
+func ms(absolute: UInt64) -> UInt64 {
+    if sTimebaseInfo.denom == 0 {
+        guard mach_timebase_info(&sTimebaseInfo) == KERN_SUCCESS else {
+            return 0
+        }
+    }
+
+    let nsec = UInt64(absolute) * UInt64(sTimebaseInfo.numer) / UInt64(sTimebaseInfo.denom)
+
+    return nsec / UInt64(NSEC_PER_MSEC)
+}
+
+// MARK: - Etc
 
 /**
  "보조 키(Modifier Keys)" 매핑 설정에 맞는 usage 값 반환
