@@ -110,6 +110,13 @@ class StatusBar {
         graveItem.action = #selector(toggleGraveOverWon)
         menu.addItem(graveItem)
 
+        let abcItem = NSMenuItem()
+        abcItem.title = "ABC 입력기 제한"
+        abcItem.state = Preferences.suppressABC ? .on : .off
+        abcItem.target = self
+        abcItem.action = #selector(toggleSuppressABC)
+        menu.addItem(abcItem)
+
         let debugItem = NSMenuItem()
         debugItem.title = "디버그 모드"
         debugItem.state = Preferences.debug ? .on : .off
@@ -222,13 +229,18 @@ class StatusBar {
 
     /** 기타 설정 */
 
-    @objc func toggleDebug(sender: NSMenuItem) {
-        Preferences.debug = sender.state == .on ? false : true
-        sender.state = Preferences.debug ? .on : .off
-    }
-
     @objc func toggleGraveOverWon(sender: NSMenuItem) {
         Preferences.graveOverWon = sender.state == .on ? false : true
         sender.state = Preferences.graveOverWon ? .on : .off
+    }
+
+    @objc func toggleSuppressABC(sender: NSMenuItem) {
+        Preferences.suppressABC = sender.state == .on ? false : true
+        sender.state = Preferences.suppressABC ? .on : .off
+    }
+
+    @objc func toggleDebug(sender: NSMenuItem) {
+        Preferences.debug = sender.state == .on ? false : true
+        sender.state = Preferences.debug ? .on : .off
     }
 }

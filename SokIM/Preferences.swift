@@ -27,6 +27,11 @@ struct Preferences {
         set(new) { UserDefaults.standard.set(new, forKey: "GraveOverWon") }
     }
 
+    static var suppressABC: Bool {
+        get { UserDefaults.standard.bool(forKey: "SuppressABC") }
+        set(new) { UserDefaults.standard.set(new, forKey: "SuppressABC") }
+    }
+
     static var debug: Bool {
         get { UserDefaults.standard.bool(forKey: "Debug") }
         set(new) { UserDefaults.standard.set(new, forKey: "Debug") }

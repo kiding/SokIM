@@ -51,6 +51,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
         InstallEventHandler(GetApplicationEventTarget(), eventHotKeyHandler, 1, &eventSpec, nil, &eventHandlerRef)
         registerEventHotKey(Preferences.rotateShortcut)
+
+        // 입력기가 변경되는 시점에 ABC 입력기 제한 로직 실행
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(suppressABC),
+            name: NSTextInputContext.keyboardSelectionDidChangeNotification,
+            object: nil
+        )
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -272,6 +280,55 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         default:
             break
+        }
+    }
+
+    @objc private func suppressABC(_ aNotification: Notification) {
+        debug("\(String(describing: aNotification))")
+
+        guard Preferences.suppressABC == true else { return }
+
+        let current = TISCopyCurrentKeyboardInputSource()?.takeRetainedValue()
+        guard let current = current else {
+            warning("TISCopyCurrentKeyboardInputSource 실패")
+            return
+        }
+
+        let currentIDOpaque = TISGetInputSourceProperty(current, kTISPropertyInputSourceID)
+        guard let currentIDOpaque = currentIDOpaque else {
+            warning("TISGetInputSourceProperty 실패")
+            return
+        }
+        let currentID = Unmanaged<CFString>.fromOpaque(currentIDOpaque).takeUnretainedValue() as String
+
+        if currentID != "com.apple.keylayout.ABC" {
+            debug("현재 입력기 ABC 아님: \(currentID)")
+            return
+        }
+
+        let sokArray = TISCreateInputSourceList([
+            kTISPropertyInputSourceType: kTISTypeKeyboardInputMode,
+            kTISPropertyInputModeID: "com.kiding.inputmethod.sok.mode" as CFString
+        ] as CFDictionary, false)?.takeRetainedValue() as? [TISInputSource]
+        guard let sokArray = sokArray else {
+            warning("TISCreateInputSourceList 실패")
+            return
+        }
+
+        let sok = sokArray.first
+        guard let sok = sok else {
+            warning("sokArray.first 실패")
+            return
+        }
+
+        // "시스템 설정 > 암호" 필드에서는 무한 루프에 빠질 수 있음
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+            guard TISSelectInputSource(sok) == 0 else {
+                warning("TISSelectInputSource 실패")
+                return
+            }
+
+            debug("ABC 입력기 제한 성공")
         }
     }
 }
