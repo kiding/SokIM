@@ -59,6 +59,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
+
+        // 입력기가 변경되는 시점에 보안 입력 상태인 경우 영문 소문자 입력 상태로 초기화
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(abcOnSecureInput),
+            name: NSTextInputContext.keyboardSelectionDidChangeNotification,
+            object: nil
+        )
+
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -145,6 +154,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         inputMonitor.flush()
         state = State(engine: state.engine)
+        if getKeyboardCapsLock() {
+            setKeyboardCapsLock(enabled: false)
+        }
         eventContext = EventContext()
     }
 
@@ -185,18 +197,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             debug("event context 변경!")
             state.clear(composing: true)
             eventContext = interimEventContext
-        }
-
-        // 별도 처리: 보안 입력 상태인 경우 Monitor가 작동하지 않음
-        if IsSecureEventInputEnabled() {
-            // Caps Lock 끄기
-            setKeyboardCapsLock(enabled: false)
-
-            // modifier 끄기
-            state.modifier.removeAll()
-
-            // OS가 대신 처리하도록 반환
-            return false
         }
 
         // 기존 state 보존
@@ -330,6 +330,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
             debug("ABC 입력기 제한 성공")
         }
+    }
+
+    @objc private func abcOnSecureInput(_ aNotification: Notification) {
+        debug("\(String(describing: aNotification))")
+
+        guard IsSecureEventInputEnabled() else { return }
+
+        state.engine = QwertyEngine.self
+        statusBar.setEngine(QwertyEngine.self)
+
+        reset(nil)
+
+        debug("abcOnSecureInput 성공")
     }
 }
 // swiftlint:enable function_body_length
