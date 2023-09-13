@@ -159,16 +159,13 @@ struct State: CustomStringConvertible {
     init(engine: Engine.Type) {
         self.engine = engine
     }
-
-    private let engines: [Engine.Type] = [QwertyEngine.self, TwoSetEngine.self]
+    let engines = (한: TwoSetEngine.self, A: QwertyEngine.self)
 
     /** 사용 가능한 다음 engine으로 변경 */
     mutating func rotate() {
         debug()
 
-        let count = engines.count
-        let index = engines.firstIndex(where: { $0 == engine }) ?? 0
-        engine = engines[(index + 1) % count]
+        engine = engine == engines.한 ? engines.A : engines.한
 
         // swiftlint:disable:next force_cast
         (NSApp.delegate as! AppDelegate).statusBar.setEngine(engine)

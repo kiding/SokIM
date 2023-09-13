@@ -13,7 +13,7 @@ class StatusBar {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     private var engine: Engine.Type = TwoSetEngine.self
-    private let engines: [Engine.Type] = [QwertyEngine.self, TwoSetEngine.self]
+    private let engines = (한: TwoSetEngine.self, A: QwertyEngine.self)
 
     /** 메뉴 */
 
@@ -130,10 +130,7 @@ class StatusBar {
     func rotateEngine() {
         debug()
 
-        let count = engines.count
-        let index = engines.firstIndex(where: { $0 == engine }) ?? 0
-        engine = engines[(index + 1) % count]
-
+        engine = engine == engines.한 ? engines.A : engines.한
         statusItem.button?.title = engine.name
     }
 

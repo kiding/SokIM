@@ -337,8 +337,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard IsSecureEventInputEnabled() else { return }
 
-        state.engine = QwertyEngine.self
-        statusBar.setEngine(QwertyEngine.self)
+        state.engine = state.engines.A
+        statusBar.setEngine(state.engines.A)
 
         reset(nil)
 
