@@ -37,14 +37,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 사용자가 입력기를 변경하는 시점에 초기화
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(reset),
+            selector: #selector(resetWithInputMonitor),
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
 
         // 사용자가 마우스 클릭하는 시점에 초기화
-        NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) {
-            self.reset($0)
+        NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) { _ in
+            self.reset(withInputMonitor: false)
         }
 
         // 사용자의 한/A 전환키 조합을 시스템에 등록, 더미 함수 호출
@@ -146,13 +146,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // 초기화
-    @objc private func reset(_ context: Any?) {
-        debug("\(String(describing: context))")
+    @objc private func resetWithInputMonitor() {
+        reset(withInputMonitor: true)
+    }
+
+    private func reset(withInputMonitor: Bool) {
+        debug("withInputMonitor: \(withInputMonitor)")
 
         if let sender = eventContext.sender {
             eventContext.strategy.flush(from: state, to: sender)
         }
-        inputMonitor.flush()
+        if withInputMonitor {
+            inputMonitor.flush()
+        }
         state = State(engine: state.engine)
         if getKeyboardCapsLock() {
             setKeyboardCapsLock(enabled: false)
@@ -339,8 +345,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         state.engine = state.engines.A
         statusBar.setEngine(state.engines.A)
-
-        reset(nil)
+        resetWithInputMonitor()
 
         debug("abcOnSecureInput 성공")
     }
