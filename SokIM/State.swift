@@ -74,6 +74,7 @@ struct State: CustomStringConvertible {
                     isCapsLockOn = true
                     setKeyboardCapsLock(enabled: true)
                     lastCapsLockDownInput = nil
+                    engine = engines.A
                 }
                 // 그 외에는 한/A 전환
                 else if canCapsLockRotate {
@@ -159,7 +160,7 @@ struct State: CustomStringConvertible {
     init(engine: Engine.Type) {
         self.engine = engine
     }
-    let engines = (한: TwoSetEngine.self, A: QwertyEngine.self)
+    let engines = (한: TwoSetEngine.self, A: QwertyEngine.self) // TODO: Preferences
 
     /** 사용 가능한 다음 engine으로 변경 */
     mutating func rotate() {

@@ -219,6 +219,7 @@ class InputMonitor {
 
                             // Caps Lock 활성화
                             setKeyboardCapsLock(enabled: true)
+                            (NSApp.delegate as! AppDelegate).statusBar.setEngine(QwertyEngine.self) // TODO: Preferences
                         }
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: capsLockTimer)
