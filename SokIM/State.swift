@@ -33,14 +33,14 @@ struct State: CustomStringConvertible {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // 오른쪽 Command: keyUp인 경우 한/A 전환 실제 처리
-            if (type, key) == (.keyUp, .rightCommand)
+            // 오른쪽 Command: 한/A 전환 실제 처리
+            if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand {
                 commit()
                 rotate()
             }
 
-            // Caps Lock: 한/A 전환 종류에 따라 상태 및 LED 실제 처리
+            // Caps Lock: 한/A 상태 및 LED 실제 처리
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 처리
                 if Preferences.rotateShortcut == .capsLock {
@@ -53,6 +53,14 @@ struct State: CustomStringConvertible {
                     isCapsLockOn = false
                     setKeyboardCapsLock(enabled: false)
                     lastCapsLockDownInput = input
+
+                    // 한/A 전환
+                    if canCapsLockRotate {
+                        commit()
+                        rotate()
+                    } else {
+                        canCapsLockRotate = true
+                    }
                 }
                 // 그 외의 경우 일반 반전 처리
                 else {
@@ -61,7 +69,7 @@ struct State: CustomStringConvertible {
                 }
             }
 
-            // Caps Lock: keyUp인 경우 한/A 전환 및 Caps Lock 실제 처리
+            // Caps Lock: Caps Lock 실제 처리
             if (type, key) == (.keyUp, .capsLock)
                 && Preferences.rotateShortcut == .capsLock {
                 // 마지막으로 keyDown된 Caps Lock Input의 timestamp가 800ms 이상 차이 나면 Caps Lock 활성화
@@ -75,13 +83,6 @@ struct State: CustomStringConvertible {
                     setKeyboardCapsLock(enabled: true)
                     lastCapsLockDownInput = nil
                     engine = engines.A
-                }
-                // 그 외에는 한/A 전환
-                else if canCapsLockRotate {
-                    commit()
-                    rotate()
-                } else {
-                    canCapsLockRotate = true
                 }
             }
         }

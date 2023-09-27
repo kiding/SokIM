@@ -193,15 +193,15 @@ class InputMonitor {
             modifier[key] = type
 
             // 별도 처리: 오른쪽 Command: 한/A 표시만 우선 갱신, 실제 처리는 State에서
-            if (type, key) == (.keyUp, .rightCommand)
+            if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand {
                 (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
             }
 
-            // 별도 처리: Caps Lock: 한/A 전환 종류에 따라 상태 및 LED 우선 갱신, 실제 처리는 State에서
+            // 별도 처리: Caps Lock: 한/A 상태 및 LED 우선 갱신, 실제 처리는 State에서
             if (type, key) == (.keyDown, .capsLock) {
-                // 한/A 전환이 Caps Lock인 경우 800ms 이상 누르고 있으면 활성화
                 if Preferences.rotateShortcut == .capsLock {
+                    /* 한/A 전환이 Caps Lock인 경우 800ms 이상 누르고 있으면 활성화 */
                     let enabled = getKeyboardCapsLock()
 
                     // Caps Lock 활성 -> 비활성: 한/A 전환 1회 억제
@@ -223,20 +223,17 @@ class InputMonitor {
                         }
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: capsLockTimer)
+
+                    /* 한/A 표시만 우선 갱신 */
+                    if canCapsLockRotate {
+                        (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
+                    } else {
+                        canCapsLockRotate = true
+                    }
                 }
                 // 그 외의 경우 일반 반전 처리
                 else {
                     setKeyboardCapsLock(enabled: !getKeyboardCapsLock())
-                }
-            }
-
-            // 별도 처리: Caps Lock: 한/A 표시만 우선 갱신, 실제 처리는 State에서
-            if (type, key) == (.keyUp, .capsLock)
-                && Preferences.rotateShortcut == .capsLock {
-                if canCapsLockRotate {
-                    (NSApp.delegate as! AppDelegate).statusBar.rotateEngine()
-                } else {
-                    canCapsLockRotate = true
                 }
             }
         }
