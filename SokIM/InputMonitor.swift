@@ -19,7 +19,6 @@ enum InputType: String {
 
 enum InputMonitorError: Error, CustomStringConvertible {
     case failedToOpen(IOReturn)
-    case notTrusted
 
     var description: String {
         switch self {
@@ -38,14 +37,9 @@ enum InputMonitorError: Error, CustomStringConvertible {
                     return "알 수 없는 오류가 발생했습니다. (\(res))"
                 }
             }
-        case .notTrusted:
-            return "손쉬운 사용 권한을 허용해 주세요."
         }
     }
 }
-
-private let kAXManualAccessibility = "AXManualAccessibility" as CFString
-private let kAXEnhancedUserInterface = "AXEnhancedUserInterface" as CFString
 
 /**
  키보드 입력 모니터링
@@ -55,7 +49,6 @@ private let kAXEnhancedUserInterface = "AXEnhancedUserInterface" as CFString
 class InputMonitor {
     private let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
     private var inputs: [Input] = []
-    private var context = InputContext()
 
     init() {
         debug()
@@ -93,63 +86,27 @@ class InputMonitor {
         IOHIDManagerRegisterInputValueCallback(hid, nil, nil)
     }
 
-    private var running = (hid: false, context: false)
+    private var running = false
 
     func start() throws {
         debug()
 
-        if running.hid == false {
-            let res = IOHIDManagerOpen(hid, 0)
-            if res != kIOReturnSuccess {
-                IOHIDManagerClose(hid, 0)
+        let res = IOHIDManagerOpen(hid, 0)
+        if res != kIOReturnSuccess {
+            IOHIDManagerClose(hid, 0)
 
-                throw InputMonitorError.failedToOpen(res)
-            }
-
-            running.hid = true
+            throw InputMonitorError.failedToOpen(res)
         }
 
-        if running.context == false {
-            if !AXIsProcessTrusted() {
-                throw InputMonitorError.notTrusted
-            }
-
-            running.context = true
-
-            // 40ms마다 context 수집
-            Task {
-                while running.context {
-                    nextContext()
-                    try? await Task.sleep(for: .milliseconds(40))
-                }
-            }
-
-            // 가장 앞에 있는 앱 바뀔 때마다 AX 활성화
-            NSWorkspace.shared.notificationCenter.addObserver(
-                self,
-                selector: #selector(activateAX),
-                name: NSWorkspace.didActivateApplicationNotification,
-                object: nil
-            )
-            activateAX(nil) // 첫 시작 시 자동으로 가장 앞에 있는 앱 AX 활성화
-        }
+        running = true
     }
 
     func stop() {
         debug()
 
-        if running.hid == true {
+        if running == true {
             IOHIDManagerClose(hid, 0)
-            running.hid = false
-        }
-
-        if running.context == true {
-            NSWorkspace.shared.notificationCenter.removeObserver(
-                self,
-                name: NSWorkspace.didActivateApplicationNotification,
-                object: nil
-            )
-            running.context = false
+            running = false
         }
     }
 
@@ -262,64 +219,10 @@ class InputMonitor {
             }
         }
 
-        let input = Input(context: context, timestamp: timestamp, type: type, usage: usage)
+        let input = Input(context: InputContext(), timestamp: timestamp, type: type, usage: usage)
         debug("\(input)")
 
         inputs.append(input)
-    }
-
-    private func nextContext() {
-        context = InputContext(AXUIElementCreateSystemWide())
-    }
-
-    /**
-     @see https://www.electronjs.org/docs/latest/tutorial/accessibility/
-     @see https://www.chromium.org/developers/design-documents/accessibility/
-     @see https://github.com/dexterleng/vimac/issues/325
-     */
-    @objc private func activateAX(_ noti: Notification?) {
-        debug("\(String(describing: noti))")
-
-        // noti로 들어온 앱 또는 가장 앞에 있는 앱의 pid 가져오기
-        guard let app = noti?.userInfo?["NSWorkspaceApplicationKey"] as? NSRunningApplication
-                ?? NSWorkspace.shared.frontmostApplication else {
-            return
-        }
-
-        // 별도의 스레드에서 진행
-        Task {
-            let appRef = AXUIElementCreateApplication(app.processIdentifier)
-
-            // AXManualAccessibility
-            var axmaValuePkd: CFTypeRef?
-            var shouldSetAXMA = true
-            if AXUIElementCopyAttributeValue(appRef, kAXManualAccessibility, &axmaValuePkd) == .success {
-                let axmaValue = axmaValuePkd as! CFBoolean
-                if axmaValue == kCFBooleanTrue {
-                    debug("AXManualAccessibility 이미 활성화되어 있음 \(appRef)")
-                    shouldSetAXMA = false
-                }
-            }
-            if shouldSetAXMA {
-                debug("AXManualAccessibility 활성화 완료 \(appRef)")
-                AXUIElementSetAttributeValue(appRef, kAXManualAccessibility, kCFBooleanTrue)
-            }
-
-            // AXEnhancedUserInterface
-            var axeuiValuePkd: CFTypeRef?
-            var shouldSetAXEUI = true
-            if AXUIElementCopyAttributeValue(appRef, kAXEnhancedUserInterface, &axeuiValuePkd) == .success {
-                let axeuiValue = axeuiValuePkd as! CFBoolean
-                if axeuiValue == kCFBooleanTrue {
-                    debug("AXEnhancedUserInterface 이미 활성화되어 있음 \(appRef)")
-                    shouldSetAXEUI = false
-                }
-            }
-            if shouldSetAXEUI {
-                debug("AXEnhancedUserInterface 활성화 \(appRef)")
-                AXUIElementSetAttributeValue(appRef, kAXEnhancedUserInterface, kCFBooleanTrue)
-            }
-        }
     }
 }
 // swiftlint:enable force_cast function_body_length cyclomatic_complexity
