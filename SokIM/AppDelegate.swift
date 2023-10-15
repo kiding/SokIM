@@ -163,6 +163,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             setKeyboardCapsLock(enabled: false)
         }
         eventContext = EventContext()
+        InputContext.reset()
     }
 
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {

@@ -219,7 +219,7 @@ class InputMonitor {
             }
         }
 
-        let input = Input(context: InputContext(), timestamp: timestamp, type: type, usage: usage)
+        let input = Input(context: InputContext(usage), timestamp: timestamp, type: type, usage: usage)
         debug("\(input)")
 
         inputs.append(input)
