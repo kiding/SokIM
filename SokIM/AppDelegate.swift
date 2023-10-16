@@ -159,7 +159,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             inputMonitor.flush()
         }
         state = State(engine: state.engine)
-        statusBar.setEngine(state.engine)
         if getKeyboardCapsLock() {
             setKeyboardCapsLock(enabled: false)
         }
