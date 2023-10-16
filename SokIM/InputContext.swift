@@ -1,6 +1,6 @@
 import AppKit
 
-/** 글자가 아닌 글쇠(Shift 제외)가 입력될 때마다 증가하는 카운터 */
+/** 글자가 아닌 글쇠(modifier 제외)가 입력될 때마다 증가하는 카운터 */
 private var counter: UInt64 = 0
 
 /** 키보드 입력 후 InputMonitor에 의해 HID 값 발생 시점의 context */
@@ -17,8 +17,8 @@ struct InputContext {
 
         // QwertyEngine에서 지원하는 글쇠면 카운트 증가 안 함
         if QwertyEngine.usageToTupleMap[usage] != nil { }
-        // Shift인 경우에도 카운트 증가 안 함
-        else if usage == ModifierUsage.leftShift.rawValue || usage == ModifierUsage.rightShift.rawValue { }
+        // modifier인 경우에도 카운트 증가 안 함
+        else if ModifierUsage(rawValue: usage) != nil { }
         // 그 외의 모든 글자가 아닌 글쇠인 경우 카운트 증가
         else { InputContext.reset() }
 
