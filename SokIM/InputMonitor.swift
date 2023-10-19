@@ -47,12 +47,18 @@ enum InputMonitorError: Error, CustomStringConvertible {
  @see https://www.usb.org/sites/default/files/hut1_21_0.pdf
  */
 class InputMonitor {
-    private let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
+    private var hid: IOHIDManager?
     private var inputs: [Input] = []
 
-    init() {
+    func start() throws {
         debug()
 
+        if hid != nil {
+            warning("초기화된 hid가 이미 있음")
+            return
+        }
+
+        let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
         IOHIDManagerSetDeviceMatching(hid, [
             kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop,   // Generic Desktop Page (0x01)
             kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard          // Keyboard (0x06, Collection Application)
@@ -77,19 +83,6 @@ class InputMonitor {
             // context로 self 포인터 전달
             Unmanaged.passUnretained(self).toOpaque())
         IOHIDManagerScheduleWithRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
-    }
-
-    deinit {
-        debug()
-
-        IOHIDManagerUnscheduleFromRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
-        IOHIDManagerRegisterInputValueCallback(hid, nil, nil)
-    }
-
-    private var running = false
-
-    func start() throws {
-        debug()
 
         let res = IOHIDManagerOpen(hid, 0)
         if res != kIOReturnSuccess {
@@ -98,16 +91,24 @@ class InputMonitor {
             throw InputMonitorError.failedToOpen(res)
         }
 
-        running = true
+        self.hid = hid
+        debug("InputMonitor 시작 성공")
     }
 
     func stop() {
         debug()
 
-        if running == true {
-            IOHIDManagerClose(hid, 0)
-            running = false
+        guard let hid = hid else {
+            warning("초기화된 hid가 없음")
+            return
         }
+
+        IOHIDManagerClose(hid, 0)
+        IOHIDManagerUnscheduleFromRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
+        IOHIDManagerRegisterInputValueCallback(hid, nil, nil)
+
+        self.hid = nil
+        debug("InputMonitor 중단 성공")
     }
 
     @discardableResult

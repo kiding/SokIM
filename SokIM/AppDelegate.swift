@@ -31,7 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         debug()
 
-        startMonitor()
+        startMonitorInitially()
 
         // 사용자가 입력기를 변경하는 시점에 초기화
         NotificationCenter.default.addObserver(
@@ -67,6 +67,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
+        // 잠자기 상태에서 깨어나는 경우 InputMonitor 재시작
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(restartMonitorSilently),
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(restartMonitorSilently),
+            name: NSWorkspace.screensDidWakeNotification,
+            object: nil
+        )
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -85,7 +98,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         RemoveEventHandler(eventHandlerRef)
     }
 
-    @objc private func startMonitor() {
+    @objc private func startMonitorInitially() {
         debug()
 
         do {
@@ -97,7 +110,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             warning("\(error)")
             statusBar.setStatus("⚠️")
             statusBar.setMessage("⚠️ \(error)")
-            self.perform(#selector(startMonitor), with: nil, afterDelay: 1)
+            self.perform(#selector(startMonitorInitially), with: nil, afterDelay: 1)
+        }
+    }
+
+    @objc private func restartMonitorSilently(_ aNotification: Notification) {
+        debug("\(aNotification)")
+
+        do {
+            notice("모니터 재시작 중...")
+            inputMonitor.stop()
+            try inputMonitor.start()
+        } catch {
+            warning("\(error)")
         }
     }
 
