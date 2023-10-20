@@ -1,6 +1,6 @@
 import AppKit
 
-/** 글자가 아닌 글쇠(modifier 제외)가 입력될 때마다 증가하는 카운터 */
+/** 글자가 아닌 글쇠(alt, shift 제외)가 입력될 때마다 증가하는 카운터 */
 private var counter: UInt64 = 0
 
 /** 키보드 입력 후 InputMonitor에 의해 HID 값 발생 시점의 context */
@@ -12,15 +12,20 @@ struct InputContext {
     /** counter의 현재 값 */
     let count: UInt64
 
-    init(_ usage: UInt32) {
+    init(type: InputType, usage: UInt32) {
         bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
 
-        // QwertyEngine에서 지원하는 글쇠면 카운트 증가 안 함
-        if QwertyEngine.usageToTupleMap[usage] != nil { }
-        // modifier인 경우에도 카운트 증가 안 함
-        else if ModifierUsage(rawValue: usage) != nil { }
-        // 그 외의 모든 글자가 아닌 글쇠인 경우 카운트 증가
-        else { InputContext.reset() }
+        // keyDown만 보고 판단하여 단축키 조합은 같은 context로 묶음
+        if type == .keyDown {
+            // QwertyEngine에서 지원하는 글쇠면 카운트 증가 안 함
+            if QwertyEngine.usageToTupleMap[usage] != nil { }
+            // Alt인 경우 카운트 증가 안 함
+            else if usage == ModifierUsage.leftAlt.rawValue || usage == ModifierUsage.rightAlt.rawValue { }
+            // Shift인 경우 카운트 증가 안 함
+            else if usage == ModifierUsage.leftShift.rawValue || usage == ModifierUsage.rightShift.rawValue { }
+            // 그 외의 모든 글자가 아닌 글쇠인 경우 카운트 증가
+            else { InputContext.reset() }
+        }
 
         count = counter
     }
