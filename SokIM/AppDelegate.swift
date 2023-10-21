@@ -286,13 +286,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func filterContexts(_ inputs: inout [Input]) {
         debug()
 
-        // 마지막과 동일한 context만 남김, 단 modifier는 언제나 처리
-        if let last = inputs.last {
-            inputs = inputs.filter {
-                $0.context == last.context
-                || ModifierUsage(rawValue: $0.usage) != nil
+        // 마지막과 동일한 context만 남김, 단 modifier와 modifier+space는 언제나 처리
+        guard let last = inputs.last else { return }
+        var flags = Array(repeating: false, count: inputs.count)
+
+        for (idx, input) in inputs.enumerated() {
+            if input.context == last.context {
+                flags[idx] = true
+            } else if let modifier = ModifierUsage(rawValue: input.usage) {
+                flags[idx] = true
+
+                if input.type == .keyDown {
+                    for (jdx, input) in inputs[idx..<inputs.endIndex].enumerated() {
+                        if SpecialUsage(rawValue: input.usage) == .space {
+                            flags[idx + jdx] = true
+                        } else if ModifierUsage(rawValue: input.usage) == modifier && input.type == .keyUp {
+                            break
+                        }
+                    }
+                }
             }
         }
+
+        debug("inputs: \(inputs)")
+        debug("flags: \(flags)")
+
+        inputs = inputs.indices.filter { flags[$0] }.map { inputs[$0] }
     }
 
     /** 전처리: 특정 앱에 대해 입력 정리 */
