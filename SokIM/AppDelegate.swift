@@ -1,7 +1,4 @@
-// TODO: "Automatically switch to a document's input source"를 InputContext로 구현
-// TODO: Safari: 구글 문서, iCloud Pages 한/글/을/입/력 문제... string 가져오기? Safari에서 downgrade 하는 방법 찾기
-// TODO: D->M downgrade: NotificationCenter to Context & memory
-
+// swiftlint:disable type_body_length
 import Cocoa
 import InputMethodKit
 
@@ -181,7 +178,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             eventContext.strategy.flush(from: state, to: sender)
         }
         if withInputMonitor {
-            inputMonitor.flush()
+            var inputs = inputMonitor.flush()
+            filterContexts(&inputs)
+            inputs.forEach { state.next($0) }
         }
         state = State(engine: state.engine)
         if getKeyboardCapsLock() {
@@ -333,6 +332,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /** 암호 입력 필드를 위한 ABC 입력기 제한 기능 */
     @objc private func suppressABC(_ aNotification: Notification) {
         debug("\(String(describing: aNotification))")
 
@@ -387,10 +387,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard IsSecureEventInputEnabled() else { return }
 
+        resetWithInputMonitor()
         state.engine = state.engines.A
         statusBar.setEngine(state.engines.A)
-        resetWithInputMonitor()
 
         debug("abcOnSecureInput 성공")
     }
 }
+// swiftlint:enable type_body_length
