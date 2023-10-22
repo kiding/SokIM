@@ -351,7 +351,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         let currentID = Unmanaged<CFString>.fromOpaque(currentIDOpaque).takeUnretainedValue() as String
 
-        if currentID != "com.apple.keylayout.ABC" {
+        guard currentID == "com.apple.keylayout.ABC" || currentID == "com.apple.keylayout.US" else {
             debug("현재 입력기 ABC 아님: \(currentID)")
             return
         }
