@@ -104,8 +104,10 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
  연결된 모든 HID 키보드에 대해 Caps Lock 상태와 LED 조정
  @see https://github.com/busyloop/maclight
  */
+private var block = DispatchWorkItem { }
 func setKeyboardCapsLock(enabled: Bool) {
-    let block = {
+    block.cancel()
+    block = DispatchWorkItem {
         let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
 
         /** HID 키보드 찾기 */
@@ -164,8 +166,8 @@ func setKeyboardCapsLock(enabled: Bool) {
         }
     }
 
-    DispatchQueue.main.asyncAfter(deadline: .now(), execute: block)
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: block)
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: block)
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300), execute: block)
 }
 
 func getKeyboardCapsLock() -> Bool {
