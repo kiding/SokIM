@@ -15,7 +15,7 @@ struct InputContext {
     init(type: InputType, usage: UInt32) {
         bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
 
-        // keyDown만 보고 판단하여 단축키 조합은 같은 context로 묶음
+        // keyDown만 보고 판단, 단축키 조합(예: Cmd+X)은 같은 context로 묶음
         if type == .keyDown {
             // QwertyEngine에서 지원하는 글쇠면 카운트 증가 안 함
             if QwertyEngine.usageToTupleMap[usage] != nil { }

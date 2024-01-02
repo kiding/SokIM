@@ -285,16 +285,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func filterContexts(_ inputs: inout [Input]) {
         debug()
 
-        // 마지막과 동일한 context만 남김, 단 modifier와 modifier+space는 언제나 처리
-        guard let last = inputs.last else { return }
         var flags = Array(repeating: false, count: inputs.count)
 
+        // 전체 input 중에 마지막과 동일한 context만 남김
+        guard let last = inputs.last else { return }
+        for (idx, input) in inputs.enumerated() where input.context == last.context {
+            flags[idx] = true
+        }
+
+        // 전체 input 중에 modifier와 modifier+space는 언제나 남김
         for (idx, input) in inputs.enumerated() {
-            if input.context == last.context {
-                flags[idx] = true
-            } else if let modifier = ModifierUsage(rawValue: input.usage) {
+            if let modifier = ModifierUsage(rawValue: input.usage) {
                 flags[idx] = true
 
+                // modifier의 keyDown–keyUp 사이에 있는 모든 space는 언제나 남김
                 if input.type == .keyDown {
                     for (jdx, input) in inputs[idx..<inputs.endIndex].enumerated() {
                         if SpecialUsage(rawValue: input.usage) == .space {
