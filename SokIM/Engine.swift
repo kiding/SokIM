@@ -28,7 +28,7 @@ enum SpecialUsage: UInt32 {
  Virtual keycodes -> USB HID Usage 매핑
  @see <HIToolbox/Events.h>
  */
-private let keyCodeToUsage: [Int: UInt32] = [
+let keyCodeToUsage: [Int: UInt32] = [
     kVK_ANSI_A: 0x04, kVK_ANSI_S: 0x16, kVK_ANSI_D: 0x07, kVK_ANSI_F: 0x09,
     kVK_ANSI_H: 0x0B, kVK_ANSI_G: 0x0A, kVK_ANSI_Z: 0x1D, kVK_ANSI_X: 0x1B,
     kVK_ANSI_C: 0x06, kVK_ANSI_V: 0x19, kVK_ANSI_B: 0x05, kVK_ANSI_Q: 0x14,

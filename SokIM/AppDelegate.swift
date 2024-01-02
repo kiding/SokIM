@@ -1,4 +1,4 @@
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length cyclomatic_complexity file_length
 import Cocoa
 import InputMethodKit
 
@@ -179,7 +179,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if withInputMonitor {
             var inputs = inputMonitor.flush()
-            filterContexts(&inputs)
+            filterInputs(&inputs, event: nil)
             inputs.forEach { state.next($0) }
         }
         state = State(engine: state.engine)
@@ -207,7 +207,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var inputs = inputMonitor.flush()
 
         // inputs 전처리
-        filterContexts(&inputs)
+        filterInputs(&inputs, event: event)
         filterQuirks(&inputs)
 
         debug("이전 state: \(state)")
@@ -281,8 +281,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    /** 전처리: EventContext와 InputContext 비교하여 입력 정리 */
-    private func filterContexts(_ inputs: inout [Input]) {
+    /** 전처리: 입력 정리 */
+    private func filterInputs(_ inputs: inout [Input], event: NSEvent?) {
         debug()
 
         var flags = Array(repeating: false, count: inputs.count)
@@ -291,6 +291,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let last = inputs.last else { return }
         for (idx, input) in inputs.enumerated() where input.context == last.context {
             flags[idx] = true
+        }
+
+        // 남아있는 input 중에 event와 usage가 같은 것 이전은 버림
+        if let event = event,
+           event.type == .keyDown,
+           let usage = keyCodeToUsage[Int(event.keyCode)] {
+            var endIndex = -1
+
+            for (idx, input) in inputs.enumerated() {
+                // 남아있지 않거나 keyDown이 아닌 경우 넘어감
+                guard flags[idx], input.type == .keyDown else {
+                    continue
+                }
+
+                // usage가 같으면 기억 (반복되는 경우 가장 마지막 위치를 기억함)
+                if input.usage == usage {
+                    endIndex = idx
+                }
+                // usage가 다르고 기억이 있으면 중단 (앞쪽에 있는 첫번째 군집만 찾음)
+                else if endIndex >= 0 {
+                    break
+                }
+            }
+
+            if endIndex >= 0 {
+                for idx in 0..<endIndex {
+                    flags[idx] = false
+                }
+            }
         }
 
         // 전체 input 중에 modifier와 modifier+space는 언제나 남김
@@ -398,4 +427,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debug("abcOnSecureInput 성공")
     }
 }
-// swiftlint:enable type_body_length
+// swiftlint:enable type_body_length cyclomatic_complexity file_length
