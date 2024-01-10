@@ -120,6 +120,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             try inputMonitor.start()
         } catch {
             warning("\(error)")
+            self.perform(#selector(restartMonitorSilently), with: aNotification, afterDelay: 1)
         }
     }
 
