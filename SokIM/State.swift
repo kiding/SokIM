@@ -124,11 +124,8 @@ struct State: CustomStringConvertible {
                 return
             }
 
-            // input 입력 시점부터 지금까지 걸린 시간
-            let elapsed = ms(since: input.timestamp)
-
-            // engine으로 현재 input을 tuple로 변환 가능하며 처리 시간이 3000ms 이내면
-            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn), elapsed < 3000 {
+            // engine으로 현재 input을 tuple로 변환 가능하면
+            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn) {
                 // "₩ 대신 ` 입력" 처리
                 if tuple.char == "₩" && Preferences.graveOverWon {
                     tuple.char = "`"
@@ -139,7 +136,7 @@ struct State: CustomStringConvertible {
             }
             // 그 외 모든 경우
             else {
-                debug("Input ignored: \(input) \(elapsed)ms")
+                debug("Input ignored: \(input)")
             }
         }
         // 그 외 경우 중 keyUp인 경우
