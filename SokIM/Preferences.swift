@@ -28,7 +28,7 @@ struct Preferences {
     }
 
     static var suppressABC: Bool {
-        get { UserDefaults.standard.bool(forKey: "SuppressABC") }
+        get { UserDefaults.standard.object(forKey: "SuppressABC") as? Bool ?? true }
         set(new) { UserDefaults.standard.set(new, forKey: "SuppressABC") }
     }
 
