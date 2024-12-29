@@ -9,7 +9,6 @@
 		<string>(allow iokit-open)</string>
 		<string>(allow mach-register (global-name &quot;com.kiding.inputmethod.sok_Connection&quot;))</string>
 		<string>(allow mach-lookup (local-name &quot;com.apple.axserver&quot;))</string>
-		<string>(allow mach-lookup (global-name &quot;com.apple.universalaccessAuthWarn&quot;))</string>
 	</array>
 </dict>
 </plist>
