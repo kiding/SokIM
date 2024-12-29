@@ -1,7 +1,7 @@
 # 속 입력기
 
-<img src="https://github.com/kiding/SokIM/blob/main/SokIM/Assets.xcassets/AppIcon.appiconset/icon_128x128%402x%402x.png">
-<img src="https://github.com/kiding/SokIM/blob/main/screenshot.jpg">
+<img src="https://github.com/kiding/SokIM/blob/main/SokIM/Assets.xcassets/AppIcon.appiconset/icon_128x128%402x%402x.png" width="128px">
+<img src="https://github.com/kiding/SokIM/blob/main/screenshot.jpg" width="184px">
 
 빠르고 매끄러운 한영 전환을 위한 새로운 macOS 입력기
 
@@ -22,4 +22,4 @@
 ## 디버그 메시지 보기
 
 1. 속 입력기 → 디버그 모드 활성화
-1. 터미널에서 `log stream --predicate 'process == "SokIM"' --debug --style compact | grep swift`
+1. 터미널에서 `log stream --predicate 'process == "SokIM" AND composedMessage CONTAINS ".swift"' --debug --style compact`
