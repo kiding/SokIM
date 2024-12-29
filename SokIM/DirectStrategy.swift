@@ -79,7 +79,7 @@ struct DirectStrategy: Strategy {
  상황별 {selectedRange},{markedRange} 변화도
  [이전] > [중간] v [이후(=이전)] > [중간] v ... (단, v: insert, X: {NSNotFound,})
 
- 1. "ㅎㅏㄴ "
+ "ㅎㅏㄴ "
           "ㅎ"            "ㅏ"                "ㄴ"                " "
  Xcode     X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {2,0},X
  <input>
@@ -91,25 +91,14 @@ struct DirectStrategy: Strategy {
    Chrome  X,X > {1,0},X v {2,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
    Firefox X,X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
  조합 중단 필요   x
-
- 2. "ㅎㅏ" 마우스로 다른 영역 선택 "ㄴ"
-          "ㅎ"            "ㅏ"                마우스 "ㄴ"
- Xcode     X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {7,0},X v {7,0},X
- <textarea>
-   Safari  X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {7,0},X v {7,0},X
-   Chrome  X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {7,0},X v {7,0},X
-   Firefox X,X > {0,0},X v {0,0},X > {1,0},X v {1,0},X > {7,0},X v {7,0},X
- 구글 문서
-   Safari  X,X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
-   Chrome  X,X > {1,0},X v {2,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
-   Firefox X,X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
- 조합 중단 필요   x                                        x
 */
+    // 이전과 중간을 비교할 때 사용됨
     static func equal(left: EventContext, right: EventContext) -> Bool {
         debug()
 
         let doIdentifiersMatch = left.bundleIdentifier == right.bundleIdentifier
         let doPointersMatch = left.pointerValue == right.pointerValue
+
         let doLocationsDiffByOne = abs(left.selectedRange.location - right.selectedRange.location) <= 1
         let doLengthsMatch = left.selectedRange.length == right.selectedRange.length
 
