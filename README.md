@@ -1,6 +1,7 @@
 # 속 입력기
 
 <img src="https://github.com/kiding/SokIM/blob/main/SokIM/Assets.xcassets/AppIcon.appiconset/icon_128x128%402x%402x.png">
+<img src="https://github.com/kiding/SokIM/blob/main/screenshot.jpg">
 
 빠르고 매끄러운 한영 전환을 위한 새로운 macOS 입력기
 
