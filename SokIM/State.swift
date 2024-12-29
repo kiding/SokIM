@@ -1,4 +1,3 @@
-// swiftlint:disable function_body_length cyclomatic_complexity
 import Cocoa
 import Foundation
 
@@ -166,7 +165,6 @@ struct State: CustomStringConvertible {
 
         engine = engine == engines.한 ? engines.A : engines.한
 
-        // swiftlint:disable:next force_cast
         (NSApp.delegate as! AppDelegate).statusBar.setEngine(engine)
     }
 
@@ -246,4 +244,3 @@ struct State: CustomStringConvertible {
 
     var description: String { "\(engine) '\(composed)' [\(composing)] \(modifier)" }
 }
-// swiftlint:enable function_body_length cyclomatic_complexity

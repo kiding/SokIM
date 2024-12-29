@@ -15,7 +15,6 @@ struct Preferences {
         get { RotateShortcutType(rawValue: UserDefaults.standard.string(forKey: "RotateShortcut") ?? "") ?? .capsLock }
         set(new) {
             UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut")
-            // swiftlint:disable:next force_cast
             (NSApp.delegate as! AppDelegate).registerEventHotKey(new)
         }
     }

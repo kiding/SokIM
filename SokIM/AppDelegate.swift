@@ -1,4 +1,3 @@
-// swiftlint:disable type_body_length cyclomatic_complexity file_length
 import Cocoa
 import InputMethodKit
 
@@ -11,7 +10,6 @@ func eventHotKeyHandler(
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var server: IMKServer = IMKServer.init(
-        // swiftlint:disable:next force_cast
         name: (Bundle.main.infoDictionary!["InputMethodConnectionName"] as! String),
         bundleIdentifier: Bundle.main.bundleIdentifier
     )
@@ -398,4 +396,3 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         debug("abcOnSecureInput 성공")
     }
 }
-// swiftlint:enable type_body_length cyclomatic_complexity file_length

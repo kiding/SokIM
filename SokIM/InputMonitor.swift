@@ -1,4 +1,3 @@
-// swiftlint:disable force_cast function_body_length cyclomatic_complexity
 import ApplicationServices
 import AppKit
 import IOKit.hid
@@ -231,4 +230,3 @@ class InputMonitor {
         inputs.append(input)
     }
 }
-// swiftlint:enable force_cast function_body_length cyclomatic_complexity

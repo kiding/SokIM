@@ -31,7 +31,6 @@ class StatusBar {
     private let shiftSpaceItem = NSMenuItem()
     private let controlSpaceItem = NSMenuItem()
 
-    // swiftlint:disable:next function_body_length
     init() {
         debug()
 

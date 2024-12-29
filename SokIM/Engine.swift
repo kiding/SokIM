@@ -1,5 +1,3 @@
-// swiftlint:disable large_tuple
-
 import InputMethodKit
 import Carbon.HIToolbox.Events
 
@@ -142,4 +140,3 @@ extension Engine {
         }
     }
 }
-// swiftlint:enable large_tuple
