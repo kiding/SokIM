@@ -100,7 +100,6 @@ struct DirectStrategy: Strategy {
         let doPointersMatch = left.pointerValue == right.pointerValue
 
         let doLocationsDiffByOne = abs(left.selectedRange.location - right.selectedRange.location) <= 1
-        let doLengthsMatch = left.selectedRange.length == right.selectedRange.length
 
         // 별도 처리: 메시지 앱에서 여러 줄 입력 시 location 숫자가 급격하게 변함, 무시
         let isMessagesAndNotSelected =
@@ -111,6 +110,5 @@ struct DirectStrategy: Strategy {
         return doIdentifiersMatch
         && doPointersMatch
         && (doLocationsDiffByOne || isMessagesAndNotSelected)
-        && doLengthsMatch
     }
 }
