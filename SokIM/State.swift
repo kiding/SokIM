@@ -165,7 +165,7 @@ struct State: CustomStringConvertible {
 
         engine = engine == engines.한 ? engines.A : engines.한
 
-        (NSApp.delegate as! AppDelegate).statusBar.setEngine(engine)
+        AppDelegate.shared().statusBar.setEngine(engine)
     }
 
     // MARK: - CharTuple

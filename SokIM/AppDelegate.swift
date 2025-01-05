@@ -9,10 +9,16 @@ func eventHotKeyHandler(
 
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // swiftlint:disable force_cast
+    static func shared() -> AppDelegate {
+        NSApp.delegate as! AppDelegate
+    }
+
     private var server: IMKServer = IMKServer.init(
         name: (Bundle.main.infoDictionary!["InputMethodConnectionName"] as! String),
         bundleIdentifier: Bundle.main.bundleIdentifier
     )
+    // swiftlint:enable force_cast
 
     let statusBar = StatusBar()
     let inputMonitor = InputMonitor()

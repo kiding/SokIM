@@ -15,7 +15,7 @@ struct Preferences {
         get { RotateShortcutType(rawValue: UserDefaults.standard.string(forKey: "RotateShortcut") ?? "") ?? .capsLock }
         set(new) {
             UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut")
-            (NSApp.delegate as! AppDelegate).registerEventHotKey(new)
+            AppDelegate.shared().registerEventHotKey(new)
         }
     }
 
