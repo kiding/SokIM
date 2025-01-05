@@ -294,6 +294,35 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             flags[idx] = true
         }
 
+        // 남아있는 input 중에 event와 usage가 같은 것 이전은 버림
+        if let event = event,
+           event.type == .keyDown,
+           let usage = keyCodeToUsage[Int(event.keyCode)] {
+            var endIndex = -1
+
+            for (idx, input) in inputs.enumerated() {
+                // 남아있지 않거나 keyDown이 아닌 경우 넘어감
+                guard flags[idx], input.type == .keyDown else {
+                    continue
+                }
+
+                // usage가 같으면 기억 (반복되는 경우 가장 마지막 위치를 기억함)
+                if input.usage == usage {
+                    endIndex = idx
+                }
+                // usage가 다르고 기억이 있으면 중단 (앞쪽에 있는 첫번째 군집만 찾음)
+                else if endIndex >= 0 {
+                    break
+                }
+            }
+
+            if endIndex >= 0 {
+                for idx in 0..<endIndex {
+                    flags[idx] = false
+                }
+            }
+        }
+
         // 전체 input 중에 modifier와 modifier+space는 언제나 남김
         for (idx, input) in inputs.enumerated() {
             if let modifier = ModifierUsage(rawValue: input.usage) {
