@@ -22,6 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let statusBar = StatusBar()
     let inputMonitor = InputMonitor()
+    let clickMonitor = ClickMonitor()
 
     private var eventHandlerRef: EventHandlerRef?
     private var eventHotKeyRef: EventHotKeyRef?
@@ -41,11 +42,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
-
-        // 사용자가 마우스 클릭하는 시점에 초기화
-        NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) { _ in
-            self.reset()
-        }
 
         // 사용자의 한/A 전환키 조합을 시스템에 등록, 더미 함수 호출
         var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
@@ -105,6 +101,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         do {
             notice("모니터 시작 중...")
             try inputMonitor.start()
+            try clickMonitor.start()
             statusBar.setStatus("⌨️")
             statusBar.removeMessage()
         } catch {
@@ -122,6 +119,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             notice("모니터 재시작 중...")
             inputMonitor.stop()
             try inputMonitor.start()
+            clickMonitor.stop()
+            try clickMonitor.start()
         } catch {
             warning("\(error)")
             self.perform(#selector(restartMonitorSilently), with: aNotification, afterDelay: 1)
