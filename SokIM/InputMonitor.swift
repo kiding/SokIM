@@ -149,6 +149,12 @@ class InputMonitor {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
+            // 별도 처리: Control, Command 입력되면 조합 종료 및 초기화
+            if (type, key) == (.keyDown, .leftControl) || (type, key) == (.keyDown, .rightControl)
+                || (type, key) == (.keyDown, .leftCommand) || (type, key) == (.keyDown, .rightCommand) {
+                AppDelegate.shared().reset()
+            }
+
             // 별도 처리: 오른쪽 Command: 한/A 표시만 우선 갱신, 실제 처리는 State에서
             if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand {

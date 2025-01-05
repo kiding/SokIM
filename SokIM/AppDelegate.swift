@@ -174,19 +174,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func reset() {
         debug()
 
-        if let sender = eventContext.sender {
-            eventContext.strategy.flush(from: state, to: sender)
+        if getKeyboardCapsLock() {
+            setKeyboardCapsLock(enabled: false)
         }
 
         var inputs = inputMonitor.flush()
         filterInputs(&inputs, event: nil)
         inputs.forEach { state.next($0) }
-        state = State(engine: state.engine)
-
-        if getKeyboardCapsLock() {
-            setKeyboardCapsLock(enabled: false)
+        if let sender = eventContext.sender {
+            eventContext.strategy.flush(from: state, to: sender)
         }
 
+        state = State(engine: state.engine)
         eventContext = EventContext()
         InputContext.reset()
     }
