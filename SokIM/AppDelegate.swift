@@ -37,14 +37,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 사용자가 입력기를 변경하는 시점에 초기화
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(resetWithInputMonitor),
+            selector: #selector(reset),
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
 
         // 사용자가 마우스 클릭하는 시점에 초기화
         NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown.union(.rightMouseDown).union(.otherMouseDown)) { _ in
-            self.reset(withInputMonitor: false)
+            self.reset()
         }
 
         // 사용자의 한/A 전환키 조합을 시스템에 등록, 더미 함수 호출
@@ -172,25 +172,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // 초기화
-    @objc private func resetWithInputMonitor() {
-        reset(withInputMonitor: true)
-    }
-
-    private func reset(withInputMonitor: Bool) {
-        debug("withInputMonitor: \(withInputMonitor)")
+    @objc func reset() {
+        debug()
 
         if let sender = eventContext.sender {
             eventContext.strategy.flush(from: state, to: sender)
         }
-        if withInputMonitor {
-            var inputs = inputMonitor.flush()
-            filterInputs(&inputs, event: nil)
-            inputs.forEach { state.next($0) }
-        }
+
+        var inputs = inputMonitor.flush()
+        filterInputs(&inputs, event: nil)
+        inputs.forEach { state.next($0) }
         state = State(engine: state.engine)
+
         if getKeyboardCapsLock() {
             setKeyboardCapsLock(enabled: false)
         }
+
         eventContext = EventContext()
         InputContext.reset()
     }
@@ -395,7 +392,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard IsSecureEventInputEnabled() else { return }
 
-        resetWithInputMonitor()
+        reset()
         state.engine = state.engines.A
         statusBar.setEngine(state.engines.A)
 
