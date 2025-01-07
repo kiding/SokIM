@@ -32,14 +32,14 @@ struct State: CustomStringConvertible {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // 오른쪽 Command: 한/A 전환 실제 처리
+            // 오른쪽 Command: 한/A 전환 *실제 처리*
             if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand {
                 commit()
                 rotate()
             }
 
-            // Caps Lock: 한/A 상태 및 LED 실제 처리
+            // Caps Lock: 한/A 상태 및 LED *실제 처리*
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 처리
                 if Preferences.rotateShortcut == .capsLock {
@@ -68,7 +68,7 @@ struct State: CustomStringConvertible {
                 }
             }
 
-            // Caps Lock: Caps Lock 실제 처리
+            // Caps Lock: Caps Lock *실제 처리*
             if (type, key) == (.keyUp, .capsLock)
                 && Preferences.rotateShortcut == .capsLock {
                 // 마지막으로 keyDown된 Caps Lock Input의 timestamp가 800ms 이상 차이 나면 Caps Lock 활성화
@@ -176,6 +176,7 @@ struct State: CustomStringConvertible {
     private(set) var composing: String = "" //   / ´  /     | ㄱ / 가
 
     // TODO: 세벌식 모아치기 (두 글자 이상 조합) 지원
+    // TODO: combineChars(String, Character)?
     /** 새로운 CharTuple 입력 처리 */
     mutating func next(_ tuple: CharTuple) {
         let (inputChar, inputMarked) = tuple

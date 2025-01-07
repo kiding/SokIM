@@ -33,7 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         debug()
 
-        startMonitorInitially()
+        startMonitorsInitially()
 
         // 사용자가 입력기를 변경하는 시점에 초기화
         NotificationCenter.default.addObserver(
@@ -67,13 +67,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 잠자기 상태에서 깨어나는 경우 InputMonitor 재시작
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
-            selector: #selector(restartMonitorSilently),
+            selector: #selector(restartMonitors),
             name: NSWorkspace.didWakeNotification,
             object: nil
         )
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
-            selector: #selector(restartMonitorSilently),
+            selector: #selector(restartMonitors),
             name: NSWorkspace.screensDidWakeNotification,
             object: nil
         )
@@ -82,7 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         debug()
 
-        inputMonitor.stop()
+        stopMonitors()
 
         // applicationDidFinishLaunching에서 추가한 observer 제거
         NotificationCenter.default.removeObserver(
@@ -95,11 +95,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         RemoveEventHandler(eventHandlerRef)
     }
 
-    @objc private func startMonitorInitially() {
+    private func startMonitorsInitially() {
         debug()
 
         do {
-            notice("모니터 시작 중...")
             try inputMonitor.start()
             try clickMonitor.start()
             statusBar.setStatus("⌨️")
@@ -108,23 +107,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             warning("\(error)")
             statusBar.setStatus("⚠️")
             statusBar.setMessage("⚠️ \(error)")
-            self.perform(#selector(startMonitorInitially), with: nil, afterDelay: 1)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: startMonitorsInitially)
         }
     }
 
-    @objc private func restartMonitorSilently(_ aNotification: Notification) {
-        debug("\(aNotification)")
+    @objc private func restartMonitors() {
+        debug()
 
         do {
-            notice("모니터 재시작 중...")
             inputMonitor.stop()
             try inputMonitor.start()
             clickMonitor.stop()
             try clickMonitor.start()
         } catch {
             warning("\(error)")
-            self.perform(#selector(restartMonitorSilently), with: aNotification, afterDelay: 1)
+            statusBar.setStatus("⚠️")
+            statusBar.setMessage("⚠️ \(error)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: restartMonitors)
         }
+    }
+
+    private func stopMonitors() {
+        debug()
+
+        inputMonitor.stop()
+        clickMonitor.stop()
     }
 
     func registerEventHotKey(_ value: RotateShortcutType) {

@@ -149,6 +149,8 @@ class StatusBar {
     /** 업데이트 확인 */
 
     @objc func checkUpdate(sender: NSMenuItem) {
+        debug()
+
         NSWorkspace.shared.open(URL(string: "https://github.com/kiding/SokIM")!)
     }
 
@@ -169,6 +171,8 @@ class StatusBar {
     /** 한/A 전환키 */
 
     @objc func toggleCapsLock(sender: NSMenuItem) {
+        debug()
+
         if sender.state == .off {
             Preferences.rotateShortcut = .capsLock
             capsLockItem.state = .on
@@ -180,6 +184,8 @@ class StatusBar {
     }
 
     @objc func toggleRightCommand(sender: NSMenuItem) {
+        debug()
+
         if sender.state == .off {
             Preferences.rotateShortcut = .rightCommand
             capsLockItem.state = .off
@@ -191,6 +197,8 @@ class StatusBar {
     }
 
     @objc func toggleCommandSpace(sender: NSMenuItem) {
+        debug()
+
         if sender.state == .off {
             Preferences.rotateShortcut = .commandSpace
             capsLockItem.state = .off
@@ -202,6 +210,8 @@ class StatusBar {
     }
 
     @objc func toggleShiftSpace(sender: NSMenuItem) {
+        debug()
+
         if sender.state == .off {
             Preferences.rotateShortcut = .shiftSpace
             capsLockItem.state = .off
@@ -213,6 +223,8 @@ class StatusBar {
     }
 
     @objc func toggleControlSpace(sender: NSMenuItem) {
+        debug()
+
         if sender.state == .off {
             Preferences.rotateShortcut = .controlSpace
             capsLockItem.state = .off
@@ -226,16 +238,22 @@ class StatusBar {
     /** 기타 설정 */
 
     @objc func toggleGraveOverWon(sender: NSMenuItem) {
+        debug()
+
         Preferences.graveOverWon = sender.state == .on ? false : true
         sender.state = Preferences.graveOverWon ? .on : .off
     }
 
     @objc func toggleSuppressABC(sender: NSMenuItem) {
+        debug()
+
         Preferences.suppressABC = sender.state == .on ? false : true
         sender.state = Preferences.suppressABC ? .on : .off
     }
 
     @objc func toggleDebug(sender: NSMenuItem) {
+        debug()
+
         Preferences.debug = sender.state == .on ? false : true
         sender.state = Preferences.debug ? .on : .off
     }

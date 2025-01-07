@@ -87,27 +87,23 @@ class InputMonitor {
         if res != kIOReturnSuccess {
             IOHIDManagerClose(hid, 0)
 
+            warning("IOHIDManagerOpen 실패: \(res)")
             throw InputMonitorError.failedToOpen(res)
         }
-
         self.hid = hid
-        debug("InputMonitor 시작 성공")
     }
 
     func stop() {
         debug()
 
-        guard let hid = hid else {
+        if let hid {
+            IOHIDManagerClose(hid, 0)
+            IOHIDManagerUnscheduleFromRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
+            IOHIDManagerRegisterInputValueCallback(hid, nil, nil)
+            self.hid = nil
+        } else {
             warning("초기화된 hid가 없음")
-            return
         }
-
-        IOHIDManagerClose(hid, 0)
-        IOHIDManagerUnscheduleFromRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
-        IOHIDManagerRegisterInputValueCallback(hid, nil, nil)
-
-        self.hid = nil
-        debug("InputMonitor 중단 성공")
     }
 
     @discardableResult
@@ -155,13 +151,13 @@ class InputMonitor {
                 AppDelegate.shared().reset()
             }
 
-            // 별도 처리: 오른쪽 Command: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            // 별도 처리: 오른쪽 Command: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
             if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcut == .rightCommand {
                 AppDelegate.shared().statusBar.rotateEngine()
             }
 
-            // 별도 처리: Caps Lock: 한/A 상태 및 LED 우선 갱신, 실제 처리는 State에서
+            // 별도 처리: Caps Lock: 한/A 상태 및 LED *우선 처리*, 실제 처리는 State에서
             if (type, key) == (.keyDown, .capsLock) {
                 if Preferences.rotateShortcut == .capsLock {
                     /* 한/A 전환이 Caps Lock인 경우 800ms 이상 누르고 있으면 활성화 */
@@ -187,7 +183,7 @@ class InputMonitor {
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: capsLockTimer)
 
-                    /* 한/A 표시만 우선 갱신 */
+                    /* 한/A 표시만 *우선 처리* */
                     if canCapsLockRotate {
                         AppDelegate.shared().statusBar.rotateEngine()
                     } else {
@@ -207,7 +203,7 @@ class InputMonitor {
             let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
 
-            // 별도 처리: Command/Shift/Control + Space: 한/A 표시만 우선 갱신, 실제 처리는 State에서
+            // 별도 처리: Command/Shift/Control + Space: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
             if (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue

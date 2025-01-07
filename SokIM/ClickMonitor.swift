@@ -38,7 +38,8 @@ class ClickMonitor {
             eventsOfInterest: CGEventMask(
                 1 << CGEventType.leftMouseDown.rawValue
                 | 1 << CGEventType.rightMouseDown.rawValue
-                | 1 << CGEventType.otherMouseDown.rawValue),
+                | 1 << CGEventType.otherMouseDown.rawValue
+            ),
             callback: { _, _, event, _ in
                 // 사용자가 마우스 클릭하는 시점에 초기화
                 AppDelegate.shared().reset()
@@ -47,20 +48,20 @@ class ClickMonitor {
             userInfo: nil
         )
         guard let tap else {
+            warning("CGEvent.tapCreate 실패")
             throw ClickMonitorError.failedToCreateTap
         }
+        self.tap = tap
 
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
         guard let source else {
+            warning("CFMachPortCreateRunLoopSource 실패")
             throw ClickMonitorError.failedToCreateSource
         }
+        self.source = source
 
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .defaultMode)
         CGEvent.tapEnable(tap: tap, enable: true)
-
-        self.tap = tap
-        self.source = source
-        debug("ClickMonitor 시작 성공")
     }
 
     func stop() {
@@ -69,18 +70,16 @@ class ClickMonitor {
         if let tap {
             CGEvent.tapEnable(tap: tap, enable: false)
             CFMachPortInvalidate(tap)
+            self.tap = nil
         } else {
             warning("초기화된 tap이 없음")
         }
 
         if let source {
             CFRunLoopSourceInvalidate(source)
+            self.source = nil
         } else {
             warning("초기화된 source가 없음")
         }
-
-        self.tap = nil
-        self.source = nil
-        debug("ClickMonitor 중단 성공")
     }
 }
