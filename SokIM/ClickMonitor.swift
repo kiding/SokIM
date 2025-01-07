@@ -72,14 +72,14 @@ class ClickMonitor {
             CFMachPortInvalidate(tap)
             self.tap = nil
         } else {
-            warning("초기화된 tap이 없음")
+            notice("초기화된 tap이 없음")
         }
 
         if let source {
             CFRunLoopSourceInvalidate(source)
             self.source = nil
         } else {
-            warning("초기화된 source가 없음")
+            notice("초기화된 source가 없음")
         }
     }
 }

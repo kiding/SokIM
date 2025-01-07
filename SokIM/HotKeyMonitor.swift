@@ -97,7 +97,7 @@ class HotKeyMonitor {
             RemoveEventHandler(eventHandlerRef)
             self.eventHandlerRef = nil
         } else {
-            warning("초기화된 eventHandlerRef가 없음")
+            notice("초기화된 eventHandlerRef가 없음")
         }
 
         if let eventHotKeyRef {

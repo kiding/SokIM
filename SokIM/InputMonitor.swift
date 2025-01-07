@@ -102,7 +102,7 @@ class InputMonitor {
             IOHIDManagerRegisterInputValueCallback(hid, nil, nil)
             self.hid = nil
         } else {
-            warning("초기화된 hid가 없음")
+            notice("초기화된 hid가 없음")
         }
     }
 
