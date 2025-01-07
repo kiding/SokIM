@@ -15,7 +15,7 @@ struct Preferences {
         get { RotateShortcutType(rawValue: UserDefaults.standard.string(forKey: "RotateShortcut") ?? "") ?? .capsLock }
         set(new) {
             UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut")
-            AppDelegate.shared().registerEventHotKey(new)
+            AppDelegate.shared().restartMonitors()
         }
     }
 

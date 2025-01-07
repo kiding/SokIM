@@ -1,12 +1,6 @@
 import Cocoa
 import InputMethodKit
 
-func eventHotKeyHandler(
-    nextHandler: EventHandlerCallRef?,
-    theEvent: EventRef?,
-    userData: UnsafeMutableRawPointer?
-) -> OSStatus { noErr }
-
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
     // swiftlint:disable force_cast
@@ -23,9 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let statusBar = StatusBar()
     let inputMonitor = InputMonitor()
     let clickMonitor = ClickMonitor()
-
-    private var eventHandlerRef: EventHandlerRef?
-    private var eventHotKeyRef: EventHotKeyRef?
+    let hotKeyMonitor = HotKeyMonitor()
 
     private var state = State()
     private var eventContext = EventContext()
@@ -42,11 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
-
-        // 사용자의 한/A 전환키 조합을 시스템에 등록, 더미 함수 호출
-        var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-        InstallEventHandler(GetApplicationEventTarget(), eventHotKeyHandler, 1, &eventSpec, nil, &eventHandlerRef)
-        registerEventHotKey(Preferences.rotateShortcut)
 
         // 입력기가 변경되는 시점에 ABC 입력기 제한 로직 실행
         NotificationCenter.default.addObserver(
@@ -90,9 +77,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
-
-        unregisterEventHotKey()
-        RemoveEventHandler(eventHandlerRef)
     }
 
     private func startMonitorsInitially() {
@@ -101,6 +85,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         do {
             try inputMonitor.start()
             try clickMonitor.start()
+            try hotKeyMonitor.start()
             statusBar.setStatus("⌨️")
             statusBar.removeMessage()
         } catch {
@@ -111,7 +96,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc private func restartMonitors() {
+    @objc func restartMonitors() {
         debug()
 
         do {
@@ -119,6 +104,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             try inputMonitor.start()
             clickMonitor.stop()
             try clickMonitor.start()
+            hotKeyMonitor.stop()
+            try hotKeyMonitor.start()
         } catch {
             warning("\(error)")
             statusBar.setStatus("⚠️")
@@ -132,49 +119,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         inputMonitor.stop()
         clickMonitor.stop()
-    }
-
-    func registerEventHotKey(_ value: RotateShortcutType) {
-        debug()
-
-        unregisterEventHotKey()
-
-        let code: UInt32
-        let modifiers: UInt32
-
-        switch value {
-        case .capsLock:
-            return
-        case .rightCommand:
-            return
-        case .commandSpace:
-            code = UInt32(kVK_Space)
-            modifiers = UInt32(cmdKey)
-        case .shiftSpace:
-            code = UInt32(kVK_Space)
-            modifiers = UInt32(shiftKey)
-        case .controlSpace:
-            code = UInt32(kVK_Space)
-            modifiers = UInt32(controlKey)
-        }
-
-        RegisterEventHotKey(
-            code,
-            modifiers,
-            EventHotKeyID(signature: 0, id: 0),
-            GetApplicationEventTarget(),
-            0,
-            &eventHotKeyRef
-        )
-    }
-
-    func unregisterEventHotKey() {
-        debug()
-
-        if eventHotKeyRef != nil {
-            UnregisterEventHotKey(eventHotKeyRef)
-            eventHotKeyRef = nil
-        }
+        hotKeyMonitor.stop()
     }
 
     // 초기화
