@@ -29,6 +29,8 @@ private struct Hangul {
     var jong: Character?
 
     init?(_ character: Character) {
+        debug("\(character)")
+
         switch character {
             // 초성만, 단독 자음
         case "ㄱ"..."ㅎ" where choMap[character] != nil:
@@ -56,6 +58,8 @@ private struct Hangul {
     }
 
     init?(_ cho: Character?, _ jung: Character?, _ jong: Character?) {
+        debug("\(String(describing: cho)) \(String(describing: jung)) \(String(describing: jong))")
+
         switch (cho, jung, jong) {
             // 초성만, 단독 자음
         case (let cho?, nil, nil) where choMap[cho] != nil:

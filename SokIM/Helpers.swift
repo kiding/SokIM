@@ -35,6 +35,8 @@ func warning(_ message: String = "",
 // https://developer.apple.com/library/archive/qa/qa1398/
 private var sTimebaseInfo = mach_timebase_info()
 func ms(since: UInt64) -> Int64 {
+    debug("\(since)")
+
     let current = mach_absolute_time()
 
     if sTimebaseInfo.denom == 0 {
@@ -50,6 +52,8 @@ func ms(since: UInt64) -> Int64 {
 }
 
 func ms(absolute: UInt64) -> UInt64 {
+    debug("\(absolute)")
+
     if sTimebaseInfo.denom == 0 {
         guard mach_timebase_info(&sTimebaseInfo) == KERN_SUCCESS else {
             return 0
@@ -69,6 +73,8 @@ func ms(absolute: UInt64) -> UInt64 {
  @see https://stackoverflow.com/a/37648516
  */
 func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
+    debug("\(usage) \(device)")
+
     guard let vendor = IOHIDDeviceGetProperty(device, kIOHIDVendorIDKey as CFString) as? Int,
           let product = IOHIDDeviceGetProperty(device, kIOHIDProductIDKey as CFString) as? Int else {
         warning("알 수 없는 키보드: \(device)")
@@ -106,6 +112,8 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
  */
 private var block = DispatchWorkItem { }
 func setKeyboardCapsLock(enabled: Bool) {
+    debug("\(enabled)")
+
     block.cancel()
     block = DispatchWorkItem {
         let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
@@ -171,6 +179,8 @@ func setKeyboardCapsLock(enabled: Bool) {
 }
 
 func getKeyboardCapsLock() -> Bool {
+    debug()
+
     var conn = io_connect_t()
     let serv = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching(kIOHIDSystemClass))
 

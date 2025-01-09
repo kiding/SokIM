@@ -26,6 +26,8 @@ struct State: CustomStringConvertible {
 
     /** 새로운 Input 입력 처리 */
     mutating func next(_ input: Input) {
+        debug("\(input)")
+
         let (usage, type) = (input.usage, input.type)
 
         // usage가 modifier인 경우
@@ -155,6 +157,8 @@ struct State: CustomStringConvertible {
 
     var engine: Engine.Type = TwoSetEngine.self
     init(engine: Engine.Type) {
+        debug("\(engine)")
+
         self.engine = engine
     }
     let engines = (한: TwoSetEngine.self, A: QwertyEngine.self) // TODO: Preferences
@@ -179,6 +183,8 @@ struct State: CustomStringConvertible {
     // TODO: combineChars(String, Character)?
     /** 새로운 CharTuple 입력 처리 */
     mutating func next(_ tuple: CharTuple) {
+        debug("\(tuple)")
+
         let (inputChar, inputMarked) = tuple
         let markedChar = composing.last
         var nextText: String
@@ -227,6 +233,8 @@ struct State: CustomStringConvertible {
     }
 
     mutating func deleteBackwardComposing() {
+        debug()
+
         // 조합에서 마지막 글자를 꺼냈을 때, 글자가 있다면
         if let oldLast = composing.popLast() {
             debug("oldLast: \(oldLast)")

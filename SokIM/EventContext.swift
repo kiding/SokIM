@@ -82,12 +82,16 @@ struct EventContext {
     }
 
     static func == (left: Self, right: Self) -> Bool {
-        left.strategy == right.strategy
+        debug("\(left) \(right)")
+
+        return left.strategy == right.strategy
         ? left.strategy.equal(left: left, right: right)
         : false
     }
 
     static func != (left: Self, right: Self) -> Bool {
-        !(left == right)
+        debug("\(left) \(right)")
+
+        return !(left == right)
     }
 }

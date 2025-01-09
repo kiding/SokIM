@@ -88,6 +88,8 @@ extension Engine {
         _ isShiftDown: Bool,
         _ isCapsLockOn: Bool
     ) -> CharTuple? {
+        debug("\(usage) \(isAltDown) \(isShiftDown) \(isCapsLockOn)")
+
         let map = usageToTupleMap[usage]
 
         // Caps Lock이 켜져있고 map이 Caps Lock의 영향을 받는다면 Shift가 눌린 것으로 가정하여 처리
@@ -110,6 +112,8 @@ extension Engine {
 
     /** NSEvent -> CharTuple 매핑 */
     static func eventToTuple(_ event: NSEvent) -> CharTuple? {
+        debug("\(event)")
+
         // 모든 .keyUp 무시
         if event.type == .keyUp {
             return nil

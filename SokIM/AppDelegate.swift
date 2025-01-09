@@ -5,7 +5,9 @@ import InputMethodKit
 class AppDelegate: NSObject, NSApplicationDelegate {
     // swiftlint:disable force_cast
     static func shared() -> AppDelegate {
-        NSApp.delegate as! AppDelegate
+        debug()
+
+        return NSApp.delegate as! AppDelegate
     }
 
     private var server: IMKServer = IMKServer.init(

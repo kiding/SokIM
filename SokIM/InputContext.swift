@@ -5,7 +5,11 @@ private var counter: UInt64 = 0
 
 /** 키보드 입력 후 InputMonitor에 의해 HID 값 발생 시점의 context */
 struct InputContext {
-    static func reset() { counter += 1 }
+    static func reset() {
+        debug()
+
+        counter += 1
+    }
 
     /** 입력되는 앱, 샤용자 상황에 따라 달라짐 */
     let bundleIdentifier: String
@@ -13,6 +17,8 @@ struct InputContext {
     let count: UInt64
 
     init(type: InputType, usage: UInt32) {
+        debug("\(type) \(usage)")
+
         bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
 
         // keyDown만 보고 판단, 단축키 조합(예: Cmd+X)은 같은 context로 묶음
@@ -31,11 +37,15 @@ struct InputContext {
     }
 
     static func == (left: Self, right: Self) -> Bool {
-        left.bundleIdentifier == right.bundleIdentifier
+        debug("\(left) \(right)")
+
+        return left.bundleIdentifier == right.bundleIdentifier
         && left.count == right.count
     }
 
     static func != (left: Self, right: Self) -> Bool {
-        !(left == right)
+        debug("\(left) \(right)")
+
+        return !(left == right)
     }
 }
