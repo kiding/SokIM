@@ -48,7 +48,7 @@
 		</array>
 	</dict>
 	<key>InputMethodConnectionName</key>
-	<string>Sok_1_Connection</string>
+	<string>com.kiding.inputmethod.sok_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>Controller</string>
 	<key>LSApplicationCategoryType</key>
@@ -71,7 +71,7 @@
 	<key>TISIconIsTemplate</key>
 	<true/>
 	<key>TISInputSourceID</key>
-	<string>com.kiding.sok.inputmethod</string>
+	<string>com.kiding.inputmethod.sok</string>
 	<key>TISIntendedLanguage</key>
 	<string>en</string>
 	<key>tsInputMethodCharacterRepertoireKey</key>
