@@ -65,7 +65,52 @@ func ms(absolute: UInt64) -> UInt64 {
     return nsec / UInt64(NSEC_PER_MSEC)
 }
 
-// MARK: - Etc
+// MARK: - Modifier Mapping
+
+private func getModifierMappingPairs_Registry(_ device: IOHIDDevice) -> [[String: UInt64]]? {
+    debug()
+
+    var entry = IOHIDDeviceGetService(device)
+
+    while entry != 0 {
+        if let properties = IORegistryEntryCreateCFProperty(
+            entry,
+            "HIDEventServiceProperties" as CFString,
+            kCFAllocatorDefault,
+            .zero
+        )?.takeUnretainedValue() as? [String: Any],
+           let maps = properties["HIDKeyboardModifierMappingPairs"] as? [[String: UInt64]] {
+            return maps
+        }
+
+        var child: io_registry_entry_t = 0
+        IORegistryEntryGetChildEntry(entry, kIOServicePlane, &child)
+        entry = child
+    }
+
+    warning("HIDKeyboardModifierMappingPairs 없음")
+    return nil
+}
+
+private func getModifierMappingPairs_UserDefaults(_ device: IOHIDDevice) -> [[String: UInt64]]? {
+    debug()
+
+    guard let vendor = IOHIDDeviceGetProperty(device, kIOHIDVendorIDKey as CFString) as? Int,
+          let product = IOHIDDeviceGetProperty(device, kIOHIDProductIDKey as CFString) as? Int else {
+        warning("VendorID 또는 ProductID 없음")
+        return nil
+    }
+
+    let key = "com.apple.keyboard.modifiermapping.\(vendor)-\(product)-0"
+    let maps = UserDefaults.standard.object(forKey: key) as? [[String: UInt64]]
+
+    guard let maps else {
+        warning("com.apple.keyboard.modifiermapping 없음")
+        return nil
+    }
+
+    return maps
+}
 
 /**
  "보조 키(Modifier Keys)" 매핑 설정에 맞는 usage 값 반환
@@ -75,16 +120,8 @@ func ms(absolute: UInt64) -> UInt64 {
 func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
     debug("\(usage) \(device)")
 
-    guard let vendor = IOHIDDeviceGetProperty(device, kIOHIDVendorIDKey as CFString) as? Int,
-          let product = IOHIDDeviceGetProperty(device, kIOHIDProductIDKey as CFString) as? Int else {
-        warning("알 수 없는 키보드: \(device)")
-
-        return usage
-    }
-
-    let key = "com.apple.keyboard.modifiermapping.\(vendor)-\(product)-0"
-    guard let maps = UserDefaults.standard.object(forKey: key) as? [[String: UInt64]] else {
-        // 설정이 없는 경우 그대로 반환
+    guard let maps = getModifierMappingPairs_Registry(device) ?? getModifierMappingPairs_UserDefaults(device) else {
+        // 매핑 자체가 없음, 문제가 있을 수 있음
         return usage
     }
 
@@ -96,7 +133,7 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
 
         // 설정에 매핑되어 있으면 맞는 값 반환
         if src & 0xFF == usage {
-            debug("\(vendor) \(product): \(String(format: "0x%X", src)) -> \(String(format: "0x%X", dst))")
+            debug("\(String(format: "0x%X", src)) -> \(String(format: "0x%X", dst))")
 
             return UInt32(dst & 0xFF)
         }
@@ -105,6 +142,8 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
     // 설정은 있으나 매핑이 없으면 그대로 반환
     return usage
 }
+
+// MARK: - Etc
 
 /**
  연결된 모든 HID 키보드에 대해 Caps Lock 상태와 LED 조정
