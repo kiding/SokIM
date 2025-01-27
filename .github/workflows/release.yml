@@ -1,0 +1,232 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+    if: github.event.actor.login == 'kiding'
+
+env:
+  APP_NAME: ${{ vars.APP_NAME }}
+  APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
+
+jobs:
+  Release:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install the certificates
+        env:
+          APPLE_CERT_DEVE_BASE64: ${{ secrets.APPLE_CERT_DEVE_BASE64 }}
+          APPLE_CERT_DEVE_PASSWORD: ${{ secrets.APPLE_CERT_DEVE_PASSWORD }}
+          APPLE_CERT_APPL_BASE64: ${{ secrets.APPLE_CERT_APPL_BASE64 }}
+          APPLE_CERT_APPL_PASSWORD: ${{ secrets.APPLE_CERT_APPL_PASSWORD }}
+          APPLE_CERT_INST_BASE64: ${{ secrets.APPLE_CERT_INST_BASE64 }}
+          APPLE_CERT_INST_PASSWORD: ${{ secrets.APPLE_CERT_INST_PASSWORD }}
+        run: |
+          KEY_PATH="$RUNNER_TEMP/Key"
+          mkdir "$KEY_PATH"
+
+          KEY_KEYCHAIN_PATH="$KEY_PATH/app-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+          security create-keychain \
+            -p "$KEYCHAIN_PASSWORD" \
+            "$KEY_KEYCHAIN_PATH"
+          security set-keychain-settings \
+            -lut 3600 \
+            "$KEY_KEYCHAIN_PATH"
+          security unlock-keychain \
+            -p "$KEYCHAIN_PASSWORD" \
+            "$KEY_KEYCHAIN_PATH"
+
+          KEY_DEVE_P12_PATH="$KEY_PATH/deve.p12"
+          echo -n "$APPLE_CERT_DEVE_BASE64" \
+            | base64 --decode -o "$KEY_DEVE_P12_PATH"
+          security import "$KEY_DEVE_P12_PATH" \
+            -A -t cert -f pkcs12 \
+            -P "$APPLE_CERT_DEVE_PASSWORD" \
+            -k "$KEY_KEYCHAIN_PATH"
+
+          KEY_APPL_P12_PATH="$KEY_PATH/appl.p12"
+          echo -n "$APPLE_CERT_APPL_BASE64" \
+            | base64 --decode -o "$KEY_APPL_P12_PATH"
+          security import "$KEY_APPL_P12_PATH" \
+            -A -t cert -f pkcs12 \
+            -P "$APPLE_CERT_APPL_PASSWORD" \
+            -k "$KEY_KEYCHAIN_PATH"
+
+          KEY_INST_P12_PATH="$KEY_PATH/inst.p12"
+          echo -n "$APPLE_CERT_INST_BASE64" \
+            | base64 --decode -o "$KEY_INST_P12_PATH"
+          security import "$KEY_INST_P12_PATH" \
+            -A -t cert -f pkcs12 \
+            -P "$APPLE_CERT_INST_PASSWORD" \
+            -k "$KEY_KEYCHAIN_PATH"
+
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$KEY_KEYCHAIN_PATH"
+      - name: Build and archive the project
+        run: |
+          BUILD_PATH="$RUNNER_TEMP/Build"
+          mkdir "$BUILD_PATH"
+
+          BUILD_ARCHIVE_PATH="$BUILD_PATH/$APP_NAME.xcarchive"
+          xcodebuild archive \
+            -scheme "$APP_NAME" \
+            -derivedDataPath "$BUILD_PATH" \
+            -archivePath "$BUILD_ARCHIVE_PATH"
+
+          echo "BUILD_ARCHIVE_PATH=$BUILD_ARCHIVE_PATH" >> "$GITHUB_ENV"
+      - name: Export the app
+        run: |
+          EXPORT_PATH="$RUNNER_TEMP/Export"
+          mkdir "$EXPORT_PATH"
+
+          EXPORT_OPTIONS_PLIST="$EXPORT_PATH/exportOptions.plist"
+          cat > "$EXPORT_OPTIONS_PLIST" <<- EOF 
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>developer-id</string>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$BUILD_ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST"
+
+          EXPORT_APP_PATH="$EXPORT_PATH/$APP_NAME.app"
+          codesign -dvvv --entitlements - "$EXPORT_APP_PATH"
+
+          echo "EXPORT_APP_PATH=$EXPORT_APP_PATH" >> "$GITHUB_ENV"
+      - name: Notarize the app
+        env:
+          APPLE_ID: ${{ vars.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: |
+          EXPORT_ZIP_PATH="$EXPORT_APP_PATH.zip"
+          ditto -c -k --keepParent "$EXPORT_APP_PATH" "$EXPORT_ZIP_PATH"
+
+          EXPORT_SUB_ID="$(xcrun notarytool submit \
+            "$EXPORT_ZIP_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            | awk '/id: / {print $2; exit 0;}' || true)"
+
+          xcrun notarytool wait \
+            "$EXPORT_SUB_ID" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID"
+
+          stapler staple "$EXPORT_APP_PATH"
+          codesign -dvvv --entitlements - "$EXPORT_APP_PATH"
+      - name: Create a package
+        env:
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: |
+          PACKAGE_PATH="$RUNNER_TEMP/Package"
+          mkdir "$PACKAGE_PATH"
+
+          PACKAGE_SCRIPTS_PATH="$PACKAGE_PATH/scripts"
+          mkdir "$PACKAGE_SCRIPTS_PATH"
+
+          PACKAGE_PREINSTALL_PATH="$PACKAGE_SCRIPTS_PATH/preinstall"
+          cat > "$PACKAGE_PREINSTALL_PATH" <<- EOF
+          #!/bin/sh
+          killall KeyboardSettings keyboardservicesd TextInputMenuAgent TextInputSwitcher imklaunchagent $APP_NAME || true
+          sleep 3
+          killall KeyboardSettings keyboardservicesd TextInputMenuAgent TextInputSwitcher imklaunchagent $APP_NAME || true
+          EOF
+          chmod +x "$PACKAGE_PREINSTALL_PATH"
+
+          PACKAGE_ROOT_PATH="$PACKAGE_PATH/ROOT"
+          PACKAGE_INSTALL_PATH="$PACKAGE_ROOT_PATH/Library/Input Methods/"
+          mkdir -p "$PACKAGE_INSTALL_PATH"
+          cp -rfv "$EXPORT_APP_PATH" "$PACKAGE_INSTALL_PATH"
+
+          PACKAGE_COMPONENT_NAME="$APP_NAME""_component.pkg"
+          PACKAGE_COMPONENT_PATH="$PACKAGE_PATH/$PACKAGE_COMPONENT_NAME"
+
+          pkgbuild \
+            --root "$PACKAGE_ROOT_PATH" \
+            --scripts "$PACKAGE_SCRIPTS_PATH" \
+            --identifier "$APP_IDENTIFIER" \
+            "$PACKAGE_COMPONENT_PATH"
+
+          PACKAGE_DISTRIBUTION_PATH="$PACKAGE_PATH/Distribution.xml"
+          cat > "$PACKAGE_DISTRIBUTION_PATH" <<- EOF 
+          <?xml version="1.0" encoding="utf-8"?>
+          <installer-gui-script minSpecVersion="1">
+              <title>속 입력기</title>
+              <pkg-ref id="$APP_IDENTIFIER"/>
+              <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+              <volume-check>
+                <allowed-os-versions>
+                  <os-version min="13.0"/>
+                </allowed-os-versions>
+              </volume-check>
+              <choices-outline>
+                  <line choice="default">
+                      <line choice="$APP_IDENTIFIER"/>
+                  </line>
+              </choices-outline>
+              <choice id="default"/>
+              <choice id="$APP_IDENTIFIER" visible="false">
+                  <pkg-ref id="$APP_IDENTIFIER"/>
+              </choice>
+              <pkg-ref id="$APP_IDENTIFIER" version="0" onConclusion="RequireLogout">$PACKAGE_COMPONENT_NAME</pkg-ref>
+          </installer-gui-script>
+          EOF
+
+          PACKAGE_UNSIGNED_PATH="$PACKAGE_PATH/$APP_NAME""_unsigned.pkg"
+          productbuild \
+            --distribution "$PACKAGE_DISTRIBUTION_PATH" \
+            --package-path "$PACKAGE_PATH" \
+            "$PACKAGE_UNSIGNED_PATH"
+
+          ARTIFACT_PATH="$RUNNER_TEMP/$APP_NAME"".pkg"
+          productsign \
+            --sign "$APPLE_TEAM_ID" \
+            "$PACKAGE_UNSIGNED_PATH" \
+            "$ARTIFACT_PATH"
+
+          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> "$GITHUB_ENV"
+      - name: Notarize the package
+        env:
+          APPLE_ID: ${{ vars.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: |
+          ARTIFACT_SUB_ID="$(xcrun notarytool submit \
+            "$ARTIFACT_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            | awk '/id: / {print $2; exit 0;}' || true)"
+
+          xcrun notarytool wait \
+            "$ARTIFACT_SUB_ID" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID"
+
+          stapler staple "$ARTIFACT_PATH"
+      - name: Upload the package
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+        with:
+          prerelease: true
+          files: ${{ env.ARTIFACT_PATH }}
