@@ -12,7 +12,7 @@ struct State: CustomStringConvertible {
     /** modifier 키 눌림 상태 (InputMonitor와 유사) */
     var modifier: [ModifierUsage: InputType] = [:]
 
-    /** Caps Lock 키 활성화 상태 */
+    /** Input 처리에서 도출된 Caps Lock 키 활성화 상태 */
     private var isCapsLockOn = false
 
     /** 한/A 전환이 Caps Lock인 경우 Caps Lock이 활성화/비활성화 되는 과정에서 한/A 전환이 진행될 수 있는지 여부를 판단하는 플래그 (InputMonitor와 유사) */
@@ -52,7 +52,6 @@ struct State: CustomStringConvertible {
 
                     // Caps Lock 비활성화
                     isCapsLockOn = false
-                    setKeyboardCapsLock(enabled: false)
                     lastCapsLockDownInput = input
 
                     // 한/A 전환
@@ -66,7 +65,6 @@ struct State: CustomStringConvertible {
                 // 그 외의 경우 일반 반전 처리
                 else {
                     isCapsLockOn.toggle()
-                    setKeyboardCapsLock(enabled: isCapsLockOn)
                 }
             }
 
@@ -81,7 +79,6 @@ struct State: CustomStringConvertible {
 
                     // Caps Lock 활성화
                     isCapsLockOn = true
-                    setKeyboardCapsLock(enabled: true)
                     lastCapsLockDownInput = nil
                     engine = engines.A
                 }
