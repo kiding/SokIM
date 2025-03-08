@@ -143,21 +143,30 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
     return usage
 }
 
-// MARK: - Etc
+// MARK: - 물리 키보드 Caps Lock 상태
 
-/**
- 연결된 모든 HID 키보드에 대해 Caps Lock 상태와 LED 조정
- @see https://github.com/busyloop/maclight
- */
-private var block = DispatchWorkItem { }
+private var state: Bool = false
+private var block1 = DispatchWorkItem { }
+private var block2 = DispatchWorkItem { }
 func setKeyboardCapsLock(enabled: Bool) {
-    debug("\(enabled)")
+    debug("enabled: \(enabled) (state: \(state))")
 
-    block.cancel()
-    block = DispatchWorkItem {
+    /** HIS_XPC: Caps Lock 상태는 늘 false */
+    block1.cancel()
+    block1 = DispatchWorkItem {
+        debug("HIS_XPC_SetCapsLockModifierState")
+        HIS_XPC_SetCapsLockModifierState(false)
+    }
+
+    /** HIS_XPC: Sonoma 이후 커서 밑에 생기는 "버블"/HUD/Indicator/Accessory 방지 */
+    for delay in stride(from: 0, to: 200, by: 20) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay), execute: block1)
+    }
+
+    block2.cancel()
+    block2 = DispatchWorkItem {
+        /** HID: 키보드 찾기 */
         let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
-
-        /** HID 키보드 찾기 */
         IOHIDManagerSetDeviceMatching(hid, [
             kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop, // Generic Desktop Page (0x01)
             kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard        // Keyboard (0x06, Collection Application)
@@ -174,7 +183,7 @@ func setKeyboardCapsLock(enabled: Bool) {
         }
 
         for dev in devs {
-            /** Caps Lock 상태 */
+            /** HID: Caps Lock 상태는 늘 false */
             let serv = IOHIDDeviceGetService(dev)
             var conn = io_connect_t()
 
@@ -184,14 +193,14 @@ func setKeyboardCapsLock(enabled: Bool) {
             }
             defer { IOServiceClose(conn) }
 
-            guard IOHIDSetModifierLockState(conn, Int32(kIOHIDCapsLockState), enabled) == KERN_SUCCESS else {
+            guard IOHIDSetModifierLockState(conn, Int32(kIOHIDCapsLockState), false) == KERN_SUCCESS else {
                 warning("IOHIDSetModifierLockState 실패: \(conn)")
                 continue
             }
 
             debug("IOHIDSetModifierLockState 성공: \(dev)")
 
-            /** Caps Lock LED */
+            /** HID: Caps Lock LED */
             guard let elems = IOHIDDeviceCopyMatchingElements(dev, [
                 kIOHIDElementUsagePageKey: kHIDPage_LEDs,     // LED Page (0x08)
                 kIOHIDElementUsageKey: kHIDUsage_LED_CapsLock // Caps Lock (0x02)
@@ -212,30 +221,13 @@ func setKeyboardCapsLock(enabled: Bool) {
             debug("IOHIDDeviceSetValue 성공: \(dev)")
         }
     }
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: block2)
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200), execute: block)
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300), execute: block)
+    state = enabled
 }
 
 func getKeyboardCapsLock() -> Bool {
-    debug()
+    debug("state: \(state)")
 
-    var conn = io_connect_t()
-    let serv = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching(kIOHIDSystemClass))
-
-    guard IOServiceOpen(serv, mach_task_self_, UInt32(kIOHIDParamConnectType), &conn) == KERN_SUCCESS else {
-        warning("IOServiceOpen 실패: \(serv)")
-        return false
-    }
-    defer { IOServiceClose(conn) }
-
-    var enabled = false
-    guard IOHIDGetModifierLockState(conn, Int32(kIOHIDCapsLockState), &enabled) == KERN_SUCCESS else {
-        warning("IOHIDGetModifierLockState 실패: \(conn)")
-        return false
-    }
-
-    debug("IOHIDGetModifierLockState 성공: \(conn) \(enabled)")
-
-    return enabled
+    return state
 }
