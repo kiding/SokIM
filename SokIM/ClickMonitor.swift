@@ -41,8 +41,10 @@ class ClickMonitor {
                 | 1 << CGEventType.otherMouseDown.rawValue
             ),
             callback: { _, _, event, _ in
+                debug()
+
                 // 사용자가 마우스 클릭하는 시점에 초기화
-                AppDelegate.shared().reset()
+                AppDelegate.shared().reset(nil)
                 return Unmanaged.passUnretained(event)
             },
             userInfo: nil

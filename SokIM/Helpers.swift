@@ -121,7 +121,7 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
     debug("\(usage) \(device)")
 
     guard let maps = getModifierMappingPairs_Registry(device) ?? getModifierMappingPairs_UserDefaults(device) else {
-        // 매핑 자체가 없음, 문제가 있을 수 있음
+        warning("보조 키 매핑이 없음")
         return usage
     }
 

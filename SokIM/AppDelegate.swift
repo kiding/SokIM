@@ -79,6 +79,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
+
+        NotificationCenter.default.removeObserver(
+            self,
+            name: NSWorkspace.didWakeNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.removeObserver(
+            self,
+            name: NSWorkspace.screensDidWakeNotification,
+            object: nil
+        )
     }
 
     private func startMonitorsInitially() {
@@ -101,8 +113,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func restartMonitors() {
-        debug()
+    @objc func restartMonitors(_ aNotification: Notification?) {
+        debug("aNotification: \(String(describing: aNotification))")
 
         do {
             inputMonitor.stop()
@@ -118,7 +130,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             hotKeyMonitor.stop()
             statusBar.setStatus("⚠️")
             statusBar.setMessage("⚠️ \(error)")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: restartMonitors)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { self.restartMonitors(nil) }
         }
     }
 
@@ -131,12 +143,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // 초기화
-    @objc func reset() {
-        debug()
-
-        if getKeyboardCapsLock() {
-            setKeyboardCapsLock(enabled: false)
-        }
+    @objc func reset(_ aNotification: Notification?) {
+        debug("aNotification: \(String(describing: aNotification))")
 
         var inputs = inputMonitor.flush()
         filterInputs(&inputs, event: nil)
@@ -381,7 +389,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard IsSecureEventInputEnabled() else { return }
 
-        reset()
+        reset(nil)
         state.engine = state.engines.A
         statusBar.setEngine(state.engines.A)
 
