@@ -7,7 +7,7 @@
 
 ## 설치 방법
 
-1. [GitHub Releases](https://github.com/kiding/SokIM/releases)에서 `SokIM.pkg` 다운로드 및 설치
+1. [GitHub Releases](https://github.com/kiding/SokIM/releases)에서 `SokIM.pkg` 다운로드 및 설치 또는 `brew install --cask sokim` 실행
 1. 시스템 설정 → 키보드 → 입력 소스 "편집..." 버튼 → "+" 버튼 → 영어 → "속" → "추가" 버튼
 1. 메뉴 막대에서 현재 입력기를 속 입력기로 변경
 1. 시스템 설정 → 개인정보 보호 및 보안 → 입력 모니터링에서 "속 입력기" 권한 허용
