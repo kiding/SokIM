@@ -8,47 +8,77 @@ enum RotateShortcutType: String {
     case controlSpace = "ControlSpace"
 }
 
+// MARK: -
+
+private struct Defaults {
+    enum Key: String {
+        case rotateShortcut = "RotateShortcut"
+        case rotateShortcuts = "RotateShortcuts"
+        case graveOverWon = "GraveOverWon"
+        case suppressABC = "SuppressABC"
+        case debug = "Debug"
+    }
+
+    static let container = UserDefaults.standard
+
+    static func get(_ key: Key) -> RotateShortcutType? {
+        if let value = container.string(forKey: key.rawValue) {
+            RotateShortcutType(rawValue: value)
+        } else {
+            nil
+        }
+    }
+
+    static func get(_ key: Key) -> Bool? {
+        container.object(forKey: key.rawValue) as? Bool
+    }
+
+    static func set(_ key: Key, _ value: Any) {
+        container.set(value, forKey: key.rawValue)
+    }
+}
+
+// MARK: -
+
 struct Preferences {
     /** 한/A 전환키 */
 
-    private static var _rotateShortcut = RotateShortcutType(
-        rawValue: UserDefaults.standard.string(forKey: "RotateShortcut") ?? ""
-    ) ?? .capsLock
+    private static var _rotateShortcut = Defaults.get(.rotateShortcut) ?? .capsLock
     static var rotateShortcut: RotateShortcutType {
         get { _rotateShortcut }
-        set(new) {
-            _rotateShortcut = new
-            UserDefaults.standard.set(new.rawValue, forKey: "RotateShortcut")
+        set {
+            _rotateShortcut = newValue
+            Defaults.set(.rotateShortcut, newValue)
             AppDelegate.shared().restartMonitors(nil)
         }
     }
 
     /** 기타 설정 */
 
-    private static var _graveOverWon = UserDefaults.standard.bool(forKey: "GraveOverWon")
+    private static var _graveOverWon = Defaults.get(.graveOverWon) ?? false
     static var graveOverWon: Bool {
         get { _graveOverWon }
-        set(new) {
-            _graveOverWon = new
-            UserDefaults.standard.set(new, forKey: "GraveOverWon")
+        set {
+            _graveOverWon = newValue
+            Defaults.set(.graveOverWon, newValue)
         }
     }
 
-    private static var _suppressABC = UserDefaults.standard.object(forKey: "SuppressABC") as? Bool ?? true
+    private static var _suppressABC = Defaults.get(.suppressABC) ?? true
     static var suppressABC: Bool {
         get { _suppressABC }
-        set(new) {
-            _suppressABC = new
-            UserDefaults.standard.set(new, forKey: "SuppressABC")
+        set {
+            _suppressABC = newValue
+            Defaults.set(.suppressABC, newValue)
         }
     }
 
-    private static var _debug = UserDefaults.standard.bool(forKey: "Debug")
+    private static var _debug = Defaults.get(.debug) ?? false
     static var debug: Bool {
         get { _debug }
-        set(new) {
-            _debug = new
-            UserDefaults.standard.set(new, forKey: "Debug")
+        set {
+            _debug = newValue
+            Defaults.set(.debug, newValue)
         }
     }
 }
