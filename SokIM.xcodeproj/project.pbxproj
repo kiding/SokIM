@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DF1D7D0F29EBF5E000A2302F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DF1D7D0E29EBF5E000A2302F /* README.md */; };
 		DF2651AC28321AC3001A9317 /* EventContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651AB28321AC3001A9317 /* EventContext.swift */; };
 		DF2651B028324E8A001A9317 /* MarkedStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */; };
 		DF2651CE28328B23001A9317 /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651CC28328B23001A9317 /* Strategy.swift */; };
@@ -33,7 +32,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DF1D7D0E29EBF5E000A2302F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		DF1D7D1229EBF9BB00A2302F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		DF2651AB28321AC3001A9317 /* EventContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventContext.swift; sourceTree = "<group>"; };
 		DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkedStrategy.swift; sourceTree = "<group>"; };
@@ -117,7 +115,6 @@
 				DFEB9DD627F49EFB007D978A /* InfoPlist.strings */,
 				DF9286D526F5CFB000002080 /* SokIM.entitlements */,
 				DFFFD8AF280FE99B007B6470 /* icon.tiff */,
-				DF1D7D0E29EBF5E000A2302F /* README.md */,
 			);
 			path = SokIM;
 			sourceTree = "<group>";
@@ -184,7 +181,6 @@
 				DF98FCF12D21B27A0058850E /* .swiftlint.yml in Resources */,
 				DF9286D026F5CFB000002080 /* Assets.xcassets in Resources */,
 				DFFFD8B0280FE99B007B6470 /* icon.tiff in Resources */,
-				DF1D7D0F29EBF5E000A2302F /* README.md in Resources */,
 				DFEB9DD827F49EFB007D978A /* InfoPlist.strings in Resources */,
 				DF9286D326F5CFB000002080 /* MainMenu.xib in Resources */,
 			);
