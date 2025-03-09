@@ -2,7 +2,7 @@
 
 NSHumanReadableCopyright = "© Dongsung Kim, 2022";
 
-com.kiding.inputmethod.sok.mode = "속";
+com.kiding.inputmethod.sok.mode = "속 입력기";
 
 CFBundleName = "속 입력기";
 CFBundleDisplayName = "속 입력기";
