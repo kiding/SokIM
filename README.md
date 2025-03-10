@@ -17,7 +17,7 @@
 1. 시스템 설정 → 키보드 → 입력 소스 "편집..." 버튼 → "속" → "-" 버튼
 1. 로그아웃 후 재로그인
 1. 시스템 설정 → 개인정보 보호 및 보안 → 입력 모니터링 → "속 입력기" → "-" 버튼  
-1. `/Library/Input Methods/SokIM.app` 삭제
+1. `/Library/Input Methods/SokIM.app` 삭제 또는 `brew uninstall --cask sokim` 실행
 
 ## 디버그 메시지 보기
 
