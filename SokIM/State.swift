@@ -36,7 +36,7 @@ struct State: CustomStringConvertible {
 
             // 오른쪽 Command: 한/A 전환 *실제 처리*
             if (type, key) == (.keyDown, .rightCommand)
-                && Preferences.rotateShortcut == .rightCommand {
+                && Preferences.rotateShortcuts.contains(.rightCommand) {
                 commit()
                 rotate()
             }
@@ -44,7 +44,7 @@ struct State: CustomStringConvertible {
             // Caps Lock: 한/A 상태 및 LED *실제 처리*
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 처리
-                if Preferences.rotateShortcut == .capsLock {
+                if Preferences.rotateShortcuts.contains(.capsLock) {
                     // Caps Lock 활성 -> 비활성: 한/A 전환 1회 억제
                     if isCapsLockOn {
                         canCapsLockRotate = false
@@ -70,7 +70,7 @@ struct State: CustomStringConvertible {
 
             // Caps Lock: Caps Lock *실제 처리*
             if (type, key) == (.keyUp, .capsLock)
-                && Preferences.rotateShortcut == .capsLock {
+                && Preferences.rotateShortcuts.contains(.capsLock) {
                 // 마지막으로 keyDown된 Caps Lock Input의 timestamp가 800ms 이상 차이 나면 Caps Lock 활성화
                 if let down = lastCapsLockDownInput,
                     ms(absolute: input.timestamp) - ms(absolute: down.timestamp) > 800 {
@@ -99,15 +99,15 @@ struct State: CustomStringConvertible {
             if (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .commandSpace
+                && Preferences.rotateShortcuts.contains(.commandSpace)
             ) || (
                 isShiftDown
                 && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .shiftSpace
+                && Preferences.rotateShortcuts.contains(.shiftSpace)
             ) || (
                 isControlDown
                 && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .controlSpace
+                && Preferences.rotateShortcuts.contains(.controlSpace)
             ) {
                 commit()
                 rotate()

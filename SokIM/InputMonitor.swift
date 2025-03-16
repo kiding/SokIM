@@ -153,13 +153,13 @@ class InputMonitor {
 
             // 별도 처리: 오른쪽 Command: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
             if (type, key) == (.keyDown, .rightCommand)
-                && Preferences.rotateShortcut == .rightCommand {
+                && Preferences.rotateShortcuts.contains(.rightCommand) {
                 AppDelegate.shared().statusBar.rotateEngine()
             }
 
             // 별도 처리: Caps Lock: 한/A 상태 및 LED *우선 처리*, 실제 처리는 State에서
             if (type, key) == (.keyDown, .capsLock) {
-                if Preferences.rotateShortcut == .capsLock {
+                if Preferences.rotateShortcuts.contains(.capsLock) {
                     /* 한/A 전환이 Caps Lock인 경우 800ms 이상 누르고 있으면 활성화 */
                     let enabled = getKeyboardCapsLock()
 
@@ -207,15 +207,15 @@ class InputMonitor {
             if (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .commandSpace
+                && Preferences.rotateShortcuts.contains(.commandSpace)
             ) || (
                 isShiftDown
                 && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .shiftSpace
+                && Preferences.rotateShortcuts.contains(.shiftSpace)
             ) || (
                 isControlDown
                 && usage == SpecialUsage.space.rawValue
-                && Preferences.rotateShortcut == .controlSpace
+                && Preferences.rotateShortcuts.contains(.controlSpace)
             ) {
                 AppDelegate.shared().statusBar.rotateEngine()
             }

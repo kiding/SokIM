@@ -29,8 +29,20 @@ private struct Defaults {
         }
     }
 
+    static func get(_ key: Key) -> Set<RotateShortcutType>? {
+        if let value = container.array(forKey: key.rawValue) as? [String] {
+            Set(value.compactMap { RotateShortcutType(rawValue: $0) })
+        } else {
+            nil
+        }
+    }
+
     static func get(_ key: Key) -> Bool? {
         container.object(forKey: key.rawValue) as? Bool
+    }
+
+    static func set(_ key: Key, _ value: Set<RotateShortcutType>) {
+        container.set(value.map { $0.rawValue }, forKey: key.rawValue)
     }
 
     static func set(_ key: Key, _ value: Any) {
@@ -43,12 +55,13 @@ private struct Defaults {
 struct Preferences {
     /** 한/A 전환키 */
 
-    private static var _rotateShortcut = Defaults.get(.rotateShortcut) ?? .capsLock
-    static var rotateShortcut: RotateShortcutType {
-        get { _rotateShortcut }
+    private static var _rotateShortcuts = Defaults.get(.rotateShortcuts)
+    ?? Set([Defaults.get(.rotateShortcut) ?? .capsLock])
+    static var rotateShortcuts: Set<RotateShortcutType> {
+        get { _rotateShortcuts }
         set {
-            _rotateShortcut = newValue
-            Defaults.set(.rotateShortcut, newValue)
+            _rotateShortcuts = newValue
+            Defaults.set(.rotateShortcuts, newValue)
             AppDelegate.shared().restartMonitors(nil)
         }
     }
