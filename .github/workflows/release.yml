@@ -71,7 +71,8 @@ jobs:
             -S apple-tool:,apple: \
             -k "$KEYCHAIN_PASSWORD" \
             "$KEY_KEYCHAIN_PATH"
-      - name: Build and archive the project
+      - id: archive
+        name: Build and archive the project
         run: |
           BUILD_PATH="$RUNNER_TEMP/Build"
           mkdir "$BUILD_PATH"
@@ -82,8 +83,11 @@ jobs:
             -derivedDataPath "$BUILD_PATH" \
             -archivePath "$BUILD_ARCHIVE_PATH"
 
-          echo "BUILD_ARCHIVE_PATH=$BUILD_ARCHIVE_PATH" >> "$GITHUB_ENV"
-      - name: Export the app
+          echo "BUILD_ARCHIVE_PATH=$BUILD_ARCHIVE_PATH" >> "$GITHUB_OUTPUT"
+      - id: export
+        name: Export the app
+        env:
+          BUILD_ARCHIVE_PATH: ${{ steps.archive.outputs.BUILD_ARCHIVE_PATH }}
         run: |
           EXPORT_PATH="$RUNNER_TEMP/Export"
           mkdir "$EXPORT_PATH"
@@ -109,9 +113,10 @@ jobs:
           EXPORT_APP_PATH="$EXPORT_PATH/$APP_NAME.app"
           codesign -dvvv --entitlements - "$EXPORT_APP_PATH"
 
-          echo "EXPORT_APP_PATH=$EXPORT_APP_PATH" >> "$GITHUB_ENV"
+          echo "EXPORT_APP_PATH=$EXPORT_APP_PATH" >> "$GITHUB_OUTPUT"
       - name: Notarize the app
         env:
+          EXPORT_APP_PATH: ${{ steps.export.outputs.EXPORT_APP_PATH }}
           APPLE_ID: ${{ vars.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
@@ -134,8 +139,10 @@ jobs:
 
           stapler staple "$EXPORT_APP_PATH"
           codesign -dvvv --entitlements - "$EXPORT_APP_PATH"
-      - name: Create a package
+      - id: package
+        name: Create a package
         env:
+          EXPORT_APP_PATH: ${{ steps.export.outputs.EXPORT_APP_PATH }}
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
         run: |
           PACKAGE_PATH="$RUNNER_TEMP/Package"
@@ -204,9 +211,10 @@ jobs:
             "$PACKAGE_UNSIGNED_PATH" \
             "$ARTIFACT_PATH"
 
-          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> "$GITHUB_ENV"
+          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> "$GITHUB_OUTPUT"
       - name: Notarize the package
         env:
+          ARTIFACT_PATH: ${{ steps.package.outputs.ARTIFACT_PATH }}
           APPLE_ID: ${{ vars.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
@@ -229,4 +237,4 @@ jobs:
         uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         with:
           prerelease: true
-          files: ${{ env.ARTIFACT_PATH }}
+          files: ${{ steps.package.outputs.ARTIFACT_PATH }}
