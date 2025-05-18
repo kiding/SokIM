@@ -21,7 +21,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install the certificates
+      - id: cert
+        name: Install the certificates
         env:
           APPLE_CERT_APPL_BASE64: ${{ secrets.APPLE_CERT_APPL_BASE64 }}
           APPLE_CERT_APPL_PASSWORD: ${{ secrets.APPLE_CERT_APPL_PASSWORD }}
@@ -33,12 +34,15 @@ jobs:
 
           KEY_KEYCHAIN_PATH="$KEY_PATH/app-signing.keychain-db"
           KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+
           security create-keychain \
             -p "$KEYCHAIN_PASSWORD" \
             "$KEY_KEYCHAIN_PATH"
+
           security set-keychain-settings \
             -lut 3600 \
             "$KEY_KEYCHAIN_PATH"
+
           security unlock-keychain \
             -p "$KEYCHAIN_PASSWORD" \
             "$KEY_KEYCHAIN_PATH"
@@ -47,22 +51,38 @@ jobs:
           echo -n "$APPLE_CERT_APPL_BASE64" \
             | base64 --decode -o "$KEY_APPL_P12_PATH"
           security import "$KEY_APPL_P12_PATH" \
-            -A -t cert -f pkcs12 \
-            -P "$APPLE_CERT_APPL_PASSWORD" \
-            -k "$KEY_KEYCHAIN_PATH"
+            -k "$KEY_KEYCHAIN_PATH" \
+            -f pkcs12 \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security \
+            -T /usr/bin/pkgbuild \
+            -T /usr/bin/productbuild \
+            -T /usr/bin/productsign \
+            -P "$APPLE_CERT_APPL_PASSWORD"
 
           KEY_INST_P12_PATH="$KEY_PATH/inst.p12"
           echo -n "$APPLE_CERT_INST_BASE64" \
             | base64 --decode -o "$KEY_INST_P12_PATH"
           security import "$KEY_INST_P12_PATH" \
-            -A -t cert -f pkcs12 \
-            -P "$APPLE_CERT_INST_PASSWORD" \
-            -k "$KEY_KEYCHAIN_PATH"
+            -k "$KEY_KEYCHAIN_PATH" \
+            -f pkcs12 \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security \
+            -T /usr/bin/pkgbuild \
+            -T /usr/bin/productbuild \
+            -T /usr/bin/productsign \
+            -P "$APPLE_CERT_INST_PASSWORD"
 
           security set-key-partition-list \
             -S apple-tool:,apple: \
             -k "$KEYCHAIN_PASSWORD" \
             "$KEY_KEYCHAIN_PATH"
+
+          security list-keychains \
+            -d user \
+            -s "$KEY_KEYCHAIN_PATH" login.keychain
+
+          echo "KEY_KEYCHAIN_PATH=$KEY_KEYCHAIN_PATH" >> "$GITHUB_OUTPUT"
       - id: archive
         name: Build and archive the project
         run: |
@@ -238,3 +258,10 @@ jobs:
           prerelease: true
           name: "v${{ steps.version.outputs.MARKETING_VERSION }} (${{ steps.version.outputs.CURRENT_PROJECT_VERSION }})"
           files: ${{ steps.package.outputs.ARTIFACT_PATH }}
+      - name: Post Install the certificates
+        if: ${{ steps.cert.outputs.KEY_KEYCHAIN_PATH }}
+        env:
+          KEY_KEYCHAIN_PATH: ${{ steps.cert.outputs.KEY_KEYCHAIN_PATH }}
+        run: |
+          security delete-keychain \
+            "$KEY_KEYCHAIN_PATH"
