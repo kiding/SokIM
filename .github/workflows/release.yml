@@ -233,8 +233,19 @@ jobs:
             --team-id "$APPLE_TEAM_ID"
 
           stapler staple "$ARTIFACT_PATH"
+      - id: version
+        name: Parse the version strings
+        run: |
+          PBXPROJ_PATH='SokIM.xcodeproj/project.pbxproj'
+
+          MARKETING_VERSION=$(awk -F' *= *|;' '/MARKETING_VERSION/ {print $2; exit;}' "$PBXPROJ_PATH")
+          echo "MARKETING_VERSION=$MARKETING_VERSION" >> "$GITHUB_OUTPUT"
+
+          CURRENT_PROJECT_VERSION=$(awk -F' *= *|;' '/CURRENT_PROJECT_VERSION/ {print $2; exit;}' "$PBXPROJ_PATH")
+          echo "CURRENT_PROJECT_VERSION=$CURRENT_PROJECT_VERSION" >> "$GITHUB_OUTPUT"
       - name: Upload the package
         uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         with:
           prerelease: true
+          name: "v${{ steps.version.outputs.MARKETING_VERSION }} (${{ steps.version.outputs.CURRENT_PROJECT_VERSION }})"
           files: ${{ steps.package.outputs.ARTIFACT_PATH }}
