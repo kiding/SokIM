@@ -101,14 +101,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             try clickMonitor.start()
             try hotKeyMonitor.start()
             statusBar.setStatus(state.engine.name)
-            statusBar.removeMessage()
+            statusBar.setError(nil)
         } catch {
             warning("\(error)")
             inputMonitor.stop()
             clickMonitor.stop()
             hotKeyMonitor.stop()
             statusBar.setStatus("⚠️")
-            statusBar.setMessage("⚠️ \(error)")
+            statusBar.setError("⚠️ \(error)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: startMonitorsInitially)
         }
     }
@@ -123,13 +123,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             try clickMonitor.start()
             hotKeyMonitor.stop()
             try hotKeyMonitor.start()
+            statusBar.setStatus(state.engine.name)
+            statusBar.setError(nil)
         } catch {
             warning("\(error)")
             inputMonitor.stop()
             clickMonitor.stop()
             hotKeyMonitor.stop()
             statusBar.setStatus("⚠️")
-            statusBar.setMessage("⚠️ \(error)")
+            statusBar.setError("⚠️ \(error)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { self.restartMonitors(nil) }
         }
     }

@@ -20,7 +20,7 @@ class StatusBar {
 
     /** 시스템 메시지 */
 
-    private let messageItem = NSMenuItem()
+    private let errorItem = NSMenuItem()
 
     /** 한/A 전환키 */
 
@@ -46,6 +46,11 @@ class StatusBar {
         infoItem.title = "속 입력기 v\(version) (\(build))"
         menu.addItem(infoItem)
 
+        /** 시스템 메시지 */
+
+        errorItem.title = ""
+        errorItem.isHidden = true
+        menu.addItem(errorItem)
         /** 업데이트 확인 */
 
         let updateItem = NSMenuItem()
@@ -53,11 +58,6 @@ class StatusBar {
         updateItem.target = self
         updateItem.action = #selector(checkUpdate)
         menu.addItem(updateItem)
-
-        /** 시스템 메시지 */
-
-        messageItem.title = "초기화 중..."
-        menu.addItem(messageItem)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -155,16 +155,16 @@ class StatusBar {
 
     /** 시스템 메시지 */
 
-    func setMessage(_ msg: String) {
+    func setError(_ msg: String?) {
         debug()
 
-        messageItem.title = msg
-    }
-
-    func removeMessage() {
-        debug()
-
-        menu.removeItem(messageItem)
+        if let msg {
+            errorItem.title = msg
+            errorItem.isHidden = false
+        } else {
+            errorItem.isHidden = true
+            errorItem.title = ""
+        }
     }
 
     /** 한/A 전환키 */
