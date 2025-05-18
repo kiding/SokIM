@@ -21,6 +21,7 @@ class StatusBar {
     /** 시스템 메시지 */
 
     private let errorItem = NSMenuItem()
+    private let noticeItem = NSMenuItem()
 
     /** 한/A 전환키 */
 
@@ -51,6 +52,11 @@ class StatusBar {
         errorItem.title = ""
         errorItem.isHidden = true
         menu.addItem(errorItem)
+
+        noticeItem.title = ""
+        noticeItem.isHidden = true
+        menu.addItem(noticeItem)
+
         /** 업데이트 확인 */
 
         let updateItem = NSMenuItem()
@@ -164,6 +170,18 @@ class StatusBar {
         } else {
             errorItem.isHidden = true
             errorItem.title = ""
+        }
+    }
+
+    func setNotice(_ msg: String?) {
+        debug()
+
+        if let msg {
+            noticeItem.title = msg
+            noticeItem.isHidden = false
+        } else {
+            noticeItem.isHidden = true
+            noticeItem.title = ""
         }
     }
 

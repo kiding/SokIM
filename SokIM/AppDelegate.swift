@@ -27,6 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         debug()
 
+        startCheckingUpdate()
         startMonitorsInitially()
 
         // 사용자가 입력기를 변경하는 시점에 초기화
@@ -91,6 +92,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSWorkspace.screensDidWakeNotification,
             object: nil
         )
+    }
+
+    private func startCheckingUpdate() {
+        let block: (Timer) -> Void = { [self] _ in
+            debug()
+
+            Task {
+                let config = URLSessionConfiguration.ephemeral
+                config.timeoutIntervalForResource = 15
+                let url = URL(string: "https://api.github.com/repos/kiding/SokIM/releases/latest")!
+                guard let data = try? await URLSession(configuration: config).data(from: url).0 else {
+                    warning("요청 실패: \(url)")
+                    return
+                }
+
+                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let name = json["name"] as? String else {
+                    warning("릴리스 이름 파싱 실패")
+                    return
+                }
+
+                guard let latest = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1 else {
+                    warning("알 수 없는 릴리스 이름: \(name)")
+                    return
+                }
+
+                guard let current = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
+                    warning("CFBundleVersion 없음")
+                    return
+                }
+
+                debug("current: \(current), latest: \(latest)")
+                if current != latest {
+                    await MainActor.run {
+                        statusBar.setStatus("📥")
+                        statusBar.setNotice("📥 새로운 업데이트가 있습니다.")
+                    }
+                }
+            }
+        }
+        block(Timer.scheduledTimer(withTimeInterval: 86400 * 2, repeats: true, block: block))
     }
 
     private func startMonitorsInitially() {
