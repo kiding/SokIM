@@ -340,14 +340,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard Preferences.suppressABC == true else { return }
 
-        let current = TISCopyCurrentKeyboardInputSource()?.takeRetainedValue()
-        guard let current = current else {
+        guard let current = TISCopyCurrentKeyboardInputSource()?.takeRetainedValue() else {
             warning("TISCopyCurrentKeyboardInputSource 실패")
             return
         }
 
-        let currentIDOpaque = TISGetInputSourceProperty(current, kTISPropertyInputSourceID)
-        guard let currentIDOpaque = currentIDOpaque else {
+        guard let currentIDOpaque = TISGetInputSourceProperty(current, kTISPropertyInputSourceID) else {
             warning("TISGetInputSourceProperty 실패")
             return
         }
@@ -358,17 +356,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let sokArray = TISCreateInputSourceList([
+        guard let sokArray = TISCreateInputSourceList([
             kTISPropertyInputSourceType: kTISTypeKeyboardInputMode,
             kTISPropertyInputModeID: "com.kiding.inputmethod.sok.mode" as CFString
-        ] as CFDictionary, false)?.takeRetainedValue() as? [TISInputSource]
-        guard let sokArray = sokArray else {
+        ] as CFDictionary, false)?.takeRetainedValue() as? [TISInputSource] else {
             warning("TISCreateInputSourceList 실패")
             return
         }
 
-        let sok = sokArray.first
-        guard let sok = sok else {
+        guard let sok = sokArray.first else {
             warning("sokArray.first 실패")
             return
         }
