@@ -9,8 +9,10 @@ on:
       - "v*.*.*"
 
 env:
-  APP_NAME: ${{ vars.APP_NAME }}
+  APPLE_ID: ${{ vars.APPLE_ID }}
+  APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
   APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
+  APP_NAME: ${{ vars.APP_NAME }}
 
 jobs:
   Release:
@@ -21,8 +23,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Install the certificates
         env:
-          APPLE_CERT_DEVE_BASE64: ${{ secrets.APPLE_CERT_DEVE_BASE64 }}
-          APPLE_CERT_DEVE_PASSWORD: ${{ secrets.APPLE_CERT_DEVE_PASSWORD }}
           APPLE_CERT_APPL_BASE64: ${{ secrets.APPLE_CERT_APPL_BASE64 }}
           APPLE_CERT_APPL_PASSWORD: ${{ secrets.APPLE_CERT_APPL_PASSWORD }}
           APPLE_CERT_INST_BASE64: ${{ secrets.APPLE_CERT_INST_BASE64 }}
@@ -42,14 +42,6 @@ jobs:
           security unlock-keychain \
             -p "$KEYCHAIN_PASSWORD" \
             "$KEY_KEYCHAIN_PATH"
-
-          KEY_DEVE_P12_PATH="$KEY_PATH/deve.p12"
-          echo -n "$APPLE_CERT_DEVE_BASE64" \
-            | base64 --decode -o "$KEY_DEVE_P12_PATH"
-          security import "$KEY_DEVE_P12_PATH" \
-            -A -t cert -f pkcs12 \
-            -P "$APPLE_CERT_DEVE_PASSWORD" \
-            -k "$KEY_KEYCHAIN_PATH"
 
           KEY_APPL_P12_PATH="$KEY_PATH/appl.p12"
           echo -n "$APPLE_CERT_APPL_BASE64" \
@@ -100,6 +92,8 @@ jobs:
           <dict>
               <key>method</key>
               <string>developer-id</string>
+              <key>teamID</key>
+              <string>$APPLE_TEAM_ID</string>
           </dict>
           </plist>
           EOF
@@ -117,9 +111,7 @@ jobs:
       - name: Notarize the app
         env:
           EXPORT_APP_PATH: ${{ steps.export.outputs.EXPORT_APP_PATH }}
-          APPLE_ID: ${{ vars.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
         run: |
           EXPORT_ZIP_PATH="$EXPORT_APP_PATH.zip"
           ditto -c -k --keepParent "$EXPORT_APP_PATH" "$EXPORT_ZIP_PATH"
@@ -143,7 +135,6 @@ jobs:
         name: Create a package
         env:
           EXPORT_APP_PATH: ${{ steps.export.outputs.EXPORT_APP_PATH }}
-          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
         run: |
           PACKAGE_PATH="$RUNNER_TEMP/Package"
           mkdir "$PACKAGE_PATH"
@@ -215,9 +206,7 @@ jobs:
       - name: Notarize the package
         env:
           ARTIFACT_PATH: ${{ steps.package.outputs.ARTIFACT_PATH }}
-          APPLE_ID: ${{ vars.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
         run: |
           ARTIFACT_SUB_ID="$(xcrun notarytool submit \
             "$ARTIFACT_PATH" \
