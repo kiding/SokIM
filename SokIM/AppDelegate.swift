@@ -113,23 +113,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
 
-                guard let latestString = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1 else {
+                guard let latestString = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1,
+                      let latest = Int(latestString) else {
                     warning("알 수 없는 릴리스 이름: \(name)")
                     return
                 }
 
-                guard let latest = Int(latestString) else {
-                    warning("릴리스가 숫자가 아님: \(latestString)")
-                    return
-                }
-
-                guard let currentString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
-                    warning("CFBundleVersion 없음")
-                    return
-                }
-
-                guard let current = Int(currentString) else {
-                    warning("CFBundleVersion이 숫자가 아님: \(currentString)")
+                guard let currentString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
+                      let current = Int(currentString) else {
+                    warning("CFBundleVersion 없거나 숫자가 아님")
                     return
                 }
 
