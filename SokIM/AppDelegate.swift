@@ -113,18 +113,28 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     return
                 }
 
-                guard let latest = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1 else {
+                guard let latestString = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1 else {
                     warning("알 수 없는 릴리스 이름: \(name)")
                     return
                 }
 
-                guard let current = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
+                guard let latest = Int(latestString) else {
+                    warning("릴리스가 숫자가 아님: \(latestString)")
+                    return
+                }
+
+                guard let currentString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
                     warning("CFBundleVersion 없음")
                     return
                 }
 
+                guard let current = Int(currentString) else {
+                    warning("CFBundleVersion이 숫자가 아님: \(currentString)")
+                    return
+                }
+
                 debug("current: \(current), latest: \(latest)")
-                if current != latest {
+                if current < latest {
                     await MainActor.run {
                         statusBar.setStatus("📥")
                         statusBar.setNotice("📥 새로운 업데이트가 있습니다.")
