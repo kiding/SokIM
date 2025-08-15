@@ -215,6 +215,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return false
         }
 
+        // 별도 처리: 암호 필드에 포커스된 경우 OS가 대신 처리
+        if IsSecureEventInputEnabled() {
+            return false
+        }
+
         // 별도 처리: 한영키 한자키 英数키 かな/カナ키 입력 시 OS 처리 무시
         if event.keyCode == kVK_JIS_Eisu || event.keyCode == kVK_JIS_Kana {
             return true

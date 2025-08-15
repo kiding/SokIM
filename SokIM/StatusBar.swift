@@ -139,14 +139,14 @@ class StatusBar {
     }
 
     func setEngine(_ engine: Engine.Type) {
-        debug()
+        debug("\(engine)")
 
         self.engine = engine
         statusItem.button?.title = engine.name
     }
 
     func setStatus(_ msg: String) {
-        debug()
+        debug("\(msg)")
 
         statusItem.button?.title = msg
     }
