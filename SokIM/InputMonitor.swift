@@ -198,7 +198,7 @@ class InputMonitor {
         }
         // 그 외 경우 중 keyDown인 경우
         else if type == .keyDown {
-            // Command, Shift, Alt, Control
+            // Command, Shift, Option, Control
             let isCommandDown = modifier[.leftCommand] == .keyDown || modifier[.rightCommand] == .keyDown
             let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown

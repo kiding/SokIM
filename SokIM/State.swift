@@ -89,10 +89,10 @@ struct State: CustomStringConvertible {
             // 눌린 키를 down에 기록
             down = input
 
-            // Command, Shift, Alt, Control
+            // Command, Shift, Option, Control
             let isCommandDown = modifier[.leftCommand] == .keyDown || modifier[.rightCommand] == .keyDown
             let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
-            let isAltDown = modifier[.leftAlt] == .keyDown || modifier[.rightAlt] == .keyDown
+            let isOptionDown = modifier[.leftOption] == .keyDown || modifier[.rightOption] == .keyDown
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
 
             // Command/Shift/Control + Space: keyDown인 경우 한/A 전환
@@ -123,7 +123,7 @@ struct State: CustomStringConvertible {
             }
 
             // engine으로 현재 input을 tuple로 변환 가능하면
-            if var tuple = engine.usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn) {
+            if var tuple = engine.usageToTuple(usage, isOptionDown, isShiftDown, isCapsLockOn) {
                 // "₩ 대신 ` 입력" 처리
                 if tuple.char == "₩" && Preferences.graveOverWon {
                     tuple.char = "`"

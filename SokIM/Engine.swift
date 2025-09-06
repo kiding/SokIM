@@ -8,11 +8,11 @@ import Carbon.HIToolbox.Events
 enum ModifierUsage: UInt32 {
     case leftControl = 0xE0
     case leftShift
-    case leftAlt
+    case leftOption
     case leftCommand
     case rightControl
     case rightShift
-    case rightAlt
+    case rightOption
     case rightCommand
     case capsLock = 0x39
 }
@@ -59,8 +59,8 @@ let keyCodeToUsage: [Int: UInt32] = [
 
 /** (글자, 글자가 이후 조합을 허용하는지 여부) */
 typealias CharTuple = (char: Character, composable: Bool)
-/** 특정 키를 alt, shift와 합쳐서 눌렀을 때 해당하는 CharTuple과 Caps Lock 상태에 영향을 받는지 여부 */
-typealias CharTupleMap = (base: CharTuple, alt: CharTuple, shift: CharTuple, altShift: CharTuple, capsLock: Bool)
+/** 특정 키를 option, shift와 합쳐서 눌렀을 때 해당하는 CharTuple과 Caps Lock 상태에 영향을 받는지 여부 */
+typealias CharTupleMap = (base: CharTuple, option: CharTuple, shift: CharTuple, optionShift: CharTuple, capsLock: Bool)
 
 /** 키보드 엔진 / 오토마타 */
 protocol Engine {
@@ -84,11 +84,11 @@ extension Engine {
     /** USB HID Usage -> CharTuple 매핑 */
     static func usageToTuple(
         _ usage: UInt32,
-        _ isAltDown: Bool,
+        _ isOptionDown: Bool,
         _ isShiftDown: Bool,
         _ isCapsLockOn: Bool
     ) -> CharTuple? {
-        debug("\(usage) \(isAltDown) \(isShiftDown) \(isCapsLockOn)")
+        debug("\(usage) \(isOptionDown) \(isShiftDown) \(isCapsLockOn)")
 
         let map = usageToTupleMap[usage]
 
@@ -98,11 +98,11 @@ extension Engine {
             isShiftDown = true
         }
 
-        switch (isAltDown, isShiftDown) {
+        switch (isOptionDown, isShiftDown) {
         case (true, true):
-            return map?.altShift
+            return map?.optionShift
         case (true, false):
-            return map?.alt
+            return map?.option
         case (false, true):
             return map?.shift
         case (false, false):
@@ -129,15 +129,15 @@ extension Engine {
             return nil
         }
 
-        // Alt, Shift: keyDown 상태
-        let isAltDown = flags.contains(.option)
+        // Option, Shift: keyDown 상태
+        let isOptionDown = flags.contains(.option)
         let isShiftDown = flags.contains(.shift)
 
         // Caps Lock: 활성화 상태
         let isCapsLockOn = flags.contains(.capsLock)
 
         if let usage = keyCodeToUsage[Int(keyCode)],
-           let tuple = usageToTuple(usage, isAltDown, isShiftDown, isCapsLockOn) {
+           let tuple = usageToTuple(usage, isOptionDown, isShiftDown, isCapsLockOn) {
             return tuple
         } else {
             return nil
