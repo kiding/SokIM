@@ -160,6 +160,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func restartMonitors(_ aNotification: Notification?) {
         debug("aNotification: \(String(describing: aNotification))")
 
+        reset(nil)
+
         do {
             inputMonitor.stop()
             try inputMonitor.start()
@@ -226,6 +228,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         var inputs = inputMonitor.flush()
+
+        // 별도 처리: IMK로 입력은 들어왔는데 HID 입력은 없다면 모니터링 재시작
+        if inputs.count == 0 {
+            restartMonitors(nil)
+            return false
+        }
 
         // inputs 전처리
         filterInputs(&inputs, event: event)
