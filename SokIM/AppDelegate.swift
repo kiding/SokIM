@@ -160,8 +160,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func restartMonitors(_ aNotification: Notification?) {
         debug("aNotification: \(String(describing: aNotification))")
 
-        reset(nil)
-
         do {
             inputMonitor.stop()
             try inputMonitor.start()
@@ -229,10 +227,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         var inputs = inputMonitor.flush()
 
-        // 별도 처리: IMK로 입력은 들어왔는데 HID 입력은 없다면 모니터링 재시작
-        if inputs.count == 0 {
+        /**
+         별도 처리: IMK로 입력은 들어왔는데 HID 입력은 없다면 모니터링 재시작
+         반복되는 IMK 입력은 HID로 들어오지 않으므로 제외
+         IMK 입력이 많이 늦어서 직전 handle에서 이미 모든 HID가 처리되었을 수 있으므로 완료 반환
+         */
+        if inputs.count == 0 && !event.isARepeat {
             restartMonitors(nil)
-            return false
+            return true
         }
 
         // inputs 전처리
