@@ -227,16 +227,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         var inputs = inputMonitor.flush()
 
-        /**
-         별도 처리: IMK로 입력은 들어왔는데 HID 입력은 없다면 모니터링 재시작
-         반복되는 IMK 입력은 HID로 들어오지 않으므로 제외
-         IMK 입력이 많이 늦어서 직전 handle에서 이미 모든 HID가 처리되었을 수 있으므로 완료 반환
-         */
-        if inputs.count == 0 && !event.isARepeat {
-            restartMonitors(nil)
-            return true
-        }
-
         // inputs 전처리
         filterInputs(&inputs, event: event)
         filterQuirks(&inputs)
@@ -285,7 +275,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         if (
-            // event가 engine이 처리할 수 없는 글자인 경우
+            // event가 engine이 처리할 수 없는 글자인 경우 (예: Cmd + 방향 키 등)
             state.engine.eventToTuple(event) == nil
         ) || (
             // event가 state가 입력할 문자열과 완전히 동일한 경우
@@ -300,6 +290,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
             // OS가 대신 처리하도록 반환
             return false
+        }
+
+        // event를 engine이 처리할 수 있는데도 state에 완성/조합된 문자열이 없는 경우
+        if state.composed.count == 0 && state.composing.count == 0 {
+            // 가능성 1: inputMonitor가 정상적으로 작동하지 않고 있을 수 있으므로 재시작
+            restartMonitors(nil)
+
+            // 가능성 2: event가 inputs보다 많이 늦어서 직전 handle에서 이미 모두 flush되었을 수 있으므로 완료 반환
+            return true
         }
 
         // state에 완성/조합된 문자열을 sender에 입력
