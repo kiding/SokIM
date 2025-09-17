@@ -95,7 +95,7 @@ struct State: CustomStringConvertible {
             let isOptionDown = modifier[.leftOption] == .keyDown || modifier[.rightOption] == .keyDown
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
 
-            // Command/Shift/Control + Space: keyDown인 경우 한/A 전환
+            // Command/Shift/Control + Space: keyDown인 경우 한/A 전환 // TODO: #15
             if (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue
@@ -158,7 +158,7 @@ struct State: CustomStringConvertible {
 
         self.engine = engine
     }
-    let engines = (한: TwoSetEngine.self, A: QwertyEngine.self) // TODO: Preferences
+    let engines = (한: TwoSetEngine.self, A: QwertyEngine.self) // TODO: #24
 
     /** 사용 가능한 다음 engine으로 변경 */
     mutating func rotate() {
@@ -216,8 +216,8 @@ struct State: CustomStringConvertible {
         composing = ""
     }
 
-    /** 완성/조합 초기화 */
-    mutating func clear(composed includeComposed: Bool = true, composing includeComposing: Bool = false) {
+    /** 완성/조합 버림 */
+    mutating func clear(composed includeComposed: Bool, composing includeComposing: Bool) {
         debug("composed: \(includeComposed), composing: \(includeComposing)")
 
         if includeComposed {
@@ -229,7 +229,7 @@ struct State: CustomStringConvertible {
         }
     }
 
-    mutating func deleteBackwardComposing() {
+    mutating func backspaceComposing() {
         debug()
 
         // 조합에서 마지막 글자를 꺼냈을 때, 글자가 있다면
@@ -237,7 +237,7 @@ struct State: CustomStringConvertible {
             debug("oldLast: \(oldLast)")
 
             // engine을 통해 뒤로 삭제, 이후에도 글자가 남아있으면
-            if let newLast = engine.deleteBackward(oldLast) {
+            if let newLast = engine.backspaceComposing(oldLast) {
                 debug("newLast: \(newLast)")
 
                 // 다시 조합에 붙임

@@ -100,7 +100,7 @@ struct QwertyEngine: Engine {
         }
     }
 
-    static func deleteBackward(_ char: Character) -> Character? {
+    static func backspaceComposing(_ char: Character) -> Character? {
         debug()
 
         if let chars = charIntoChars[char] {

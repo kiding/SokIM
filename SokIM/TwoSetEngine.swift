@@ -255,7 +255,7 @@ struct TwoSetEngine: Engine {
         }
     }
 
-    static func deleteBackward(_ char: Character) -> Character? {
+    static func backspaceComposing(_ char: Character) -> Character? {
         debug()
 
         let hangul = Hangul(char)

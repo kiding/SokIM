@@ -8,7 +8,7 @@ struct Input: CustomStringConvertible {
     let type: InputType
     var usage: UInt32
 
-    var description: String { "(\(context), \(timestamp), \(type), \(String(format: "0x%X", usage)))" }
+    var description: String { "(\(context), \(timestamp), \(type), \(usage)/\(String(format: "0x%X", usage)))" }
 }
 
 enum InputType: String {
@@ -178,7 +178,7 @@ class InputMonitor {
 
                             // Caps Lock 활성화
                             setKeyboardCapsLock(enabled: true)
-                            AppDelegate.shared().statusBar.setEngine(QwertyEngine.self) // TODO: Preferences
+                            AppDelegate.shared().statusBar.setEngine(QwertyEngine.self) // TODO: #24
                         }
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: capsLockTimer)
@@ -203,7 +203,7 @@ class InputMonitor {
             let isShiftDown = modifier[.leftShift] == .keyDown || modifier[.rightShift] == .keyDown
             let isControlDown = modifier[.leftControl] == .keyDown || modifier[.rightControl] == .keyDown
 
-            // 별도 처리: Command/Shift/Control + Space: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
+            // 별도 처리: Command/Shift/Control + Space: 한/A 표시만 *우선 처리*, 실제 처리는 State에서 // TODO: #15
             if (
                 isCommandDown
                 && usage == SpecialUsage.space.rawValue

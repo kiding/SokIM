@@ -1,5 +1,6 @@
 import Cocoa
 
+// TODO: #15
 enum RotateShortcutType: String {
     case capsLock = "CapsLock"
     case rightCommand = "RightCommand"

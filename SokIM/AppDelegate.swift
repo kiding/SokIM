@@ -30,7 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         startCheckingUpdate()
         startMonitorsInitially()
 
-        // 사용자가 입력기를 변경하는 시점에 초기화
+        // 사용자가 입력기를 변경하는 시점에 대부분 버림
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(reset),
@@ -46,7 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
-        // 입력기가 변경되는 시점에 보안 입력 상태인 경우 영문 소문자 입력 상태로 초기화
+        // 입력기가 변경되는 시점에 보안 입력 상태인 경우 모두 버리고 영문 소문자 입력으로 변경
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(abcOnSecureInput),
@@ -196,12 +196,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         filterInputs(&inputs, event: nil)
         inputs.forEach { state.next($0) }
         if let sender = eventContext.sender {
-            eventContext.strategy.flush(from: state, to: sender)
+            eventContext.strategy.commit(from: state, to: sender)
         }
 
         state = State(engine: state.engine)
         eventContext = EventContext()
-        InputContext.reset()
+        InputContext.commit()
 
         setKeyboardCapsLock(enabled: false)
     }
@@ -209,6 +209,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         debug("\(String(describing: event)) \(String(describing: sender))")
 
+        // 처리할 event 또는 sender가 없음, OS가 입력하지 않도록 완료 처리
         guard let event = event,
               let sender = sender as? (IMKTextInput & NSObjectProtocol)
         else {
@@ -225,12 +226,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return true
         }
 
+        // inputs 처리 시작
         var inputs = inputMonitor.flush()
-
-        // inputs 전처리
         filterInputs(&inputs, event: event)
         filterQuirks(&inputs)
 
+        // 기존 state 보존
         debug("이전 state: \(state)")
         defer { debug("이후 state: \(state)") }
 
@@ -250,26 +251,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             eventContext = interimEventContext
         }
 
-        // 기존 state 보존
         let oldState = state
 
         // inputs 입력, 반복 입력인 경우 down 한번 더 입력
         inputs.forEach { state.next($0) }
         if event.isARepeat, let down = state.down { state.next(down) }
 
-        // 별도 처리: modifier 없는 백스페이스 키
+        // modifier 없는 백스페이스 키인 경우
         if event.keyCode == kVK_Delete && event.modifierFlags.subtracting(.capsLock).isEmpty {
-            // 이전에 조합 중이던 글자에서 백스페이스
-            state.deleteBackwardComposing()
+            // 조합 중이던 글자에서 백스페이스
+            state.backspaceComposing()
 
-            // sender에 입력
+            // sender에 백스페이스 반영
             let handled = eventContext.strategy.backspace(from: state, to: sender, with: oldState)
 
             /*
-             처리가 완료된 경우 -> 완성 초기화
-             OS가 대신 처리할 것이 있는 경우 -> 완성/조합 초기화
+             처리가 완료된 경우 -> 완성만 버림
+             OS가 대신 처리할 것이 있는 경우 -> 완성/조합 버림
              */
-            state.clear(composing: !handled)
+            state.clear(composed: true, composing: !handled)
 
             return handled
         }
@@ -282,11 +282,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             state.composed == event.characters
             && state.composing == ""
         ) {
-            // 이전 조합 종료
-            eventContext.strategy.flush(from: oldState, to: sender)
+            // sender에 oldState 그대로 조합 종료 반영
+            eventContext.strategy.commit(from: oldState, to: sender)
 
-            // 완성/조합 초기화
-            state.clear(composing: true)
+            // state 새로운 완성/조합 버림
+            state.clear(composed: true, composing: true)
 
             // OS가 대신 처리하도록 반환
             return false
@@ -301,11 +301,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return true
         }
 
-        // state에 완성/조합된 문자열을 sender에 입력
-        eventContext.strategy.insert(from: state, to: sender, with: oldState)
+        // sender에 state 새로운 완성/조합 진행 반영
+        eventContext.strategy.next(from: state, to: sender, with: oldState)
 
-        // 완성 초기화
-        state.clear(composing: false)
+        // state 새로운 완성 버림
+        state.clear(composed: true, composing: false)
 
         // 처리 완료
         return true
@@ -324,9 +324,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // 남아있는 input 중에 event와 usage가 같은 것 이전은 버림
-        if let event = event,
-           event.type == .keyDown,
-           let usage = keyCodeToUsage[Int(event.keyCode)] {
+        if let event = event, let usage = keyCodeToUsage[Int(event.keyCode)] {
             var endIndex = -1
 
             for (idx, input) in inputs.enumerated() {
@@ -352,7 +350,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        // 전체 input 중에 modifier와 modifier+space는 언제나 남김
+        // 전체 input 중에 modifier와 modifier+space는 언제나 남김 // TODO: #15
         for (idx, input) in inputs.enumerated() {
             if let modifier = ModifierUsage(rawValue: input.usage) {
                 flags[idx] = true
@@ -387,7 +385,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 inputs = inputs.indices
                     .filter { $0 > idx || ModifierUsage(rawValue: inputs[$0].usage) != nil }
                     .map { inputs[$0] }
-                state.clear(composing: true)
+                state.clear(composed: true, composing: true)
             }
         default:
             break

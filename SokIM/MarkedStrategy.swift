@@ -17,7 +17,7 @@ struct MarkedStrategy: Strategy {
         }
     }
 
-    static func insert(from state: State, to sender: IMKTextInput, with oldState: State) {
+    static func next(from state: State, to sender: IMKTextInput, with oldState: State) {
         debug("\(oldState) -> \(state)")
 
         // composed -> insertText
@@ -42,7 +42,7 @@ struct MarkedStrategy: Strategy {
         }
     }
 
-    static func flush(from state: State, to sender: IMKTextInput) {
+    static func commit(from state: State, to sender: IMKTextInput) {
         debug("\(state)")
 
         // composed -> insertText
