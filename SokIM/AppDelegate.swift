@@ -259,7 +259,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // event를 engine이 처리할 수 있는데도 state에 완성/조합된 문자열이 없는 경우
         if state.composed.count == 0 && state.composing.count == 0 {
             // 가능성 1: inputMonitor가 정상적으로 작동하지 않고 있을 수 있으므로 재시작
-            restartMonitors(nil)
+            inputMonitor.restartIfIdle()
 
             // 가능성 2: event가 inputs보다 많이 늦어서 직전 handle에서 이미 모두 flush되었을 수 있으므로 완료 반환
             return true

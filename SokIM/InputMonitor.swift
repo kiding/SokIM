@@ -48,6 +48,7 @@ enum InputMonitorError: Error, CustomStringConvertible {
 class InputMonitor {
     private var hid: IOHIDManager?
     private var inputs: [Input] = []
+    private var restartTimer = DispatchWorkItem(block: {})
 
     func start() throws {
         debug()
@@ -77,6 +78,7 @@ class InputMonitor {
                 guard let context = context else { return }
                 let unmanagedSelf = Unmanaged<InputMonitor>.fromOpaque(context).takeUnretainedValue()
 
+                unmanagedSelf.restartTimer.cancel()
                 unmanagedSelf.nextHID(value, unmanagedDevice)
             },
             // context로 self 포인터 전달
@@ -104,6 +106,19 @@ class InputMonitor {
         } else {
             notice("초기화된 hid가 없음")
         }
+    }
+
+    func restartIfIdle() {
+        debug()
+
+        restartTimer.cancel()
+        restartTimer = DispatchWorkItem { [self] in
+            debug()
+
+            stop()
+            try? start()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: restartTimer)
     }
 
     @discardableResult
@@ -172,6 +187,8 @@ class InputMonitor {
                     setKeyboardCapsLock(enabled: false)
                     capsLockTimer.cancel()
                     capsLockTimer = DispatchWorkItem { [self] in
+                        debug()
+
                         if modifier[.capsLock] == .keyDown {
                             // Caps Lock 비활성 -> 활성: 한/A 전환 1회 억제
                             canCapsLockRotate = false
