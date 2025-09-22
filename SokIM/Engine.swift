@@ -76,8 +76,8 @@ protocol Engine {
     /** 특정 글자 두개를 조합하려고 했을 때 결과 문자열 */
     static func combineChars(_ char0: Character, _ char1: Character) -> String
 
-    /** 특정 글자를 분해하여 뒤로 삭제했을 때 결과 글자 */
-    static func deleteBackward(_ char: Character) -> Character?
+    /** 조합 중인 특정 글자를 분해하여 뒤로 삭제했을 때 결과 글자 */
+    static func backspaceComposing(_ char: Character) -> Character?
 }
 
 extension Engine {
@@ -88,7 +88,7 @@ extension Engine {
         _ isShiftDown: Bool,
         _ isCapsLockOn: Bool
     ) -> CharTuple? {
-        debug("\(usage) \(isOptionDown) \(isShiftDown) \(isCapsLockOn)")
+        debug("\(usage)/\(String(format: "0x%X", usage)) \(isOptionDown) \(isShiftDown) \(isCapsLockOn)")
 
         let map = usageToTupleMap[usage]
 

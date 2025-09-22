@@ -29,7 +29,7 @@ struct DirectStrategy: Strategy {
         }
     }
 
-    static func insert(from state: State, to sender: IMKTextInput, with oldState: State) {
+    static func next(from state: State, to sender: IMKTextInput, with oldState: State) {
         debug("\(oldState) -> \(state)")
 
         // 이전의 "조합||커서||블록" 위치
@@ -64,7 +64,7 @@ struct DirectStrategy: Strategy {
         }
     }
 
-    static func flush(from state: State, to sender: IMKTextInput) {
+    static func commit(from state: State, to sender: IMKTextInput) {
         debug("\(state)")
 
         // composed -> insertText

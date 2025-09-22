@@ -5,19 +5,20 @@ private var counter: UInt64 = 0
 
 /** 키보드 입력 후 InputMonitor에 의해 HID 값 발생 시점의 context */
 struct InputContext {
-    static func reset() {
+    /** 새로운 context 구분 */
+    static func commit() {
         debug()
 
-        counter += 1
+        counter = (counter + 1) % 65536
     }
 
     /** 입력되는 앱, 샤용자 상황에 따라 달라짐 */
-    let bundleIdentifier: String
+    private let bundleIdentifier: String
     /** counter의 현재 값 */
-    let count: UInt64
+    private let count: UInt64
 
     init(type: InputType, usage: UInt32) {
-        debug("\(type) \(usage)")
+        debug("\(type) \(usage)/\(String(format: "0x%X", usage))")
 
         bundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
 
@@ -30,7 +31,7 @@ struct InputContext {
             // Shift인 경우 카운트 증가 안 함
             else if usage == ModifierUsage.leftShift.rawValue || usage == ModifierUsage.rightShift.rawValue { }
             // 그 외의 모든 글자가 아닌 글쇠인 경우 카운트 증가
-            else { InputContext.reset() }
+            else { InputContext.commit() }
         }
 
         count = counter

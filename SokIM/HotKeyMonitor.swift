@@ -59,6 +59,7 @@ class HotKeyMonitor {
             let code: UInt32
             let modifiers: UInt32
 
+            // TODO: #15
             switch $0 {
             case .capsLock:
                 debug("HotKey 해당 없음")

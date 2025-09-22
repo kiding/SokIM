@@ -43,7 +43,7 @@ class ClickMonitor {
             callback: { _, _, event, _ in
                 debug()
 
-                // 사용자가 마우스 클릭하는 시점에 초기화
+                // 사용자가 마우스 클릭하는 시점에 조합 종료
                 AppDelegate.shared().reset(nil)
                 return Unmanaged.passUnretained(event)
             },
