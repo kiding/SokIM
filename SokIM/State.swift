@@ -37,7 +37,6 @@ struct State: CustomStringConvertible {
             // 오른쪽 Command: 한/A 전환 *실제 처리*
             if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcuts.contains(.rightCommand) {
-                commit()
                 rotate()
             }
 
@@ -56,7 +55,6 @@ struct State: CustomStringConvertible {
 
                     // 한/A 전환
                     if canCapsLockRotate {
-                        commit()
                         rotate()
                     } else {
                         canCapsLockRotate = true
@@ -109,7 +107,6 @@ struct State: CustomStringConvertible {
                 && usage == SpecialUsage.space.rawValue
                 && Preferences.rotateShortcuts.contains(.controlSpace)
             ) {
-                commit()
                 rotate()
 
                 return
@@ -206,14 +203,6 @@ struct State: CustomStringConvertible {
 
         // 완성 갱신
         composed += nextText
-    }
-
-    /** 조합->완성 반영 */
-    mutating func commit() {
-        debug()
-
-        composed += composing
-        composing = ""
     }
 
     /** 완성/조합 버림 */
