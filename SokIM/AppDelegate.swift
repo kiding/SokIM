@@ -8,12 +8,6 @@ func appDelegate() -> AppDelegate? {
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
     // swiftlint:disable force_cast
-    static func shared() -> AppDelegate {
-        debug()
-
-        return NSApp.delegate as! AppDelegate
-    }
-
     private var server: IMKServer = IMKServer.init(
         name: (Bundle.main.infoDictionary!["InputMethodConnectionName"] as! String),
         bundleIdentifier: Bundle.main.bundleIdentifier
@@ -37,7 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 사용자가 입력기를 변경하는 시점에 대부분 버림
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(reset),
+            selector: #selector(clearExceptEngine),
             name: NSTextInputContext.keyboardSelectionDidChangeNotification,
             object: nil
         )
@@ -192,20 +186,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         hotKeyMonitor.stop()
     }
 
-    // 초기화
-    @objc func reset(_ aNotification: Notification?) {
-        debug("aNotification: \(String(describing: aNotification))")
-
-        var inputs = inputMonitor.flush()
-        filterInputs(&inputs, event: nil)
-        inputs.forEach { state.next($0) }
-
-        state = State(engine: state.engine)
-        InputContext.commit()
-
-        setKeyboardCapsLock(enabled: false)
-    }
-
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         debug("\(String(describing: event)) \(String(describing: sender))")
 
@@ -295,6 +275,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
+    /** 지금까지의 입력 전체 state와 sender에 조합 종료 반영 */
+    func commit() {
+        debug()
+
+        var inputs = inputMonitor.flush()
+        if let sender = sender {
+            filterQuirks(&inputs, sender: sender)
+        }
+        filterInputs(&inputs, event: nil)
+
+        debug("이전 state: \(state)")
+        defer { debug("이후 state: \(state)") }
+
+        inputs.forEach { state.next($0) }
+        if let sender = sender {
+            strategy(for: sender).commit(from: state, to: sender)
+        }
+        state.clear(composed: true, composing: true)
+    }
+
     /** 전처리: 입력 정리 */
     private func filterInputs(_ inputs: inout [Input], event: NSEvent?) {
         debug("inputs: \(inputs)")
@@ -376,6 +376,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /** engine 선택 외 모든 상태 버림 */
+    @objc func clearExceptEngine(_ aNotification: Notification?) {
+        debug("\(String(describing: aNotification))")
+
+        inputMonitor.flush()
+        state = State(engine: state.engine)
+        sender = nil
+        InputContext.commit()
+        setKeyboardCapsLock(enabled: false)
+    }
+
     /** 암호 입력 필드를 위한 ABC 입력기 제한 기능 */
     @objc private func suppressABC(_ aNotification: Notification) {
         debug("\(String(describing: aNotification))")
@@ -427,7 +438,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         guard IsSecureEventInputEnabled() else { return }
 
-        reset(nil)
+        clearExceptEngine(nil)
         state.engine = state.engines.A
         statusBar.setEngine(state.engines.A)
 
