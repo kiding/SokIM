@@ -1,6 +1,10 @@
 import Cocoa
 import InputMethodKit
 
+func appDelegate() -> AppDelegate? {
+    return NSApp.delegate as? AppDelegate
+}
+
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
     // swiftlint:disable force_cast

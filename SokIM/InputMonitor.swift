@@ -154,7 +154,7 @@ class InputMonitor {
             // 별도 처리: 오른쪽 Command: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
             if (type, key) == (.keyDown, .rightCommand)
                 && Preferences.rotateShortcuts.contains(.rightCommand) {
-                AppDelegate.shared().statusBar.rotateEngine()
+                appDelegate()?.statusBar.rotateEngine()
             }
 
             // 별도 처리: Caps Lock: 한/A 상태 및 LED *우선 처리*, 실제 처리는 State에서
@@ -178,14 +178,14 @@ class InputMonitor {
 
                             // Caps Lock 활성화
                             setKeyboardCapsLock(enabled: true)
-                            AppDelegate.shared().statusBar.setEngine(QwertyEngine.self) // TODO: #24
+                            appDelegate()?.statusBar.setEngine(QwertyEngine.self) // TODO: #24
                         }
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800), execute: capsLockTimer)
 
                     /* 한/A 표시만 *우선 처리* */
                     if canCapsLockRotate {
-                        AppDelegate.shared().statusBar.rotateEngine()
+                        appDelegate()?.statusBar.rotateEngine()
                     } else {
                         canCapsLockRotate = true
                     }

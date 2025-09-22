@@ -166,7 +166,7 @@ struct State: CustomStringConvertible {
 
         engine = engine == engines.한 ? engines.A : engines.한
 
-        AppDelegate.shared().statusBar.setEngine(engine)
+        appDelegate()?.statusBar.setEngine(engine)
     }
 
     // MARK: - CharTuple

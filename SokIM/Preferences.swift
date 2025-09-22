@@ -63,7 +63,7 @@ struct Preferences {
         set {
             _rotateShortcuts = newValue
             Defaults.set(.rotateShortcuts, newValue)
-            AppDelegate.shared().restartMonitors(nil)
+            appDelegate()?.restartMonitors(nil)
         }
     }
 
