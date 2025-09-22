@@ -145,9 +145,9 @@ class InputMonitor {
         if let key = ModifierUsage(rawValue: usage) {
             modifier[key] = type
 
-            // 별도 처리: Control, Command 입력되면 조합 종료 및 초기화
-            if (type, key) == (.keyDown, .leftControl) || (type, key) == (.keyDown, .rightControl)
-                || (type, key) == (.keyDown, .leftCommand) || (type, key) == (.keyDown, .rightCommand) {
+            // 별도 처리: Control, Command, Caps Lock 입력되면 조합 종료
+            if type == .keyDown
+                && [.leftControl, .rightControl, .leftCommand, .rightCommand, .capsLock].contains(key) {
                 Task { @MainActor in appDelegate()?.commit() }
             }
 
@@ -217,7 +217,10 @@ class InputMonitor {
                 && usage == SpecialUsage.space.rawValue
                 && Preferences.rotateShortcuts.contains(.controlSpace)
             ) {
-                AppDelegate.shared().statusBar.rotateEngine()
+                Task { @MainActor in
+                    appDelegate()?.commit()
+                    appDelegate()?.statusBar.rotateEngine()
+                }
             }
         }
 
