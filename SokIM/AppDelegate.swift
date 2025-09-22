@@ -361,16 +361,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func filterQuirks(_ inputs: inout [Input], sender: IMKTextInput) {
         debug()
 
-        switch sender.bundleIdentifier() {
-            // 파워포인트의 경우 "엔터" 이벤트가 입력기로 전달되지 않음
-        case "com.microsoft.Powerpoint":
-            // "엔터" 입력이 있는 경우 이후 입력만 처리, 단 modifier는 언제나 처리
-            if let idx = inputs.lastIndex(where: { $0.type == .keyDown && [0x28, 0x58].contains($0.usage) }) {
+        // 특정 입력이 있는 경우 이후 입력만 처리, 단 modifier는 언제나 처리
+        func ignoreBefore(usages: [UInt32], last: Bool = false) {
+            let find = last ? inputs.lastIndex : inputs.firstIndex
+            if let idx = try? find({ $0.type == .keyDown && usages.contains($0.usage) }) {
                 inputs = inputs.indices
                     .filter { $0 > idx || ModifierUsage(rawValue: inputs[$0].usage) != nil }
                     .map { inputs[$0] }
                 state.clear(composed: true, composing: true)
             }
+        }
+
+        switch sender.bundleIdentifier() {
+        case "com.microsoft.Powerpoint": // 파워포인트의 경우 "엔터" 이벤트가 입력기로 전달되지 않음
+            ignoreBefore(usages: [0x28, 0x58], last: true)
+        case "com.apple.Spotlight": // Spotlight의 경우 "탭" 이벤트가 입력기로 전달되지 않음
+            ignoreBefore(usages: [0x2B])
         default:
             break
         }
