@@ -159,7 +159,7 @@ struct TwoSetEngine: Engine {
         0x26: (("9", false), ("ª", false), ("(", false), ("·", false), false), // Keyboard 9 and (
         0x27: (("0", false), ("º", false), (")", false), ("‚", false), false), // Keyboard 0 and )
 
-        0x2C: ((" ", false), (" ", false), (" ", false), (" ", false), false), // Keyboard Spacebar
+        0x2C: ((" ", false), (" ", false), (" ", false), (" ", false), false), // Keyboard Spacebar
         0x2D: (("-", false), ("–", false), ("_", false), ("—", false), false), // Keyboard - and (underscore)
         0x2E: (("=", false), ("≠", false), ("+", false), ("±", false), false), // Keyboard = and +
         0x2F: (("[", false), ("“", false), ("{", false), ("”", false), false), // Keyboard [ and {
