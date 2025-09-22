@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DF2651AC28321AC3001A9317 /* EventContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651AB28321AC3001A9317 /* EventContext.swift */; };
 		DF2651B028324E8A001A9317 /* MarkedStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */; };
 		DF2651CE28328B23001A9317 /* Strategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651CC28328B23001A9317 /* Strategy.swift */; };
 		DF2651CF28328B23001A9317 /* DirectStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2651CD28328B23001A9317 /* DirectStrategy.swift */; };
@@ -33,7 +32,6 @@
 
 /* Begin PBXFileReference section */
 		DF1D7D1229EBF9BB00A2302F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		DF2651AB28321AC3001A9317 /* EventContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventContext.swift; sourceTree = "<group>"; };
 		DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkedStrategy.swift; sourceTree = "<group>"; };
 		DF2651CC28328B23001A9317 /* Strategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Strategy.swift; sourceTree = "<group>"; };
 		DF2651CD28328B23001A9317 /* DirectStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DirectStrategy.swift; sourceTree = "<group>"; };
@@ -99,7 +97,6 @@
 				DF971F5B2D2AE95000CECF3D /* ClickMonitor.swift */,
 				DF971F5D2D2BD4CF00CECF3D /* HotKeyMonitor.swift */,
 				DFB825D827F7386000F31B72 /* State.swift */,
-				DF2651AB28321AC3001A9317 /* EventContext.swift */,
 				DF2651CC28328B23001A9317 /* Strategy.swift */,
 				DF2651CD28328B23001A9317 /* DirectStrategy.swift */,
 				DF2651AF28324E8A001A9317 /* MarkedStrategy.swift */,
@@ -218,7 +215,6 @@
 				DFB825D727F6B25700F31B72 /* QwertyEngine.swift in Sources */,
 				DFAC075B28F80B0200B7A1EC /* InputContext.swift in Sources */,
 				DF9286CE26F5CFAE00002080 /* AppDelegate.swift in Sources */,
-				DF2651AC28321AC3001A9317 /* EventContext.swift in Sources */,
 				DFD8998627F59E3B00C9B8CE /* Engine.swift in Sources */,
 				DF7A3049289F96970003BFA6 /* InputMonitor.swift in Sources */,
 				DF2651B028324E8A001A9317 /* MarkedStrategy.swift in Sources */,

@@ -74,41 +74,4 @@ struct DirectStrategy: Strategy {
 
         // composing: 이미 직접 입력되어 있으므로 무시
     }
-
-/*
- 상황별 {selectedRange},{markedRange} 변화도
- [이전] > [중간] v [이후(=이전)] > [중간] v ... (단, v: insert, X: {NSNotFound,})
-
- "ㅎㅏㄴ "
-          "ㅎ"            "ㅏ"                "ㄴ"                " "
- Xcode     X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {2,0},X
- <input>
-   Safari  X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {2,0},X
-   Chrome  X,X > {0,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
-   Firefox X,X > {0,0},X v {0,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
- 구글 문서
-   Safari  X,X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
-   Chrome  X,X > {1,0},X v {2,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
-   Firefox X,X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X > {1,0},X v {1,0},X
- 조합 중단 필요   x
-*/
-    // 이전과 중간을 비교할 때 사용됨
-    static func equal(left: EventContext, right: EventContext) -> Bool {
-        debug()
-
-        let doIdentifiersMatch = left.bundleIdentifier == right.bundleIdentifier
-        let doPointersMatch = left.pointerValue == right.pointerValue
-
-        let doLocationsDiffByOne = abs(left.selectedRange.location - right.selectedRange.location) <= 1
-
-        // 별도 처리: 메시지 앱에서 여러 줄 입력 시 location 숫자가 급격하게 변함, 무시
-        let isMessagesAndNotSelected =
-        left.bundleIdentifier == "com.apple.MobileSMS"
-        && left.selectedRange.length == 0
-        && right.selectedRange.length == 0
-
-        return doIdentifiersMatch
-        && doPointersMatch
-        && (doLocationsDiffByOne || isMessagesAndNotSelected)
-    }
 }

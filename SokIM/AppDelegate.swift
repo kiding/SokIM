@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let hotKeyMonitor = HotKeyMonitor()
 
     private var state = State()
-    private var eventContext = EventContext()
+    private var sender: IMKTextInput?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         debug()
@@ -199,12 +199,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var inputs = inputMonitor.flush()
         filterInputs(&inputs, event: nil)
         inputs.forEach { state.next($0) }
-        if let sender = eventContext.sender {
-            eventContext.strategy.commit(from: state, to: sender)
-        }
 
         state = State(engine: state.engine)
-        eventContext = EventContext()
         InputContext.commit()
 
         setKeyboardCapsLock(enabled: false)
@@ -215,10 +211,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 처리할 event 또는 sender가 없음, OS가 입력하지 않도록 완료 처리
         guard let event = event,
-              let sender = sender as? (IMKTextInput & NSObjectProtocol)
+              let sender = sender as? IMKTextInput
         else {
-            return false
+            return true
         }
+        self.sender = sender
 
         // 별도 처리: 암호 필드에 포커스된 경우 OS가 대신 처리
         if IsSecureEventInputEnabled() {
@@ -232,29 +229,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // inputs 처리 시작
         var inputs = inputMonitor.flush()
+        filterQuirks(&inputs, sender: sender)
         filterInputs(&inputs, event: event)
-        filterQuirks(&inputs)
 
         // 기존 state 보존
         debug("이전 state: \(state)")
         defer { debug("이후 state: \(state)") }
-
-        // event context 처리
-        debug("이전 event context: \(eventContext)")
-        defer {
-            eventContext = EventContext(sender)
-            debug("이후 event context: \(eventContext)")
-        }
-
-        // event context 변한 경우 완성/조합 초기화
-        let interimEventContext = EventContext(sender)
-        debug("중간 event context: \(interimEventContext)")
-        if eventContext != interimEventContext {
-            debug("event context 변경!")
-            state.clear(composing: true)
-            eventContext = interimEventContext
-        }
-
         let oldState = state
 
         // inputs 입력, 반복 입력인 경우 down 한번 더 입력
@@ -267,7 +247,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             state.backspaceComposing()
 
             // sender에 백스페이스 반영
-            let handled = eventContext.strategy.backspace(from: state, to: sender, with: oldState)
+            let handled = strategy(for: sender).backspace(from: state, to: sender, with: oldState)
 
             /*
              처리가 완료된 경우 -> 완성만 버림
@@ -287,7 +267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             && state.composing == ""
         ) {
             // sender에 oldState 그대로 조합 종료 반영
-            eventContext.strategy.commit(from: oldState, to: sender)
+            strategy(for: sender).commit(from: oldState, to: sender)
 
             // state 새로운 완성/조합 버림
             state.clear(composed: true, composing: true)
@@ -306,7 +286,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // sender에 state 새로운 완성/조합 진행 반영
-        eventContext.strategy.next(from: state, to: sender, with: oldState)
+        strategy(for: sender).next(from: state, to: sender, with: oldState)
 
         // state 새로운 완성 버림
         state.clear(composed: true, composing: false)
@@ -378,10 +358,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /** 전처리: 특정 앱에 대해 입력 정리 */
-    private func filterQuirks(_ inputs: inout [Input]) {
+    private func filterQuirks(_ inputs: inout [Input], sender: IMKTextInput) {
         debug()
 
-        switch eventContext.bundleIdentifier {
+        switch sender.bundleIdentifier() {
             // 파워포인트의 경우 "엔터" 이벤트가 입력기로 전달되지 않음
         case "com.microsoft.Powerpoint":
             // "엔터" 입력이 있는 경우 이후 입력만 처리, 단 modifier는 언제나 처리
