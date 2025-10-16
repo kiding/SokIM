@@ -44,7 +44,7 @@ class ClickMonitor {
                 debug()
 
                 // 사용자가 마우스 클릭하는 시점에 조합 종료
-                Task { @MainActor in appDelegate()?.commit() }
+                appDelegate()?.commit()
                 return Unmanaged.passUnretained(event)
             },
             userInfo: nil

@@ -279,18 +279,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func commit() {
         debug()
 
-        var inputs = inputMonitor.flush()
-        if let sender = sender {
-            filterQuirks(&inputs, sender: sender)
-        }
-        filterInputs(&inputs, event: nil)
-
         debug("이전 state: \(state)")
         defer { debug("이후 state: \(state)") }
 
-        inputs.forEach { state.next($0) }
         if let sender = sender {
             strategy(for: sender).commit(from: state, to: sender)
+            self.sender = nil
         }
         state.clear(composed: true, composing: true)
     }

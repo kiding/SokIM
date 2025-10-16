@@ -163,7 +163,7 @@ class InputMonitor {
             // 별도 처리: Control, Command, Caps Lock 입력되면 조합 종료
             if type == .keyDown
                 && [.leftControl, .rightControl, .leftCommand, .rightCommand, .capsLock].contains(key) {
-                Task { @MainActor in appDelegate()?.commit() }
+                appDelegate()?.commit()
             }
 
             // 별도 처리: 오른쪽 Command: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
@@ -234,10 +234,8 @@ class InputMonitor {
                 && usage == SpecialUsage.space.rawValue
                 && Preferences.rotateShortcuts.contains(.controlSpace)
             ) {
-                Task { @MainActor in
-                    appDelegate()?.commit()
-                    appDelegate()?.statusBar.rotateEngine()
-                }
+                appDelegate()?.commit()
+                appDelegate()?.statusBar.rotateEngine()
             }
         }
 
