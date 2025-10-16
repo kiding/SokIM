@@ -189,11 +189,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
         debug("\(String(describing: event)) \(String(describing: sender))")
 
-        // 처리할 event 또는 sender가 없음, OS가 입력하지 않도록 완료 처리
+        // 처리할 event 또는 sender가 없음, OS가 대신 처리
         guard let event = event,
               let sender = sender as? IMKTextInput
         else {
-            return true
+            return false
         }
         self.sender = sender
 
