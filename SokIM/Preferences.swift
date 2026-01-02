@@ -4,6 +4,7 @@ import Cocoa
 enum RotateShortcutType: String {
     case capsLock = "CapsLock"
     case rightCommand = "RightCommand"
+    case rightOption = "RightOption"
     case commandSpace = "CommandSpace"
     case shiftSpace = "ShiftSpace"
     case controlSpace = "ControlSpace"
