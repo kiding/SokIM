@@ -40,6 +40,12 @@ struct State: CustomStringConvertible {
                 rotate()
             }
 
+            // 오른쪽 Option: 한/A 전환 *실제 처리*
+            if (type, key) == (.keyDown, .rightOption)
+                && Preferences.rotateShortcuts.contains(.rightOption) {
+                rotate()
+            }
+
             // Caps Lock: 한/A 상태 및 LED *실제 처리*
             if (type, key) == (.keyDown, .capsLock) {
                 // 한/A 전환이 Caps Lock인 경우 처리
