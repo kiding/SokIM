@@ -172,9 +172,10 @@ class InputMonitor {
                 appDelegate()?.statusBar.rotateEngine()
             }
 
-            // 별도 처리: 오른쪽 Option: 한/A 표시만 *우선 처리*, 실제 처리는 State에서
+            // 별도 처리: 오른쪽 Option: 조합 종료 후 한/A 표시만 *우선 처리*, 실제 처리는 State에서
             if (type, key) == (.keyDown, .rightOption)
                 && Preferences.rotateShortcuts.contains(.rightOption) {
+                appDelegate()?.commit()
                 appDelegate()?.statusBar.rotateEngine()
             }
 
