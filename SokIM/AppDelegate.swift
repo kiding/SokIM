@@ -239,9 +239,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return handled
         }
 
+        let tuple = state.engine.eventToTuple(event)
         if (
             // event가 engine이 처리할 수 없는 글자인 경우 (예: Cmd + 방향 키 등)
-            state.engine.eventToTuple(event) == nil
+            tuple == nil
         ) || (
             // event가 state가 입력할 문자열과 완전히 동일한 경우
             state.composed == event.characters
@@ -267,7 +268,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // sender에 state 새로운 완성/조합 진행 반영
-        strategy.next(from: state, to: sender, with: oldState.composing)
+        if !strategy.next(from: state, to: sender, with: oldState.composing) {
+            // 입력 실패한 경우 tuple만 입력
+            state.clear(composed: true, composing: true)
+            if let tuple { state.next(tuple) }
+            _ = strategy.next(from: state, to: sender, with: "")
+        }
 
         // state 새로운 완성 버림
         state.clear(composed: true, composing: false)

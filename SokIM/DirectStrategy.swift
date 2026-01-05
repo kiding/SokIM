@@ -13,27 +13,45 @@ struct DirectStrategy: Strategy {
         debug("\(composing) -> \(state)")
 
         // 이전의 "조합||커서||블록" 위치
-        let prevRange = union(sender.selectedRange(), composing)
+        var prevRange = union(sender.selectedRange(), composing)
+        let prevString = sender.string(from: prevRange, actualRange: &prevRange) ?? ""
+        debug("prevString: \(prevString)")
 
-        // composing이 변경된 경우
-        if composing != state.composing && state.composing.count > 0 {
+        // 그 사이에 이전 조합이 달라진 경우
+        if prevString != composing {
+            // OS가 추가 처리함
+            debug("return false")
+            return false
+        }
+        else if composing != state.composing && state.composing.count > 0 {
             sender.insertText(state.composing, replacementRange: prevRange)
 
             // OS가 추가 처리 하지 않음
+            debug("return true")
             return true
         }
         // 그 외, 초성만 남는 경우도 포함함
         else {
             // OS가 추가 처리함
+            debug("return false")
             return false
         }
     }
 
-    static func next(from state: State, to sender: IMKTextInput, with composing: String) {
+    static func next(from state: State, to sender: IMKTextInput, with composing: String) -> Bool {
         debug("\(composing) -> \(state)")
 
         // 이전의 "조합||커서||블록" 위치
-        let prevRange = union(sender.selectedRange(), composing)
+        var prevRange = union(sender.selectedRange(), composing)
+        let prevString = sender.string(from: prevRange, actualRange: &prevRange) ?? ""
+        debug("prevString: \(prevString)")
+
+        // 그 사이에 이전 조합이 달라진 경우
+        if prevString != composing {
+            // 입력 실패
+            debug("return false")
+            return false
+        }
 
         // composed -> insertText
         if state.composed.count > 0 {
@@ -62,6 +80,9 @@ struct DirectStrategy: Strategy {
                 sender.insertText(state.composing, replacementRange: defaultRange)
             }
         }
+
+        debug("return true")
+        return true
     }
 
     static func commit(from state: State, to sender: IMKTextInput) {

@@ -17,7 +17,7 @@ struct MarkedStrategy: Strategy {
         }
     }
 
-    static func next(from state: State, to sender: IMKTextInput, with composing: String) {
+    static func next(from state: State, to sender: IMKTextInput, with composing: String) -> Bool {
         debug("\(composing) -> \(state)")
 
         // composed -> insertText
@@ -40,6 +40,8 @@ struct MarkedStrategy: Strategy {
             let string = NSAttributedString(string: state.composing, attributes: [.backgroundColor: NSColor.clear])
             sender.setMarkedText(string, selectionRange: defaultRange, replacementRange: defaultRange)
         }
+
+        return true
     }
 
     static func commit(from state: State, to sender: IMKTextInput) {
