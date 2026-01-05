@@ -228,7 +228,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             state.backspaceComposing()
 
             // sender에 백스페이스 반영
-            let handled = strategy.backspace(from: state, to: sender, with: oldState)
+            let handled = strategy.backspace(from: state, to: sender, with: oldState.composing)
 
             /*
              처리가 완료된 경우 -> 완성만 버림
@@ -267,7 +267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // sender에 state 새로운 완성/조합 진행 반영
-        strategy.next(from: state, to: sender, with: oldState)
+        strategy.next(from: state, to: sender, with: oldState.composing)
 
         // state 새로운 완성 버림
         state.clear(composed: true, composing: false)

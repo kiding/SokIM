@@ -1,11 +1,11 @@
 import InputMethodKit
 
 struct MarkedStrategy: Strategy {
-    static func backspace(from state: State, to sender: IMKTextInput, with oldState: State) -> Bool {
-        debug("\(oldState) -> \(state)")
+    static func backspace(from state: State, to sender: IMKTextInput, with composing: String) -> Bool {
+        debug("\(composing) -> \(state)")
 
         // composing이 변경된 경우
-        if oldState.composing != state.composing {
+        if composing != state.composing {
             let string = NSAttributedString(string: state.composing, attributes: [.backgroundColor: NSColor.clear])
             sender.setMarkedText(string, selectionRange: defaultRange, replacementRange: defaultRange)
 
@@ -17,8 +17,8 @@ struct MarkedStrategy: Strategy {
         }
     }
 
-    static func next(from state: State, to sender: IMKTextInput, with oldState: State) {
-        debug("\(oldState) -> \(state)")
+    static func next(from state: State, to sender: IMKTextInput, with composing: String) {
+        debug("\(composing) -> \(state)")
 
         // composed -> insertText
         if state.composed.count > 0 {
