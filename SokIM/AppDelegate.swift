@@ -196,6 +196,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return false
         }
         self.sender = sender
+        let strategy = strategy(for: sender)
 
         // 별도 처리: 암호 필드에 포커스된 경우 OS가 대신 처리
         if IsSecureEventInputEnabled() {
@@ -227,7 +228,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             state.backspaceComposing()
 
             // sender에 백스페이스 반영
-            let handled = strategy(for: sender).backspace(from: state, to: sender, with: oldState)
+            let handled = strategy.backspace(from: state, to: sender, with: oldState)
 
             /*
              처리가 완료된 경우 -> 완성만 버림
@@ -247,7 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             && state.composing == ""
         ) {
             // sender에 oldState 그대로 조합 종료 반영
-            strategy(for: sender).commit(from: oldState, to: sender)
+            strategy.commit(from: oldState, to: sender)
 
             // state 새로운 완성/조합 버림
             state.clear(composed: true, composing: true)
@@ -266,7 +267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // sender에 state 새로운 완성/조합 진행 반영
-        strategy(for: sender).next(from: state, to: sender, with: oldState)
+        strategy.next(from: state, to: sender, with: oldState)
 
         // state 새로운 완성 버림
         state.clear(composed: true, composing: false)
