@@ -3,9 +3,12 @@ import Foundation
 
 /** composing이 조합 중인 문자열일 때 selected 기준으로 "조합||커서||블록" 위치 역산 */
 private func union(_ selected: NSRange, _ composing: String) -> NSRange {
-    let count = composing.utf16.count
-    return NSRange(location: max(0, selected.location - count),
-                   length: min(NSNotFound, selected.length + count))
+    let length = composing.utf16.count
+    let location = selected.location - length
+
+    return location >= 0
+    ? NSRange(location: location, length: length)
+    : NSRange(location: 0, length: 0)
 }
 
 struct DirectStrategy: Strategy {
@@ -15,7 +18,7 @@ struct DirectStrategy: Strategy {
         // 이전의 "조합||커서||블록" 위치
         var prevRange = union(sender.selectedRange(), composing)
         let prevString = sender.string(from: prevRange, actualRange: &prevRange) ?? ""
-        debug("prevString: \(prevString)")
+        debug("prevRange: \(prevRange), prevString: \(prevString)")
 
         // 그 사이에 이전 조합이 달라진 경우
         if prevString != composing {
@@ -23,6 +26,7 @@ struct DirectStrategy: Strategy {
             debug("return false")
             return false
         }
+        // composing이 변경된 경우
         else if composing != state.composing && state.composing.count > 0 {
             sender.insertText(state.composing, replacementRange: prevRange)
 
@@ -44,7 +48,7 @@ struct DirectStrategy: Strategy {
         // 이전의 "조합||커서||블록" 위치
         var prevRange = union(sender.selectedRange(), composing)
         let prevString = sender.string(from: prevRange, actualRange: &prevRange) ?? ""
-        debug("prevString: \(prevString)")
+        debug("prevRange: \(prevRange), prevString: \(prevString)")
 
         // 그 사이에 이전 조합이 달라진 경우
         if prevString != composing {
