@@ -71,6 +71,8 @@ private func getModifierMappingPairs_Registry(_ device: IOHIDDevice) -> [[String
     debug()
 
     var entry = IOHIDDeviceGetService(device)
+    var children: Set<io_registry_entry_t> = []
+    defer { children.filter { $0 != 0 }.forEach { IOObjectRelease($0) } }
 
     while entry != 0 {
         if let properties = IORegistryEntryCreateCFProperty(
@@ -78,13 +80,14 @@ private func getModifierMappingPairs_Registry(_ device: IOHIDDevice) -> [[String
             "HIDEventServiceProperties" as CFString,
             kCFAllocatorDefault,
             .zero
-        )?.takeUnretainedValue() as? [String: Any],
+        )?.takeRetainedValue() as? [String: Any],
            let maps = properties["HIDKeyboardModifierMappingPairs"] as? [[String: UInt64]] {
             return maps
         }
 
         var child: io_registry_entry_t = 0
         IORegistryEntryGetChildEntry(entry, kIOServicePlane, &child)
+        children.insert(child)
         entry = child
     }
 
@@ -148,6 +151,23 @@ func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
 private var state: Bool = false
 private var block1 = DispatchWorkItem { }
 private var block2 = DispatchWorkItem { }
+
+private let initHID = {
+    let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
+    IOHIDManagerSetDeviceMatching(hid, [
+        kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop, // Generic Desktop Page (0x01)
+        kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard        // Keyboard (0x06, Collection Application)
+    ] as CFDictionary)
+
+    if IOHIDManagerOpen(hid, 0) != kIOReturnSuccess {
+        warning("IOHIDManagerOpen 실패")
+        return nil as IOHIDManager?
+    }
+
+    return hid
+}
+private var hid = initHID()
+
 func setKeyboardCapsLock(enabled: Bool) {
     debug("enabled: \(enabled) (state: \(state))")
 
@@ -166,18 +186,9 @@ func setKeyboardCapsLock(enabled: Bool) {
     block2.cancel()
     block2 = DispatchWorkItem {
         /** HID: 키보드 찾기 */
-        let hid = IOHIDManagerCreate(kCFAllocatorDefault, 0)
-        IOHIDManagerSetDeviceMatching(hid, [
-            kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop, // Generic Desktop Page (0x01)
-            kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard        // Keyboard (0x06, Collection Application)
-        ] as CFDictionary)
-
-        guard IOHIDManagerOpen(hid, 0) == kIOReturnSuccess else {
-            warning("IOHIDManagerOpen 실패")
-            return
-        }
-
-        guard let devs = IOHIDManagerCopyDevices(hid) as? Set<IOHIDDevice> else {
+        if hid == nil { hid = initHID() }
+        guard let hid,
+              let devs = IOHIDManagerCopyDevices(hid) as? Set<IOHIDDevice> else {
             warning("IOHIDManagerCopyDevices 실패")
             return
         }
@@ -185,13 +196,16 @@ func setKeyboardCapsLock(enabled: Bool) {
         for dev in devs {
             /** HID: Caps Lock 상태는 늘 false */
             let serv = IOHIDDeviceGetService(dev)
-            var conn = io_connect_t()
+            var conn: io_connect_t = 0
 
             guard IOServiceOpen(serv, mach_task_self_, UInt32(kIOHIDParamConnectType), &conn) == KERN_SUCCESS else {
                 warning("IOServiceOpen 실패: \(serv)")
                 continue
             }
-            defer { IOServiceClose(conn) }
+            defer {
+                IOServiceClose(conn)
+                IOConnectRelease(conn)
+            }
 
             guard IOHIDSetModifierLockState(conn, Int32(kIOHIDCapsLockState), false) == KERN_SUCCESS else {
                 warning("IOHIDSetModifierLockState 실패: \(conn)")
@@ -222,6 +236,7 @@ func setKeyboardCapsLock(enabled: Bool) {
         }
     }
     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100), execute: block2)
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(300), execute: block2)
 
     state = enabled
 }
