@@ -1,24 +1,26 @@
 import InputMethodKit
 import Foundation
 
-/** composing이 조합 중인 문자열일 때 selected 기준으로 "조합||커서||블록" 위치 역산 */
-private func union(_ selected: NSRange, _ composing: String) -> NSRange {
-    let length = composing.utf16.count
-    let location = selected.location - length
+/** composing이 조합 중인 문자열일 때 selected 기준으로 "조합||커서" 또는 "조합||커서||블록" 위치 역산 */
+private func range(_ selected: NSRange, _ composing: String, includeBlock: Bool) -> NSRange {
+    let count = composing.utf16.count
+    let location = selected.location - count
+    let block = includeBlock ? selected.length : 0
 
     return location >= 0
-    ? NSRange(location: location, length: length)
-    : NSRange(location: 0, length: 0)
+    ? NSRange(location: location, length: count + block)
+    : NSRange(location: 0, length: location + count + block)
 }
 
 struct DirectStrategy: Strategy {
     static func backspace(from state: State, to sender: IMKTextInput, with composing: String) -> Bool {
         debug("\(composing) -> \(state)")
 
-        // 이전의 "조합||커서||블록" 위치
-        var prevRange = union(sender.selectedRange(), composing)
+        // 이전 조합 문자열 확인
+        let selected = sender.selectedRange()
+        var prevRange = range(selected, composing, includeBlock: false) // "조합||커서"
         let prevString = sender.string(from: prevRange, actualRange: &prevRange) ?? ""
-        debug("prevRange: \(prevRange), prevString: \(prevString)")
+        prevRange = range(selected, composing, includeBlock: true) // "조합||커서||블록"
 
         // 그 사이에 이전 조합이 달라진 경우
         if prevString != composing {
@@ -45,10 +47,11 @@ struct DirectStrategy: Strategy {
     static func next(from state: State, to sender: IMKTextInput, with composing: String) -> Bool {
         debug("\(composing) -> \(state)")
 
-        // 이전의 "조합||커서||블록" 위치
-        var prevRange = union(sender.selectedRange(), composing)
+        // 이전 조합 문자열 확인
+        let selected = sender.selectedRange()
+        var prevRange = range(selected, composing, includeBlock: false) // "조합||커서"
         let prevString = sender.string(from: prevRange, actualRange: &prevRange) ?? ""
-        debug("prevRange: \(prevRange), prevString: \(prevString)")
+        prevRange = range(selected, composing, includeBlock: true) // "조합||커서||블록"
 
         // 그 사이에 이전 조합이 달라진 경우
         if prevString != composing {
