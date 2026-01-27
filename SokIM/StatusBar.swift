@@ -160,10 +160,10 @@ class StatusBar {
 
     /** 업데이트 확인 */
 
-    @objc func checkUpdate(sender: NSMenuItem) {
+    @objc func checkUpdate(sender: NSMenuItem?) {
         debug()
 
-        NSWorkspace.shared.open(URL(string: "https://github.com/kiding/SokIM")!)
+        NSWorkspace.shared.open(URL(string: "https://github.com/kiding/SokIM/releases")!)
     }
 
     /** 시스템 메시지 */

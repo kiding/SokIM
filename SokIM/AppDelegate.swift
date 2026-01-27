@@ -1,12 +1,13 @@
 import Cocoa
 import InputMethodKit
+import UserNotifications
 
 func appDelegate() -> AppDelegate? {
     return NSApp.delegate as? AppDelegate
 }
 
 @main
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     // swiftlint:disable force_cast
     private var server: IMKServer = IMKServer.init(
         name: (Bundle.main.infoDictionary!["InputMethodConnectionName"] as! String),
@@ -93,10 +94,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func startCheckingUpdate() {
-        let block: (Timer) -> Void = { [self] _ in
-            debug()
+        debug()
 
-            Task {
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+
+        Task {
+            _ = try? await center.requestAuthorization(options: [.alert, .sound])
+            var deliveredName = ""
+
+            while true {
+                debug()
+
                 let config = URLSessionConfiguration.ephemeral
                 config.timeoutIntervalForResource = 15
                 let url = URL(string: "https://api.github.com/repos/kiding/SokIM/releases/latest")!
@@ -129,10 +138,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         statusBar.setStatus("📥")
                         statusBar.setNotice("📥 새로운 업데이트가 있습니다.")
                     }
+
+                    if deliveredName != name {
+                        deliveredName = name
+
+                        let content = UNMutableNotificationContent()
+                        content.title = "속 입력기"
+                        content.body = "\(name) 업데이트가 있습니다."
+                        let request = UNNotificationRequest(identifier: name, content: content, trigger: nil)
+                        _ = try? await center.add(request)
+                    }
                 }
+
+                _ = try? await Task.sleep(for: .seconds(86400 * 2))
             }
         }
-        block(Timer.scheduledTimer(withTimeInterval: 86400 * 2, repeats: true, block: block))
+    }
+
+    internal func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        debug()
+
+        statusBar.checkUpdate(sender: nil)
     }
 
     private func startMonitorsInitially() {
