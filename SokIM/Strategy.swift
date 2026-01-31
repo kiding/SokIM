@@ -41,6 +41,13 @@ import InputMethodKit
  | Excel | ... |
  */
 func strategy(for sender: IMKTextInput) -> Strategy.Type {
+    debug()
+    if let bundleIdentifier = sender.bundleIdentifier(),
+       bundleIdentifier == "com.apple.Numbers"
+        || bundleIdentifier.hasPrefix("com.hancom.office.hwp") {
+        return MarkedStrategy.self
+    }
+
     let attributes = sender.validAttributesForMarkedText() as? [String] ?? []
     debug("validAttributesForMarkedText: \(attributes)")
 

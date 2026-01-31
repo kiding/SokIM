@@ -239,7 +239,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
         // inputs 처리 시작
         var inputs = inputMonitor.flush()
-        filterQuirks(&inputs, sender: sender)
         filterInputs(&inputs, event: event)
 
         // 기존 state 보존
@@ -385,31 +384,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         debug("flags: \(flags)")
 
         inputs = inputs.indices.filter { flags[$0] }.map { inputs[$0] }
-    }
-
-    /** 전처리: 특정 앱에 대해 입력 정리 */
-    private func filterQuirks(_ inputs: inout [Input], sender: IMKTextInput) {
-        debug()
-
-        // 특정 입력이 있는 경우 이후 입력만 처리, 단 modifier는 언제나 처리
-        func ignoreBefore(usages: [UInt32], last: Bool = false) {
-            let find = last ? inputs.lastIndex : inputs.firstIndex
-            if let idx = try? find({ $0.type == .keyDown && usages.contains($0.usage) }) {
-                inputs = inputs.indices
-                    .filter { $0 > idx || ModifierUsage(rawValue: inputs[$0].usage) != nil }
-                    .map { inputs[$0] }
-                state.clear(composed: true, composing: true)
-            }
-        }
-
-        switch sender.bundleIdentifier() {
-        case "com.microsoft.Powerpoint": // 파워포인트의 경우 "엔터" 이벤트가 입력기로 전달되지 않음
-            ignoreBefore(usages: [0x28, 0x58], last: true)
-        case "com.apple.Spotlight": // Spotlight의 경우 "탭" 이벤트가 입력기로 전달되지 않음
-            ignoreBefore(usages: [0x2B])
-        default:
-            break
-        }
     }
 
     /** engine 선택 외 모든 상태 버림 */
