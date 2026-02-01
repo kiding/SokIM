@@ -86,13 +86,35 @@ class InputMonitor {
         IOHIDManagerScheduleWithRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
 
         let res = IOHIDManagerOpen(hid, 0)
-        if res != kIOReturnSuccess {
+        switch res {
+        case kIOReturnSuccess:
+            debug("IOHIDManagerOpen 성공")
+            self.hid = hid
+        case kIOReturnExclusiveAccess:
+            warning("IOHIDManagerOpen kIOReturnExclusiveAccess")
             IOHIDManagerClose(hid, 0)
 
+            warning("Karabiner-Elements 호환 시도")
+            IOHIDManagerSetDeviceMatching(hid, [
+                kIOHIDSerialNumberKey: "pqrs.org:Karabiner-DriverKit-VirtualHIDKeyboard"
+            ] as CFDictionary)
+            IOHIDManagerScheduleWithRunLoop(hid, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
+
+            let res = IOHIDManagerOpen(hid, 0)
+            switch res {
+            case kIOReturnSuccess:
+                debug("Karabiner-Elements 호환 성공")
+                self.hid = hid
+            default:
+                warning("Karabiner-Elements 호환 실패: \(res)")
+                IOHIDManagerClose(hid, 0)
+                throw InputMonitorError.failedToOpen(res)
+            }
+        default:
             warning("IOHIDManagerOpen 실패: \(res)")
+            IOHIDManagerClose(hid, 0)
             throw InputMonitorError.failedToOpen(res)
         }
-        self.hid = hid
     }
 
     func stop() {
@@ -118,7 +140,7 @@ class InputMonitor {
             stop()
             try? start()
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: restartTimer)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: restartTimer)
     }
 
     @discardableResult
