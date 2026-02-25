@@ -1,5 +1,8 @@
 # 속 입력기
 
+> [!CAUTION]
+> 현재 macOS 26.4 beta에서 작동하지 않습니다. ([#57](https://github.com/kiding/SokIM/issues/57))
+
 <img src="https://github.com/kiding/SokIM/blob/main/SokIM/Assets.xcassets/AppIcon.appiconset/icon_128x128%402x%402x.png" width="128px">
 <img src="https://github.com/kiding/SokIM/releases/download/v1.2.0/screenshot.png" width="300px">
 
