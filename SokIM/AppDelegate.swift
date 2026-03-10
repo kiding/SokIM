@@ -275,6 +275,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             // event가 state가 입력할 문자열과 완전히 동일한 경우
             state.composed == event.characters
             && state.composing == ""
+            // `만 제외
+            && event.characters != "`"
         ) {
             // sender에 oldState 그대로 조합 종료 반영
             strategy.commit(from: oldState, to: sender)
