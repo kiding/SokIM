@@ -18,7 +18,6 @@
 		DF9286D026F5CFB000002080 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF9286CF26F5CFB000002080 /* Assets.xcassets */; };
 		DF9286D326F5CFB000002080 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF9286D126F5CFB000002080 /* MainMenu.xib */; };
 		DF971F5C2D2AE95300CECF3D /* ClickMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF971F5B2D2AE95000CECF3D /* ClickMonitor.swift */; };
-		DF971F5E2D2BD4D900CECF3D /* HotKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF971F5D2D2BD4CF00CECF3D /* HotKeyMonitor.swift */; };
 		DF98FCF12D21B27A0058850E /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = DF98FCF02D21B26E0058850E /* .swiftlint.yml */; };
 		DFAC075B28F80B0200B7A1EC /* InputContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAC075A28F80B0200B7A1EC /* InputContext.swift */; };
 		DFB825D727F6B25700F31B72 /* QwertyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB825D627F6B25700F31B72 /* QwertyEngine.swift */; };
@@ -47,7 +46,6 @@
 		DF9286D426F5CFB000002080 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DF9286D526F5CFB000002080 /* SokIM.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SokIM.entitlements; sourceTree = "<group>"; };
 		DF971F5B2D2AE95000CECF3D /* ClickMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickMonitor.swift; sourceTree = "<group>"; };
-		DF971F5D2D2BD4CF00CECF3D /* HotKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyMonitor.swift; sourceTree = "<group>"; };
 		DF98FCF02D21B26E0058850E /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		DFAC075A28F80B0200B7A1EC /* InputContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputContext.swift; sourceTree = "<group>"; };
 		DFB825D627F6B25700F31B72 /* QwertyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QwertyEngine.swift; sourceTree = "<group>"; };
@@ -95,7 +93,6 @@
 				DF7A3048289F96970003BFA6 /* InputMonitor.swift */,
 				DFAC075A28F80B0200B7A1EC /* InputContext.swift */,
 				DF971F5B2D2AE95000CECF3D /* ClickMonitor.swift */,
-				DF971F5D2D2BD4CF00CECF3D /* HotKeyMonitor.swift */,
 				DFB825D827F7386000F31B72 /* State.swift */,
 				DF2651CC28328B23001A9317 /* Strategy.swift */,
 				DF2651CD28328B23001A9317 /* DirectStrategy.swift */,
@@ -219,7 +216,6 @@
 				DF7A3049289F96970003BFA6 /* InputMonitor.swift in Sources */,
 				DF2651B028324E8A001A9317 /* MarkedStrategy.swift in Sources */,
 				DF2B53C22802B61D00A64F95 /* TwoSetEngine.swift in Sources */,
-				DF971F5E2D2BD4D900CECF3D /* HotKeyMonitor.swift in Sources */,
 				DFC20DAF28CEFD73006A8EC2 /* Preferences.swift in Sources */,
 				DF7A94A027F470E7005E3783 /* Helpers.swift in Sources */,
 				DF971F5C2D2AE95300CECF3D /* ClickMonitor.swift in Sources */,

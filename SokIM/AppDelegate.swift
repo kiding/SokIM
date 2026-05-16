@@ -18,7 +18,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     let statusBar = StatusBar()
     let inputMonitor = InputMonitor()
     let clickMonitor = ClickMonitor()
-    let hotKeyMonitor = HotKeyMonitor()
 
     private var state = State()
     private var sender: IMKTextInput?
@@ -170,14 +169,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         do {
             try inputMonitor.start()
             try clickMonitor.start()
-            try hotKeyMonitor.start()
             statusBar.setStatus(state.engine.name)
             statusBar.setError(nil)
         } catch {
             warning("\(error)")
             inputMonitor.stop()
             clickMonitor.stop()
-            hotKeyMonitor.stop()
             statusBar.setStatus("⚠️")
             statusBar.setError("⚠️ \(error)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: startMonitorsInitially)
@@ -192,15 +189,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             try inputMonitor.start()
             clickMonitor.stop()
             try clickMonitor.start()
-            hotKeyMonitor.stop()
-            try hotKeyMonitor.start()
             statusBar.setStatus(state.engine.name)
             statusBar.setError(nil)
         } catch {
             warning("\(error)")
             inputMonitor.stop()
             clickMonitor.stop()
-            hotKeyMonitor.stop()
             statusBar.setStatus("⚠️")
             statusBar.setError("⚠️ \(error)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { self.restartMonitors(nil) }
@@ -212,7 +206,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
         inputMonitor.stop()
         clickMonitor.stop()
-        hotKeyMonitor.stop()
     }
 
     override func handle(_ event: NSEvent!, client sender: Any!) -> Bool {
