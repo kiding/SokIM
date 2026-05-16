@@ -1,11 +1,14 @@
 import QuartzCore
 
 enum ClickMonitorError: Error, CustomStringConvertible {
+    case axProcessNotTrusted
     case failedToCreateTap
     case failedToCreateSource
 
     var description: String {
         switch self {
+        case .axProcessNotTrusted:
+            "손쉬운 사용 권한을 허용해 주세요."
         case .failedToCreateTap:
             "알 수 없는 오류가 발생했습니다. (tap)"
         case .failedToCreateSource:
@@ -34,7 +37,7 @@ class ClickMonitor {
         let tap = CGEvent.tapCreate(
             tap: .cghidEventTap,
             place: .headInsertEventTap,
-            options: .listenOnly,
+            options: .defaultTap,
             eventsOfInterest: CGEventMask(
                 1 << CGEventType.leftMouseDown.rawValue
                 | 1 << CGEventType.rightMouseDown.rawValue
@@ -51,7 +54,11 @@ class ClickMonitor {
         )
         guard let tap else {
             warning("CGEvent.tapCreate 실패")
-            throw ClickMonitorError.failedToCreateTap
+            if AXIsProcessTrusted() {
+                throw ClickMonitorError.failedToCreateTap
+            } else {
+                throw ClickMonitorError.axProcessNotTrusted
+            }
         }
         self.tap = tap
 
