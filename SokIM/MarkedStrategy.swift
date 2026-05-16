@@ -47,16 +47,14 @@ struct MarkedStrategy: Strategy {
     static func commit(from state: State, to sender: IMKTextInput) {
         debug("\(state)")
 
-        let markedRange = sender.markedRange()
-
         // composed -> insertText
         if state.composed.count > 0 {
-            sender.insertText(state.composed, replacementRange: markedRange)
+            sender.insertText(state.composed, replacementRange: defaultRange)
         }
 
         // composing -> insertText
         if state.composing.count > 0 {
-            sender.insertText(state.composing, replacementRange: markedRange)
+            sender.insertText(state.composing, replacementRange: defaultRange)
         }
     }
 }
