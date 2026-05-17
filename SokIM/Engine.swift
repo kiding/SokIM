@@ -3,7 +3,7 @@ import Carbon.HIToolbox.Events
 
 /**
  입력 가능한 modifier -> USB HID Usage 매핑
- @see NSEvent.ModifierFlags
+ - `NSEvent.ModifierUsage`
  */
 enum ModifierUsage: UInt32 {
     case leftControl = 0xE0
@@ -24,7 +24,7 @@ enum SpecialUsage: UInt32 {
 
 /**
  Virtual keycodes -> USB HID Usage 매핑
- @see <HIToolbox/Events.h>
+ - `<HIToolbox/Events.h>`
  */
 let keyCodeToUsage: [Int: UInt32] = [
     kVK_ANSI_A: 0x04, kVK_ANSI_S: 0x16, kVK_ANSI_D: 0x07, kVK_ANSI_F: 0x09,
@@ -67,10 +67,7 @@ protocol Engine {
     /** 메뉴 막대에 표시되는 이름 */
     static var name: String { get }
 
-    /**
-     USB HID Usage -> CharTupleMap 매핑
-     @see https://www.usb.org/sites/default/files/hut1_21_0.pdf
-     */
+    /** USB HID Usage -> CharTupleMap 매핑 */
     static var usageToTupleMap: [UInt32: CharTupleMap] { get }
 
     /** 특정 글자 두개를 조합하려고 했을 때 결과 문자열 */

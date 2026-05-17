@@ -19,8 +19,8 @@ enum ClickMonitorError: Error, CustomStringConvertible {
 
 /**
  마우스 클릭 모니터링
- @see https://github.com/pqrs-org/Karabiner-Elements/blob/main/DEVELOPMENT.md
- @see https://github.com/pqrs-org/Karabiner-Elements/blob/main/src/share/monitor/event_tap_monitor.hpp
+ - [Karabiner-Elements: Development](https://github.com/pqrs-org/Karabiner-Elements/blob/main/DEVELOPMENT.md)
+ - [Karabiner-Elements: `event_tap_monitor.hpp`](https://github.com/pqrs-org/Karabiner-Elements/blob/main/src/share/monitor/event_tap_monitor.hpp)
  */
 class ClickMonitor {
     private var tap: CFMachPort?

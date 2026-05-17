@@ -3,11 +3,9 @@ import InputMethodKit
 /**
  입력 방식 선택
 
- # `sender.validAttributesForMarkedText()`
+ # Direct
 
- ## Direct
-
- | App | Attributes |
+ | App | `validAttributesForMarkedText` |
  |--|--|
  | Xcode | NSMarkedClauseSegment NSGlyphInfo ... |
  | Pages | ... NSFont NSMarkedClauseSegment ... |
@@ -23,9 +21,9 @@ import InputMethodKit
  | DuckDuckGo | ... NSMarkedClauseSegment NSTextAlternatives ... |
  | Overcast | ... NSMarkedClauseSegment NSTextAlternatives ... |
 
- ## Marked
+ # Marked
 
- | App | Attributes |
+ | App | `validAttributesForMarkedText` |
  |--|--|
  | GIMP | ... |
  | Sublime Text | ... |

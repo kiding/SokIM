@@ -117,8 +117,8 @@ private func getModifierMappingPairs_UserDefaults(_ device: IOHIDDevice) -> [[St
 
 /**
  "보조 키(Modifier Keys)" 매핑 설정에 맞는 usage 값 반환
- @see https://developer.apple.com/library/archive/technotes/tn2450/
- @see https://stackoverflow.com/a/37648516
+ - [Remapping Keys in macOS 10.12 Sierra](https://developer.apple.com/library/archive/technotes/tn2450/)
+ - [Stack Overflow](https://stackoverflow.com/a/37648516)
  */
 func getMappedModifierUsage(_ usage: UInt32, _ device: IOHIDDevice) -> UInt32 {
     debug("\(usage) \(device)")

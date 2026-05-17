@@ -42,8 +42,8 @@ enum InputMonitorError: Error, CustomStringConvertible {
 
 /**
  키보드 입력 모니터링
- @see https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/HID/new_api_10_5/tn2187.html
- @see https://www.usb.org/sites/default/files/hut1_21_0.pdf
+ - [HID Class Device Interface Guide](https://developer.apple.com/library/archive/documentation/DeviceDrivers/Conceptual/HID/new_api_10_5/tn2187.html)
+ - [HID Usage Tables](https://www.usb.org/sites/default/files/hut1_21_0.pdf)
  */
 class InputMonitor {
     private var hid: IOHIDManager?

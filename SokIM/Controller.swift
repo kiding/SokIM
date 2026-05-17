@@ -1,7 +1,7 @@
 import InputMethodKit
 
 /**
- @see Info.plist
+ See `Info.plist`.
  */
 @objc(Controller)
 class Controller: IMKInputController {
