@@ -14,6 +14,7 @@
 		DF7A3049289F96970003BFA6 /* InputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7A3048289F96970003BFA6 /* InputMonitor.swift */; };
 		DF7A949E27F44C05005E3783 /* Controller.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7A949D27F44C05005E3783 /* Controller.swift */; };
 		DF7A94A027F470E7005E3783 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7A949F27F470E7005E3783 /* Helpers.swift */; };
+		DF7F6ED12FB9CF9C007AA985 /* HotKeyMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7F6ED02FB9CF68007AA985 /* HotKeyMonitor.swift */; };
 		DF9286CE26F5CFAE00002080 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF9286CD26F5CFAE00002080 /* AppDelegate.swift */; };
 		DF9286D026F5CFB000002080 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF9286CF26F5CFB000002080 /* Assets.xcassets */; };
 		DF9286D326F5CFB000002080 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DF9286D126F5CFB000002080 /* MainMenu.xib */; };
@@ -39,6 +40,7 @@
 		DF7A949D27F44C05005E3783 /* Controller.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
 		DF7A949F27F470E7005E3783 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		DF7DA4F12D7BA98C0004E154 /* HIServices.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HIServices.h; sourceTree = "<group>"; };
+		DF7F6ED02FB9CF68007AA985 /* HotKeyMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyMonitor.swift; sourceTree = "<group>"; };
 		DF91AB7F281125C50017664C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DF9286CA26F5CFAE00002080 /* SokIM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SokIM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF9286CD26F5CFAE00002080 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 				DF7A3048289F96970003BFA6 /* InputMonitor.swift */,
 				DFAC075A28F80B0200B7A1EC /* InputContext.swift */,
 				DF971F5B2D2AE95000CECF3D /* ClickMonitor.swift */,
+				DF7F6ED02FB9CF68007AA985 /* HotKeyMonitor.swift */,
 				DFB825D827F7386000F31B72 /* State.swift */,
 				DF2651CC28328B23001A9317 /* Strategy.swift */,
 				DF2651CD28328B23001A9317 /* DirectStrategy.swift */,
@@ -218,6 +221,7 @@
 				DF2B53C22802B61D00A64F95 /* TwoSetEngine.swift in Sources */,
 				DFC20DAF28CEFD73006A8EC2 /* Preferences.swift in Sources */,
 				DF7A94A027F470E7005E3783 /* Helpers.swift in Sources */,
+				DF7F6ED12FB9CF9C007AA985 /* HotKeyMonitor.swift in Sources */,
 				DF971F5C2D2AE95300CECF3D /* ClickMonitor.swift in Sources */,
 				DF2651CF28328B23001A9317 /* DirectStrategy.swift in Sources */,
 				DFC20DAD28CEF725006A8EC2 /* StatusBar.swift in Sources */,
