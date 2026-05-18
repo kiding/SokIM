@@ -259,7 +259,12 @@ jobs:
           NAME: "v${{ steps.version.outputs.MARKETING_VERSION }} (${{ steps.version.outputs.CURRENT_PROJECT_VERSION }})"
           FILE: ${{ steps.package.outputs.ARTIFACT_PATH }}
         run: |
-          gh release create "$REF_NAME" --draft --generate-notes --title "$NAME" || true
+          if [[ $(gh release view "$REF_NAME") ]]; then
+            gh release edit "$REF_NAME" --title "$NAME"
+          else
+            gh release create "$REF_NAME" --draft --generate-notes --title "$NAME"
+          fi
+
           gh release upload "$REF_NAME" "$FILE" --clobber
       - name: Post Install the certificates
         if: ${{ steps.cert.outputs.KEY_KEYCHAIN_PATH }}
