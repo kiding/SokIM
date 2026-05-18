@@ -40,11 +40,16 @@ class HotKeyMonitor {
             eventsOfInterest: CGEventMask(
                 1 << CGEventType.keyDown.rawValue
             ),
-            callback: { _, _, event, _ in
+            callback: { _, type, event, _ in
+                debug("\(type) \(event.flags)")
+                if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+                    appDelegate()?.restartMonitors(nil)
+                }
+
                 let flags = Int32(event.flags.rawValue)
                 let isRightCommand = (flags & NX_COMMANDMASK != 0) && (flags & NX_DEVICERCMDKEYMASK != 0)
                 let isRightOption = (flags & NX_ALTERNATEMASK != 0) && (flags & NX_DEVICERALTKEYMASK != 0)
-                debug("\(flags) \(isRightCommand) \(isRightOption)")
+                debug("isRightCommand: \(isRightCommand), isRightOption: \(isRightOption)")
 
                 // 한/A키로 오른쪽 커맨드, 오른쪽 옵션 사용시 단축키 무시
                 if Preferences.rotateShortcuts.contains(.rightCommand) && isRightCommand

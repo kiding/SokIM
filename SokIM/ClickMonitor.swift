@@ -43,8 +43,11 @@ class ClickMonitor {
                 | 1 << CGEventType.rightMouseDown.rawValue
                 | 1 << CGEventType.otherMouseDown.rawValue
             ),
-            callback: { _, _, event, _ in
-                debug()
+            callback: { _, type, event, _ in
+                debug("\(type) \(event.flags)")
+                if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+                    appDelegate()?.restartMonitors(nil)
+                }
 
                 // 사용자가 마우스 클릭하는 시점에 조합 종료
                 appDelegate()?.commit()
