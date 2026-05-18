@@ -3,6 +3,7 @@ import QuartzCore
 enum HotKeyMonitorError: Error, CustomStringConvertible {
     case axProcessNotTrusted
     case failedToCreateTap
+    case failedToEnableTap
     case failedToCreateSource
 
     var description: String {
@@ -10,7 +11,9 @@ enum HotKeyMonitorError: Error, CustomStringConvertible {
         case .axProcessNotTrusted:
             "손쉬운 사용 권한을 허용해 주세요."
         case .failedToCreateTap:
-            "알 수 없는 오류가 발생했습니다. (tap)"
+            "알 수 없는 오류가 발생했습니다. (tapCreate)"
+        case .failedToEnableTap:
+            "알 수 없는 오류가 발생했습니다. (tapEnable)"
         case .failedToCreateSource:
             "알 수 없는 오류가 발생했습니다. (source)"
         }
@@ -81,6 +84,11 @@ class HotKeyMonitor {
 
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .defaultMode)
         CGEvent.tapEnable(tap: tap, enable: true)
+
+        if !CGEvent.tapIsEnabled(tap: tap) {
+            warning("CGEvent.tapEnable 실패")
+            throw HotKeyMonitorError.failedToEnableTap
+        }
     }
 
     func stop() {
