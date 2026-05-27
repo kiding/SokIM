@@ -100,7 +100,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         center.delegate = self
 
         Task {
-            _ = try? await center.requestAuthorization(options: [.alert, .sound])
             var deliveredName = ""
 
             while true {
@@ -109,45 +108,47 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 let config = URLSessionConfiguration.ephemeral
                 config.timeoutIntervalForResource = 15
                 let url = URL(string: "https://api.github.com/repos/kiding/SokIM/releases/latest")!
-                guard let data = try? await URLSession(configuration: config).data(from: url).0 else {
-                    warning("요청 실패: \(url)")
-                    return
-                }
 
-                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let name = json["name"] as? String else {
-                    warning("릴리스 이름 파싱 실패")
-                    return
-                }
+                if let data = try? await URLSession(configuration: config).data(from: url).0,
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let name = json["name"] as? String,
+                   let latestString = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1,
+                   let latest = Int(latestString),
+                   let currentString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
+                   let current = Int(currentString) {
+                    debug("current: \(current), latest: \(latest)")
 
-                guard let latestString = name.wholeMatch(of: /v[\d.]+ \((\d+)\)/)?.1,
-                      let latest = Int(latestString) else {
-                    warning("알 수 없는 릴리스 이름: \(name)")
-                    return
-                }
+                    if current < latest {
+                        debug("새로운 업데이트: \(latest)")
 
-                guard let currentString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
-                      let current = Int(currentString) else {
-                    warning("CFBundleVersion 없거나 숫자가 아님")
-                    return
-                }
+                        await MainActor.run {
+                            statusBar.setStatus("📥")
+                            statusBar.setNotice("📥 새로운 업데이트가 있습니다.")
+                        }
 
-                debug("current: \(current), latest: \(latest)")
-                if current < latest {
-                    await MainActor.run {
-                        statusBar.setStatus("📥")
-                        statusBar.setNotice("📥 새로운 업데이트가 있습니다.")
+                        if deliveredName == name {
+                            debug("이미 알림 전송함")
+                        } else {
+                            debug("알림 전송")
+
+                            let content = UNMutableNotificationContent()
+                            content.title = "속 입력기"
+                            content.body = "\(name) 업데이트가 있습니다."
+                            let request = UNNotificationRequest(identifier: name, content: content, trigger: nil)
+
+                            do {
+                                try await center.requestAuthorization(options: [.alert, .sound])
+                                try await center.add(request)
+                                deliveredName = name
+                            } catch {
+                                warning("\(error)")
+                            }
+                        }
+                    } else {
+                        debug("현재 최신 버전")
                     }
-
-                    if deliveredName != name {
-                        deliveredName = name
-
-                        let content = UNMutableNotificationContent()
-                        content.title = "속 입력기"
-                        content.body = "\(name) 업데이트가 있습니다."
-                        let request = UNNotificationRequest(identifier: name, content: content, trigger: nil)
-                        _ = try? await center.add(request)
-                    }
+                } else {
+                    warning("업데이트 확인 실패: \(url)")
                 }
 
                 _ = try? await Task.sleep(for: .seconds(86400 * 2))
