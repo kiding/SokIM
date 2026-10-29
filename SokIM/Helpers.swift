@@ -65,6 +65,29 @@ func ms(absolute: UInt64) -> UInt64 {
     return nsec / UInt64(NSEC_PER_MSEC)
 }
 
+// MARK: - Secure Input
+
+/** 현재 사용자 세션에서 보안 입력을 활성화한 프로세스의 PID */
+func getSecureInputPID() -> pid_t? {
+    debug()
+
+    let root = IORegistryGetRootEntry(kIOMainPortDefault)
+    defer { IOObjectRelease(root) }
+
+    guard let users = IORegistryEntryCreateCFProperty(
+        root,
+        "IOConsoleUsers" as CFString,
+        kCFAllocatorDefault,
+        .zero
+    )?.takeRetainedValue() as? [[String: Any]] else {
+        warning("IOConsoleUsers 없음")
+        return nil
+    }
+
+    return users
+        .first { ($0["kCGSSessionUserIDKey"] as? uid_t) == getuid() }?["kCGSSessionSecureInputPID"] as? pid_t
+}
+
 // MARK: - Modifier Mapping
 
 private func getModifierMappingPairs_Registry(_ device: IOHIDDevice) -> [[String: UInt64]]? {
