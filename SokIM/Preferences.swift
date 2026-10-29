@@ -10,6 +10,29 @@ enum RotateShortcutType: String {
     case controlSpace = "ControlSpace"
 }
 
+/** 한/A 전환키: 미리 정해진 키 또는 그 외 키의 가상 키 코드, RotateShortcuts에 함께 저장 */
+enum RotateKey: RawRepresentable, Hashable {
+    case shortcut(RotateShortcutType)
+    case keyCode(Int)
+
+    init?(rawValue: String) {
+        if let type = RotateShortcutType(rawValue: rawValue) {
+            self = .shortcut(type)
+        } else if rawValue.hasPrefix("KeyCode:"), let code = Int(rawValue.dropFirst("KeyCode:".count)) {
+            self = .keyCode(code)
+        } else {
+            return nil
+        }
+    }
+
+    var rawValue: String {
+        switch self {
+        case .shortcut(let type): type.rawValue
+        case .keyCode(let code): "KeyCode:\(code)"
+        }
+    }
+}
+
 // MARK: -
 
 private struct Defaults {
@@ -30,20 +53,12 @@ private struct Defaults {
         }
     }
 
-    static func get(_ key: Key) -> Set<RotateShortcutType>? {
-        if let value = container.array(forKey: key.rawValue) as? [String] {
-            Set(value.compactMap { RotateShortcutType(rawValue: $0) })
-        } else {
-            nil
-        }
+    static func get(_ key: Key) -> [RotateKey]? {
+        container.stringArray(forKey: key.rawValue)?.compactMap { RotateKey(rawValue: $0) }
     }
 
     static func get(_ key: Key) -> Bool? {
         container.object(forKey: key.rawValue) as? Bool
-    }
-
-    static func set(_ key: Key, _ value: Set<RotateShortcutType>) {
-        container.set(value.map { $0.rawValue }, forKey: key.rawValue)
     }
 
     static func set(_ key: Key, _ value: Any) {
@@ -56,15 +71,26 @@ private struct Defaults {
 struct Preferences {
     /** 한/A 전환키 */
 
-    private static var _rotateShortcuts = Defaults.get(.rotateShortcuts)
-    ?? Set([Defaults.get(.rotateShortcut) ?? .capsLock])
-    static var rotateShortcuts: Set<RotateShortcutType> {
-        get { _rotateShortcuts }
+    private static var _rotateKeys: [RotateKey] = Defaults.get(.rotateShortcuts)
+    ?? [.shortcut(Defaults.get(.rotateShortcut) ?? .capsLock)]
+    static var rotateKeys: [RotateKey] {
+        get { _rotateKeys }
         set {
-            _rotateShortcuts = newValue
-            Defaults.set(.rotateShortcuts, newValue)
-            appDelegate()?.restartMonitors(nil)
+            _rotateKeys = newValue
+            Defaults.set(.rotateShortcuts, newValue.map(\.rawValue))
+            // 설정 화면이 먼저 갱신되도록 다음 차례에 재시작
+            DispatchQueue.main.async { appDelegate()?.restartMonitors(nil) }
         }
+    }
+
+    /** 한/A 전환키 중 미리 정해진 키 */
+    static var rotateShortcuts: Set<RotateShortcutType> {
+        Set(rotateKeys.compactMap { if case .shortcut(let type) = $0 { type } else { nil } })
+    }
+
+    /** 한/A 전환키 중 그 외 키의 가상 키 코드 */
+    static var rotateKeyCodes: [Int] {
+        rotateKeys.compactMap { if case .keyCode(let code) = $0 { code } else { nil } }
     }
 
     /** 기타 설정 */

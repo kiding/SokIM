@@ -239,6 +239,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             return false
         }
 
+        // 별도 처리: 한/A 전환키 중 그 외 키 입력 시 조합 종료 후 한/A 전환, OS 처리 무시
+        if Preferences.rotateKeyCodes.contains(Int(event.keyCode)) {
+            commit()
+            state.rotate()
+            return true
+        }
+
         // 별도 처리: 한영키 한자키 英数키 かな/カナ키 입력 시 OS 처리 무시
         if event.keyCode == kVK_JIS_Eisu || event.keyCode == kVK_JIS_Kana {
             return true
