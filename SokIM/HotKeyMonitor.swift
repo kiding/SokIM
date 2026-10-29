@@ -161,6 +161,9 @@ class HotKeyMonitor {
             case .rightOption:
                 debug("HotKey 해당 없음")
                 return
+            case .f18:
+                debug("HotKey 해당 없음")
+                return
             case .commandSpace:
                 code = UInt32(kVK_Space)
                 modifiers = UInt32(cmdKey)

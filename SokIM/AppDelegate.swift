@@ -244,6 +244,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             return true
         }
 
+        // 별도 처리: 한/A 전환키인 F18 입력 시 조합 종료 후 한/A 전환, OS 처리 무시
+        if event.keyCode == kVK_F18 && Preferences.rotateShortcuts.contains(.f18) {
+            commit()
+            state.rotate()
+            return true
+        }
+
         // inputs 처리 시작
         var inputs = inputMonitor.flush()
         filterInputs(&inputs, event: event)

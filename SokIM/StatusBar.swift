@@ -31,6 +31,7 @@ class StatusBar {
     private let commandSpaceItem = NSMenuItem()
     private let shiftSpaceItem = NSMenuItem()
     private let controlSpaceItem = NSMenuItem()
+    private let f18Item = NSMenuItem()
 
     init() {
         debug()
@@ -109,6 +110,12 @@ class StatusBar {
         controlSpaceItem.target = self
         controlSpaceItem.action = #selector(toggleControlSpace)
         menu.addItem(controlSpaceItem)
+
+        f18Item.title = "F18"
+        f18Item.state = Preferences.rotateShortcuts.contains(.f18) ? .on : .off
+        f18Item.target = self
+        f18Item.action = #selector(toggleF18)
+        menu.addItem(f18Item)
 
         menu.addItem(NSMenuItem.separator())
 
@@ -282,6 +289,22 @@ class StatusBar {
 
         statusItem.button?.performClick(nil)
    }
+
+    @objc func toggleF18(sender: NSMenuItem) {
+        debug()
+
+        var rotateShortcuts = Preferences.rotateShortcuts
+        if sender.state == .off {
+            rotateShortcuts.insert(.f18)
+            f18Item.state = .on
+        } else {
+            rotateShortcuts.remove(.f18)
+            f18Item.state = .off
+        }
+        Preferences.rotateShortcuts = rotateShortcuts
+
+        statusItem.button?.performClick(nil)
+    }
 
     /** 기타 설정 */
 

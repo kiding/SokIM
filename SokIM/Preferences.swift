@@ -8,6 +8,7 @@ enum RotateShortcutType: String {
     case commandSpace = "CommandSpace"
     case shiftSpace = "ShiftSpace"
     case controlSpace = "ControlSpace"
+    case f18 = "F18"
 }
 
 // MARK: -
